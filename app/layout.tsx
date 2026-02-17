@@ -1,20 +1,9 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Noto_Sans_KR } from 'next/font/google'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
+import { PageTransition } from '@/components/page-transition'
 
 import './globals.css'
-
-const _inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-})
-
-const _notoSansKR = Noto_Sans_KR({
-  subsets: ['latin'],
-  variable: '--font-noto-sans-kr',
-  weight: ['300', '400', '500', '600', '700', '800'],
-})
 
 export const metadata: Metadata = {
   title: 'ASSESSTA | 국내 최고의 심리학 기반 역량평가 전문기관',
@@ -23,7 +12,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#f8fafc',
+  themeColor: '#020617',
 }
 
 export default function RootLayout({
@@ -32,10 +21,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="ko" className={`${_inter.variable} ${_notoSansKR.variable}`} suppressHydrationWarning>
-      <body className="font-sans antialiased" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning>
+      <body className="bg-neutral-950 font-sans antialiased text-white" suppressHydrationWarning>
         <Navigation />
-        <main className="min-h-screen">{children}</main>
+        <main className="min-h-screen bg-neutral-950">
+          <PageTransition>{children}</PageTransition>
+        </main>
         <Footer />
       </body>
     </html>

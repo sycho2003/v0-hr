@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { AnimatePresence, motion } from "framer-motion"
 import {
   ArrowRight,
   ChevronLeft,
@@ -12,8 +13,14 @@ import {
 } from "lucide-react"
 
 const clients = [
-  "삼성전자", "SK하이닉스", "현대자동차", "LG에너지솔루션",
-  "카카오", "네이버", "포스코", "KT",
+  "Sam*** Electronics",
+  "S** Hynix",
+  "Hyu**** Motor",
+  "L** Energy",
+  "K*k*o",
+  "N****",
+  "Po****",
+  "K* Telecom",
 ]
 
 const caseStudies = [
@@ -85,66 +92,75 @@ export function CaseStudies() {
   return (
     <>
       {/* Client logos */}
-      <section className="py-12 bg-muted/30">
+      <section className="bg-neutral-950 py-12">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {clients.map((client) => (
-              <div key={client} className="flex items-center gap-2 rounded-lg border border-border bg-card px-5 py-3 shadow-sm">
-                <Building2 className="h-4 w-4 text-muted-foreground/50" />
-                <span className="text-sm font-medium text-muted-foreground">{client}</span>
-              </div>
-            ))}
+          <div
+            className="relative overflow-hidden"
+            style={{
+              WebkitMaskImage:
+                "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+              maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
+            }}
+          >
+            <div className="animate-chip-marquee flex w-max items-center gap-4">
+              {[...clients, ...clients].map((client, idx) => (
+                <div key={`${client}-${idx}`} className="flex items-center gap-2 rounded-lg border border-white/10 bg-neutral-900 px-5 py-3">
+                  <Building2 className="text-brand-primary-soft h-4 w-4" />
+                  <span className="text-sm font-medium text-neutral-300">{client}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
       {/* Case study cards */}
-      <section className="py-20 lg:py-24">
+      <section className="bg-neutral-950 py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="space-y-8">
             {caseStudies.map((cs, idx) => (
-              <div key={idx} className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+              <div key={idx} className="overflow-hidden rounded-xl border border-white/10 bg-neutral-900">
                 <div className="grid lg:grid-cols-3">
-                  <div className="border-b border-border p-8 lg:border-b-0 lg:border-r">
+                  <div className="border-b border-white/10 p-7 lg:border-b-0 lg:border-r">
                     <div className="flex flex-wrap gap-2">
-                      <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">{cs.industry}</span>
-                      <span className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">{cs.employees}</span>
+                      <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-neutral-300">{cs.industry}</span>
+                      <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-neutral-300">{cs.employees}</span>
                     </div>
-                    <h3 className="mt-4 text-xl font-bold text-foreground">{cs.company}</h3>
+                    <h3 className="mt-4 text-lg font-bold text-white md:text-xl">{cs.company}</h3>
                     <div className="mt-5">
-                      <p className="text-[10px] font-semibold tracking-widest text-destructive/70 uppercase">Problem</p>
-                      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{cs.problem}</p>
+                      <p className="text-[10px] font-semibold tracking-widest text-red-300/80 uppercase">Problem</p>
+                      <p className="mt-2 text-sm leading-relaxed text-neutral-300">{cs.problem}</p>
                     </div>
                     <div className="mt-4">
-                      <p className="text-[10px] font-semibold tracking-widest text-primary uppercase">Solution</p>
-                      <p className="mt-2 text-sm leading-relaxed text-foreground">{cs.solution}</p>
+                      <p className="text-brand-primary-soft text-[10px] font-semibold tracking-widest uppercase">Solution</p>
+                      <p className="mt-2 text-sm leading-relaxed text-white">{cs.solution}</p>
                     </div>
                   </div>
-                  <div className="p-8 lg:col-span-2">
-                    <p className="text-[10px] font-semibold tracking-widest text-muted-foreground uppercase">Results</p>
+                  <div className="p-7 lg:col-span-2">
+                    <p className="text-[10px] font-semibold tracking-widest text-neutral-400 uppercase">Results</p>
                     <div className="mt-6 grid gap-6 sm:grid-cols-3">
                       {cs.results.map((r) => (
-                        <div key={r.metric}>
-                          <p className="text-xs text-muted-foreground">{r.metric}</p>
+                        <div key={r.metric} className="transition-transform duration-300 hover:scale-105">
+                          <p className="text-xs text-neutral-400">{r.metric}</p>
                           <div className="mt-3">
                             <div className="flex items-center justify-between text-[10px]">
-                              <span className="text-muted-foreground">Before</span>
-                              <span className="text-muted-foreground">{r.before}{r.unit}</span>
+                              <span className="text-neutral-500">Before</span>
+                              <span className="text-neutral-500">{r.before}{r.unit}</span>
                             </div>
-                            <div className="mt-1 h-2.5 rounded-full bg-muted">
-                              <div className="h-full rounded-full bg-destructive/30" style={{ width: `${r.before}%` }} />
+                            <div className="mt-1 h-2.5 rounded-full bg-neutral-800">
+                              <div className="h-full rounded-full bg-red-400/35" style={{ width: `${r.before}%` }} />
                             </div>
                           </div>
                           <div className="mt-2">
                             <div className="flex items-center justify-between text-[10px]">
-                              <span className="font-medium text-foreground">After</span>
-                              <span className="font-bold text-primary">{r.after}{r.unit}</span>
+                              <span className="font-medium text-neutral-200">After</span>
+                              <span className="text-brand-primary font-bold">{r.after}{r.unit}</span>
                             </div>
-                            <div className="mt-1 h-2.5 rounded-full bg-muted">
-                              <div className="h-full rounded-full bg-primary" style={{ width: `${r.after}%` }} />
+                            <div className="mt-1 h-2.5 rounded-full bg-neutral-800">
+                              <div className="bg-brand-primary h-full rounded-full" style={{ width: `${r.after}%` }} />
                             </div>
                           </div>
-                          <p className="mt-2 text-sm font-bold text-primary">{r.improvement}</p>
+                          <p className="text-brand-primary mt-2 text-sm font-bold">{r.improvement}</p>
                         </div>
                       ))}
                     </div>
@@ -157,38 +173,50 @@ export function CaseStudies() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 lg:py-24 bg-muted/30">
+      <section className="bg-neutral-950 py-16 lg:py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <h3 className="text-center text-2xl font-bold text-foreground">전문가들의 평가</h3>
-          <p className="mt-2 text-center text-sm text-muted-foreground">
+          <h3 className="text-center text-xl font-bold text-white md:text-2xl">전문가들의 평가</h3>
+          <p className="mt-2 text-center text-sm text-neutral-400">
             전문성과 열정에 대한 고객 후기
           </p>
 
           <div className="mx-auto mt-10 max-w-2xl">
-            <div className="relative rounded-xl border border-border bg-card p-8 shadow-sm">
-              <Quote className="h-8 w-8 text-primary/20" />
-              <p className="mt-4 text-base leading-relaxed text-foreground">{t.quote}</p>
-              <div className="mt-6 flex items-center gap-1">
-                {[...Array(5)].map((_, j) => (
-                  <Star key={j} className="h-4 w-4 fill-primary text-primary" />
-                ))}
-              </div>
-              <div className="mt-3 border-t border-border pt-4">
-                <p className="text-sm font-bold text-foreground">{t.author}</p>
-                <p className="text-xs text-muted-foreground">{t.role}</p>
+            <div className="relative">
+              <div className="overflow-hidden rounded-xl border border-white/10 bg-neutral-900 p-7 pb-20">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={testimonialIdx}
+                    initial={{ opacity: 0, x: 16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -16 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    <Quote className="text-brand-primary h-8 w-8 opacity-40" />
+                    <p className="mt-4 text-base leading-relaxed text-neutral-200">{t.quote}</p>
+                    <div className="mt-6 flex items-center gap-1">
+                      {[...Array(5)].map((_, j) => (
+                        <Star key={j} className="text-brand-primary fill-current h-4 w-4" />
+                      ))}
+                    </div>
+                    <div className="mt-3 border-t border-white/10 pt-4">
+                      <p className="text-sm font-bold text-white">{t.author}</p>
+                      <p className="text-xs text-neutral-400">{t.role}</p>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
-              <div className="absolute -bottom-5 left-1/2 flex -translate-x-1/2 items-center gap-3">
-                <button onClick={prevT} className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card shadow-sm transition-colors hover:bg-muted" aria-label="이전 후기">
-                  <ChevronLeft className="h-4 w-4 text-foreground" />
+              <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-3">
+                <button onClick={prevT} className="hover-border-brand-primary-soft flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors" aria-label="이전 후기">
+                  <ChevronLeft className="h-4 w-4 text-neutral-200" />
                 </button>
                 <div className="flex gap-1.5">
                   {testimonials.map((_, i) => (
-                    <div key={i} className={`h-2 w-2 rounded-full transition-colors ${i === testimonialIdx ? "bg-primary" : "bg-border"}`} />
+                    <div key={i} className={`h-2 w-2 rounded-full transition-colors ${i === testimonialIdx ? "bg-brand-primary" : "bg-neutral-700"}`} />
                   ))}
                 </div>
-                <button onClick={nextT} className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card shadow-sm transition-colors hover:bg-muted" aria-label="다음 후기">
-                  <ChevronRight className="h-4 w-4 text-foreground" />
+                <button onClick={nextT} className="hover-border-brand-primary-soft flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors" aria-label="다음 후기">
+                  <ChevronRight className="h-4 w-4 text-neutral-200" />
                 </button>
               </div>
             </div>
@@ -197,13 +225,13 @@ export function CaseStudies() {
       </section>
 
       {/* CTA */}
-      <section className="py-20">
+      <section className="bg-neutral-950 py-16">
         <div className="mx-auto max-w-3xl px-6 text-center lg:px-8">
-          <h2 className="text-2xl font-bold text-foreground">우리 기업도 성공 사례의 주인공이 될 수 있습니다</h2>
-          <p className="mt-4 text-muted-foreground">무료 진단을 통해 어세스타 솔루션의 기대 효과를 확인하세요.</p>
+          <h2 className="text-xl font-bold text-white md:text-2xl">우리 기업도 프로젝트 사례의 주인공이 될 수 있습니다</h2>
+          <p className="mt-4 text-neutral-300">무료 진단을 통해 어세스타 솔루션의 기대 효과를 확인하세요.</p>
           <Link
             href="/inquiry"
-            className="group mt-8 inline-flex items-center gap-2 rounded-lg bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:brightness-110"
+            className="btn-brand group mt-8 inline-flex items-center gap-2 rounded-lg px-8 py-3.5 text-sm font-semibold transition-all"
           >
             무료 진단 시작하기
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />

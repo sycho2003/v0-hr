@@ -1,810 +1,1120 @@
-"use client"
+'use client'
 
-import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
 import {
   ArrowRight,
-  Brain,
-  Database,
-  Sparkles,
   BarChart3,
-  Target,
-  Zap,
-  Scale,
+  BadgeCheck,
+  BrainCircuit,
   ChevronDown,
-  CheckCircle2,
-  Award,
-  ScrollText,
-  Building2,
-  XCircle,
-  CircleCheckBig,
-  ArrowDownRight,
-} from "lucide-react"
+  Cpu,
+  Database,
+  Network,
+  RefreshCcw,
+  Workflow,
+  Target,
+} from 'lucide-react'
+import { motion, useInView, useScroll } from 'framer-motion'
 
-/* ───────── ScrollReveal ───────── */
-function ScrollReveal({
-  children,
-  className = "",
-  delay = 0,
-  direction = "up",
-}: {
-  children: React.ReactNode
-  className?: string
-  delay?: number
-  direction?: "up" | "left" | "right"
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
+const ELECTRIC_BLUE = '#3B82F6'
+
+function QuantumParticleCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          observer.disconnect()
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    let width = 0
+    let height = 0
+    let rafId = 0
+    let pointer = { x: 0, y: 0, active: false }
+
+    const particleCount = () => (window.innerWidth < 768 ? 110 : 220)
+    const particles: Array<{
+      orbit: number
+      angle: number
+      speed: number
+      radius: number
+      alpha: number
+      color: string
+      jitter: number
+      wobbleAmp: number
+      wobbleSpeed: number
+      wobblePhase: number
+    }> = []
+    const meteors: Array<{
+      x: number
+      y: number
+      vx: number
+      vy: number
+      life: number
+      maxLife: number
+    }> = []
+    let meteorTimer = 0
+
+    const createParticles = () => {
+      particles.length = 0
+      const count = particleCount()
+      const maxOrbit = Math.max(210, Math.min(width, height) * 0.47)
+      const minOrbit = Math.max(150, Math.min(width, height) * 0.26)
+      const bands = 4
+      const bandStep = (maxOrbit - minOrbit) / Math.max(1, bands - 1)
+
+      for (let i = 0; i < count; i += 1) {
+        const isPrimary = i % 5 !== 0
+        const band = Math.floor(Math.random() * bands)
+        const bandBase = minOrbit + bandStep * band
+        const ringBias = Math.pow(Math.random(), 0.5)
+        const orbit = bandBase + (ringBias - 0.5) * bandStep * 0.7
+        particles.push({
+          orbit,
+          angle: Math.random() * Math.PI * 2,
+          speed: Math.random() * 0.0014 + 0.00045,
+          radius: Math.random() * 1.9 + 1.25,
+          alpha: Math.random() * 0.36 + 0.5,
+          color: isPrimary ? '59,130,246' : '94,234,212',
+          jitter: (Math.random() - 0.5) * 18,
+          wobbleAmp: Math.random() * 8 + 2,
+          wobbleSpeed: Math.random() * 0.012 + 0.004,
+          wobblePhase: Math.random() * Math.PI * 2,
+        })
+      }
+    }
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+      width = window.innerWidth
+      height = Math.max(680, Math.floor(window.innerHeight * 0.95))
+      canvas.width = Math.floor(width * dpr)
+      canvas.height = Math.floor(height * dpr)
+      canvas.style.width = `${width}px`
+      canvas.style.height = `${height}px`
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      createParticles()
+    }
+
+    const draw = () => {
+      ctx.clearRect(0, 0, width, height)
+      const cx = width * 0.5 + (pointer.active ? (pointer.x - width * 0.5) * 0.04 : 0)
+      const cy = height * 0.45 + (pointer.active ? (pointer.y - height * 0.45) * 0.04 : 0)
+      const positions: Array<{ x: number; y: number; alpha: number; color: string }> = []
+
+      for (let i = 0; i < particles.length; i += 1) {
+        const p = particles[i]
+        p.angle += p.speed
+        p.wobblePhase += p.wobbleSpeed
+
+        const orbit = p.orbit + Math.sin(p.wobblePhase) * p.wobbleAmp
+        const x = cx + Math.cos(p.angle) * orbit + Math.cos(p.wobblePhase * 0.8) * p.jitter * 0.2
+        const y = cy + Math.sin(p.angle) * orbit * 0.96 + Math.sin(p.wobblePhase * 0.9) * p.jitter * 0.2
+        const ndx = (x - cx) / Math.max(1, width * 0.24)
+        const ndy = (y - cy) / Math.max(1, height * 0.17)
+        const centerNorm = Math.sqrt(ndx * ndx + ndy * ndy)
+        const centerWeight = Math.min(1, Math.max(0.42, centerNorm))
+        const tx = width * 0.5
+        const ty = height * 0.47
+        const trX = width * 0.35
+        const trY = height * 0.22
+        const titleNorm = Math.sqrt(((x - tx) / trX) ** 2 + ((y - ty) / trY) ** 2)
+        const titleWeight = titleNorm < 1 ? 0.28 + titleNorm * 0.72 : 1
+        const particleAlpha = p.alpha * centerWeight * titleWeight
+
+        ctx.beginPath()
+        ctx.fillStyle = `rgba(${p.color}, ${particleAlpha})`
+        ctx.shadowColor = `rgba(${p.color}, ${Math.min(0.95, particleAlpha + 0.34)})`
+        ctx.shadowBlur = 18
+        ctx.arc(x, y, p.radius, 0, Math.PI * 2)
+        ctx.fill()
+        positions.push({ x, y, alpha: particleAlpha, color: p.color })
+      }
+
+      meteorTimer += 1
+      const meteorInterval = window.innerWidth < 768 ? 180 : 140
+      if (meteorTimer > meteorInterval && Math.random() > 0.7) {
+        meteorTimer = 0
+        const startX = Math.random() * width * 0.8 + width * 0.1
+        const startY = Math.random() * height * 0.25 + height * 0.05
+        const speed = Math.random() * 5 + 7
+        const angle = Math.PI * (0.72 + Math.random() * 0.08)
+        meteors.push({
+          x: startX,
+          y: startY,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 0,
+          maxLife: 34 + Math.random() * 16,
+        })
+      }
+
+      for (let i = meteors.length - 1; i >= 0; i -= 1) {
+        const m = meteors[i]
+        m.x += m.vx
+        m.y += m.vy
+        m.life += 1
+
+        const t = m.life / m.maxLife
+        if (t >= 1) {
+          meteors.splice(i, 1)
+          continue
         }
-      },
-      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
+
+        const opacity = (1 - t) * 0.9
+        const tailX = m.x - m.vx * 3.6
+        const tailY = m.y - m.vy * 3.6
+        const g = ctx.createLinearGradient(m.x, m.y, tailX, tailY)
+        g.addColorStop(0, `rgba(191,219,254,${opacity})`)
+        g.addColorStop(1, 'rgba(191,219,254,0)')
+        ctx.strokeStyle = g
+        ctx.lineWidth = 1.6
+        ctx.beginPath()
+        ctx.moveTo(m.x, m.y)
+        ctx.lineTo(tailX, tailY)
+        ctx.stroke()
+      }
+
+      if (pointer.active) {
+        const radius = Math.min(190, Math.max(130, width * 0.12))
+        const near = positions.filter((p) => {
+          const dx = p.x - pointer.x
+          const dy = p.y - pointer.y
+          return dx * dx + dy * dy < radius * radius
+        })
+
+        const edgeGradient = ctx.createRadialGradient(pointer.x, pointer.y, radius * 0.2, pointer.x, pointer.y, radius)
+        edgeGradient.addColorStop(0, 'rgba(59,130,246,0.34)')
+        edgeGradient.addColorStop(0.55, 'rgba(59,130,246,0.18)')
+        edgeGradient.addColorStop(1, 'rgba(59,130,246,0)')
+        ctx.fillStyle = edgeGradient
+        ctx.beginPath()
+        ctx.arc(pointer.x, pointer.y, radius, 0, Math.PI * 2)
+        ctx.fill()
+
+        const coreGlow = ctx.createRadialGradient(pointer.x, pointer.y, radius * 0.02, pointer.x, pointer.y, radius * 0.68)
+        coreGlow.addColorStop(0, 'rgba(147,197,253,0.22)')
+        coreGlow.addColorStop(0.35, 'rgba(147,197,253,0.16)')
+        coreGlow.addColorStop(0.7, 'rgba(147,197,253,0.08)')
+        coreGlow.addColorStop(1, 'rgba(147,197,253,0)')
+        ctx.fillStyle = coreGlow
+        ctx.beginPath()
+        ctx.arc(pointer.x, pointer.y, radius * 0.68, 0, Math.PI * 2)
+        ctx.fill()
+
+        ctx.strokeStyle = 'rgba(96,165,250,0.22)'
+        ctx.lineWidth = 1
+        for (let i = 0; i < near.length; i += 1) {
+          for (let j = i + 1; j < near.length; j += 1) {
+            const a = near[i]
+            const b = near[j]
+            const dx = a.x - b.x
+            const dy = a.y - b.y
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            if (dist > 86) continue
+            const strength = 1 - dist / 86
+            ctx.strokeStyle = `rgba(96,165,250,${0.08 + strength * 0.35})`
+            ctx.beginPath()
+            ctx.moveTo(a.x, a.y)
+            ctx.lineTo(b.x, b.y)
+            ctx.stroke()
+          }
+        }
+
+        for (let i = 0; i < near.length; i += 1) {
+          const p = near[i]
+          const dx = p.x - pointer.x
+          const dy = p.y - pointer.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          const strength = 1 - dist / radius
+          if (strength <= 0) continue
+          ctx.strokeStyle = `rgba(94,234,212,${0.1 + strength * 0.3})`
+          ctx.beginPath()
+          ctx.moveTo(pointer.x, pointer.y)
+          ctx.lineTo(p.x, p.y)
+          ctx.stroke()
+        }
+      }
+
+      ctx.shadowBlur = 0
+
+      const ringGradient = ctx.createRadialGradient(cx, cy, 40, cx, cy, Math.min(width, height) * 0.5)
+      ringGradient.addColorStop(0, 'rgba(59,130,246,0.34)')
+      ringGradient.addColorStop(0.45, 'rgba(59,130,246,0.18)')
+      ringGradient.addColorStop(1, 'rgba(59,130,246,0)')
+      ctx.strokeStyle = ringGradient
+      ctx.lineWidth = 1.2
+      for (let i = 0; i < 3; i += 1) {
+        const r = Math.min(width, height) * (0.23 + i * 0.07)
+        ctx.beginPath()
+        ctx.arc(cx, cy, r, 0, Math.PI * 2)
+        ctx.stroke()
+      }
+
+      rafId = requestAnimationFrame(draw)
+    }
+
+    const onMove = (event: PointerEvent) => {
+      pointer = { x: event.clientX, y: event.clientY, active: true }
+    }
+    const onLeave = () => {
+      pointer = { ...pointer, active: false }
+    }
+
+    resize()
+    draw()
+    window.addEventListener('resize', resize)
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerleave', onLeave)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      window.removeEventListener('resize', resize)
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerleave', onLeave)
+    }
   }, [])
 
-  const translate =
-    direction === "up"
-      ? "translateY(32px)"
-      : direction === "left"
-        ? "translateX(32px)"
-        : "translateX(-32px)"
+  return <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-0 opacity-90" aria-hidden />
+}
+
+function SpotlightRevealSection() {
+  const [spot, setSpot] = useState({ x: 50, y: 50, active: false })
+
+  const points = [
+    {
+      title: '측정 대상',
+      left: '잠재력 중심',
+      right: '수행 능력 중심',
+      leftSub: '역량 잠재치 위주 판단',
+      rightSub: '현장 수행 역량 중심 검증',
+      icon: BrainCircuit,
+    },
+    {
+      title: '검증 방식',
+      left: '자기보고식',
+      right: '행동 시뮬레이션',
+      leftSub: '주관 응답 기반 평가',
+      rightSub: '상황 행동 기반 평가',
+      icon: Cpu,
+    },
+    {
+      title: '예측 정확도',
+      left: '낮음 / 0.3',
+      right: '높음 / 0.7',
+      leftSub: '성과 연결성 낮음',
+      rightSub: '성과 예측 신뢰도 향상',
+      icon: Target,
+    },
+  ]
+
+  const revealMask = `radial-gradient(circle 250px at ${spot.x}% ${spot.y}%, rgba(255,255,255,1) 0%, rgba(255,255,255,0.96) 55%, rgba(255,255,255,0) 100%)`
+  const inverseMask = `radial-gradient(circle 250px at ${spot.x}% ${spot.y}%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,1) 100%)`
 
   return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translate(0)" : translate,
-        transition: `opacity 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}ms, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
+    <section className="snap-start mx-auto mt-28 w-full max-w-6xl px-6 lg:px-8">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7 }}
+        className="mb-10 text-center"
+      >
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.55, ease: 'easeOut' }}
+          className="mb-4 inline-flex rounded-full border border-[#3B82F6]/50 bg-[#3B82F6]/10 px-4 py-1.5"
+        >
+          <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#3B82F6]">
+            ASTRA SOLUTION
+          </span>
+        </motion.div>
+        <h2 className="mt-3 text-3xl font-bold text-white">
+          실무자가 실전에서 좋은 성과를 내게 하려면 어떻게 해야 할까요?
+        </h2>
+        <p className="mx-auto mt-4 max-w-4xl text-gray-400">
+          채용 시 우수했던 인재가 현장에서 기대 이하의 성과를 보이는 이유, 문제는 평가 방식에 있습니다.
+        </p>
+      </motion.div>
+
+      <div
+        className="group relative overflow-hidden rounded-2xl border border-red-900/20 bg-[#070A13]/90 cursor-crosshair"
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect()
+          const xPct = ((e.clientX - rect.left) / rect.width) * 100
+          const yPct = ((e.clientY - rect.top) / rect.height) * 100
+          setSpot({ x: xPct, y: yPct, active: true })
+        }}
+        onMouseEnter={(e) => {
+          setSpot({ x: 50, y: 50, active: true })
+        }}
+        onMouseLeave={() => setSpot((s) => ({ ...s, active: false }))}
+      >
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.1)_1px,transparent_1px)] bg-[size:40px_40px] opacity-15" />
+
+        <div className="relative p-5 md:p-8">
+          <div className="invisible grid gap-4 md:grid-cols-3">
+            <div className="md:col-span-3">
+              <p className="text-sm font-semibold tracking-[0.04em]">🔴 기존 방식</p>
+            </div>
+            {points.map((point) => (
+              <div key={`sizer-${point.title}`} className="rounded-xl border border-white/10 p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full" />
+                  <p className="text-xs font-semibold tracking-[0.12em]">{point.title}</p>
+                </div>
+                <p className="text-2xl font-semibold">{point.left}</p>
+                <p className="mt-2 text-sm">{point.leftSub}</p>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className="pointer-events-none absolute top-0 left-0 h-full w-full"
+            style={{
+              WebkitMaskImage: inverseMask,
+              maskImage: inverseMask,
+              WebkitMaskRepeat: 'no-repeat',
+              maskRepeat: 'no-repeat',
+            }}
+          >
+            <div className="grid h-full gap-4 p-5 md:grid-cols-3 md:p-8">
+              <div className="md:col-span-3">
+                <p className="text-sm font-semibold tracking-[0.04em] text-red-500/50">🔴 기존 방식</p>
+              </div>
+              {points.map((point) => {
+                const Icon = point.icon
+                return (
+                  <div key={`dim-${point.title}`} className="rounded-xl border border-white/10 bg-white/[0.02] p-5">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#374151]/20">
+                        <Icon className="h-4 w-4 text-[#374151]" />
+                      </div>
+                      <p className="text-xs font-semibold tracking-[0.12em] text-[#374151]">{point.title}</p>
+                    </div>
+                    <p className="text-2xl font-semibold text-[#374151]">{point.left}</p>
+                    <p className="mt-2 text-sm text-[#374151]">{point.leftSub}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          <div
+            className="pointer-events-none absolute top-0 left-0 h-full w-full"
+            style={{
+              WebkitMaskImage: revealMask,
+              maskImage: revealMask,
+              WebkitMaskRepeat: 'no-repeat',
+              maskRepeat: 'no-repeat',
+            }}
+          >
+            <div className="grid h-full gap-4 p-5 md:grid-cols-3 md:p-8">
+              <div className="md:col-span-3">
+                <p className="text-sm font-semibold tracking-[0.04em] text-[#3B82F6]">🔵 ASTRA (AI Solution)</p>
+              </div>
+              {points.map((point) => {
+                const Icon = point.icon
+                return (
+                  <div
+                    key={`bright-${point.title}`}
+                    className="rounded-xl border border-[#3B82F6]/30 bg-[#0b1428]/70 p-5 shadow-[0_0_26px_rgba(59,130,246,0.16)]"
+                  >
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#3B82F6]/25 shadow-[0_0_14px_rgba(59,130,246,0.5)]">
+                        <Icon className="h-4 w-4 text-[#3B82F6]" />
+                      </div>
+                      <p className="text-xs font-semibold tracking-[0.12em] text-white">{point.title}</p>
+                    </div>
+                    <p className="text-2xl font-semibold text-white">
+                      <span className="text-[#3B82F6]">{point.right}</span>
+                    </p>
+                    <p className="mt-2 text-sm text-white">{point.rightSub}</p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 
-/* ───────── Auto-Rolling Client Logos ───────── */
-const clients = [
-  "삼성전자", "SK하이닉스", "현대자동차", "LG에너지솔루션",
-  "카카오", "네이버", "포스코", "KT", "CJ그룹", "한화",
-  "롯데", "두산", "GS칼텍스", "신한금융",
-]
+function FlowStep({
+  index,
+  title,
+  desc,
+  icon: Icon,
+}: {
+  index: number
+  title: string
+  desc: React.ReactNode
+  icon: React.ComponentType<{ className?: string }>
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { margin: '-20% 0px -20% 0px', amount: 0.4 })
 
-function LogoMarquee() {
   return (
-    <div className="relative overflow-hidden">
-      <div className="absolute left-0 top-0 bottom-0 z-10 w-20 bg-gradient-to-r from-background to-transparent" />
-      <div className="absolute right-0 top-0 bottom-0 z-10 w-20 bg-gradient-to-l from-background to-transparent" />
-      <div className="flex animate-marquee gap-6">
-        {[...clients, ...clients].map((client, i) => (
-          <div
-            key={`${client}-${i}`}
-            className="flex shrink-0 items-center gap-2 rounded-lg border border-border bg-card px-5 py-3"
-          >
-            <Building2 className="h-4 w-4 text-muted-foreground/40" />
-            <span className="whitespace-nowrap text-sm font-medium text-muted-foreground">
-              {client}
-            </span>
-          </div>
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0.3, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0.3, y: 24 }}
+      transition={{ duration: 0.55, ease: 'easeOut' }}
+      className="relative flex gap-5"
+    >
+      <div className="relative z-10 mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#0E1424] shadow-[0_0_20px_rgba(59,130,246,0.35)]">
+        <Icon className="h-5 w-5 text-[#3B82F6]" />
+      </div>
+      <div className="w-full rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Step 0{index + 1}</p>
+        <h3 className="mt-2 text-xl font-bold text-white">{title}</h3>
+        <p className="mt-3 text-sm leading-relaxed text-slate-300">{desc}</p>
+      </div>
+    </motion.div>
+  )
+}
+
+function FeatureFlow() {
+  const flowRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: flowRef,
+    offset: ['start 75%', 'end 30%'],
+  })
+
+  const steps = [
+    {
+      title: '우리 기업 맞춤형 AI 모델링',
+      desc: (
+        <>
+          비싼 컨설팅 없이, 고성과자 데이터와 어세스타의 검증된 DB를 결합하여{' '}
+          <span className="font-semibold text-blue-200">단 3일 만에</span> 최적화된 역량 모델을
+          구축합니다.
+        </>
+      ),
+      icon: Database,
+    },
+    {
+      title: '변화에 대응하는 실시간 업데이트',
+      desc: (
+        <>
+          비즈니스 환경이 바뀔 때마다 다시 컨설팅을 받지 마세요. 클릭 한 번으로 인재상을
+          업데이트하고, <span className="font-semibold text-blue-200">최신 트렌드를 즉시 반영</span>
+          합니다.
+        </>
+      ),
+      icon: RefreshCcw,
+    },
+    {
+      title: '채용부터 평가까지, Seamless 연결',
+      desc: (
+        <>
+          모델링 결과가 보고서에만 머물지 않습니다. 채용, 면접, 성과 평가까지{' '}
+          <span className="font-semibold text-blue-200">
+            HR 전 과정에 즉시 적용 가능한 가이드
+          </span>
+          를 제공합니다.
+        </>
+      ),
+      icon: Workflow,
+    },
+  ]
+
+  const researchChips = [
+    {
+      label: '25년 데이터베이스',
+      href: '/research#database',
+      icon: Database,
+    },
+    {
+      label: 'ISO 국제 표준 준수',
+      href: '/research#iso',
+      icon: BadgeCheck,
+    },
+    {
+      label: 'Schmidt & Hunter 타당도 입증',
+      href: '/research#validity',
+      icon: BarChart3,
+    },
+  ]
+
+  return (
+    <section className="snap-start mx-auto mt-28 w-full max-w-5xl px-6 lg:px-8">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7 }}
+        className="mb-10 text-center"
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
+          Real-time Competency Modeling
+        </p>
+        <h2 className="mt-3 text-3xl font-bold text-white md:text-4xl">
+          멈춰있는 역량 모델, 이제 실시간으로 진화합니다.
+        </h2>
+        <p className="mx-auto mt-4 max-w-3xl text-slate-300">
+          고비용, 장시간 소요되던 기존 방식의 한계를 넘어, 클릭 한 번으로 업데이트되는 살아있는
+          역량 모델을 경험하세요.
+        </p>
+      </motion.div>
+
+      <div ref={flowRef} className="relative space-y-10 pl-2">
+        <div className="absolute bottom-6 left-[22px] top-6 w-px bg-[#3B82F6]/25" />
+        <motion.div
+          className="absolute left-[22px] top-6 w-px origin-top bg-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.95)]"
+          style={{ scaleY: scrollYProgress, height: 'calc(100% - 48px)' }}
+        />
+        {steps.map((step, index) => (
+          <FlowStep key={step.title} index={index} title={step.title} desc={step.desc} icon={step.icon} />
         ))}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
+        className="mt-10 flex flex-wrap justify-center gap-4"
+      >
+        {researchChips.map((chip) => {
+          const Icon = chip.icon
+          return (
+            <Link
+              key={chip.label}
+              href={chip.href}
+              className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-gray-300 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:text-white"
+            >
+              <Icon className="h-4 w-4 text-[#3B82F6]" />
+              <span>{chip.label}</span>
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+            </Link>
+          )
+        })}
+      </motion.div>
+    </section>
+  )
+}
+
+function ROICalculator() {
+  const [hires, setHires] = useState(120)
+  const [salary, setSalary] = useState(6000)
+  const [displayValue, setDisplayValue] = useState(0)
+  const prevRef = useRef(0)
+
+  const failureReduction = useMemo(() => hires * salary * 0.05, [hires, salary])
+  const productivityGain = useMemo(() => hires * salary * 1.5 * 0.1, [hires, salary])
+
+  const estimatedBenefit = useMemo(() => {
+    return failureReduction + productivityGain
+  }, [failureReduction, productivityGain])
+
+  const formatManwonToKrw = (value: number) => {
+    const safe = Math.max(0, Math.round(value))
+    const eok = Math.floor(safe / 10000)
+    const man = safe % 10000
+
+    if (eok > 0 && man > 0) return `${eok.toLocaleString('ko-KR')}억 ${man.toLocaleString('ko-KR')}만 원`
+    if (eok > 0) return `${eok.toLocaleString('ko-KR')}억 원`
+    return `${man.toLocaleString('ko-KR')}만 원`
+  }
+
+  useEffect(() => {
+    const from = prevRef.current
+    const to = estimatedBenefit
+    const duration = 700
+    let rafId = 0
+    const start = performance.now()
+
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / duration, 1)
+      const eased = 1 - Math.pow(1 - t, 3)
+      const value = Math.round(from + (to - from) * eased)
+      setDisplayValue(value)
+      if (t < 1) rafId = requestAnimationFrame(tick)
+    }
+
+    rafId = requestAnimationFrame(tick)
+    prevRef.current = to
+    return () => cancelAnimationFrame(rafId)
+  }, [estimatedBenefit])
+
+  return (
+    <section className="snap-start mx-auto mt-28 w-full max-w-4xl px-6 lg:px-8">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.7 }}
+        className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl shadow-[0_0_45px_rgba(59,130,246,0.16)] md:p-10"
+      >
+        <div className="grid gap-8 md:grid-cols-2">
+          <div>
+            <div className="mb-8">
+              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">ROI Calculator</p>
+              <h2 className="mt-3 text-3xl font-bold text-white">예상 연간 이익 시뮬레이션</h2>
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <div className="mb-3 flex items-center justify-between text-sm text-slate-300">
+                  <span>연간 채용 규모</span>
+                  <span className="font-semibold text-white">{hires}명</span>
+                </div>
+                <input
+                  type="range"
+                  min={10}
+                  max={500}
+                  value={hires}
+                  onChange={(e) => setHires(Number(e.target.value))}
+                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-[#3B82F6]"
+                />
+              </div>
+
+              <div>
+                <div className="mb-3 flex items-center justify-between text-sm text-slate-300">
+                  <span>평균 연봉</span>
+                  <span className="font-semibold text-white">{salary.toLocaleString('ko-KR')}만원</span>
+                </div>
+                <input
+                  type="range"
+                  min={3000}
+                  max={10000}
+                  step={100}
+                  value={salary}
+                  onChange={(e) => setSalary(Number(e.target.value))}
+                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-[#3B82F6]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-[#0b1428]/50 p-6 md:p-8">
+            <p className="text-sm text-slate-300">예상 연간 이익</p>
+            <motion.p
+              key={displayValue}
+              initial={{
+                opacity: 0.85,
+                scale: 0.98,
+                textShadow: '0 0 8px rgba(96,165,250,0.35)',
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                textShadow: '0 0 22px rgba(96,165,250,0.4)',
+              }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+              className="mt-4 text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400 md:text-6xl"
+            >
+              {formatManwonToKrw(displayValue)}
+            </motion.p>
+
+            <div className="mt-7 space-y-3 border-t border-white/10 pt-5 text-left">
+              <p className="text-sm text-green-400">
+                📉 채용 실패 절감: <span className="font-semibold">{formatManwonToKrw(failureReduction).replace(' 원', '')}</span>
+              </p>
+              <p className="text-sm text-blue-400">
+                📈 생산성 증대: <span className="font-semibold">{formatManwonToKrw(productivityGain).replace(' 원', '')}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </section>
+  )
+}
+
+function AnimatedMetric({
+  label,
+  value,
+  delta,
+  decimals = 0,
+  suffix = '',
+}: {
+  label: string
+  value: number
+  delta: string
+  decimals?: number
+  suffix?: string
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, amount: 0.5 })
+  const [display, setDisplay] = useState(0)
+
+  useEffect(() => {
+    if (!inView) return
+    const duration = 900
+    const startTime = performance.now()
+    let rafId = 0
+
+    const tick = (now: number) => {
+      const t = Math.min((now - startTime) / duration, 1)
+      const eased = 1 - Math.pow(1 - t, 3)
+      setDisplay(value * eased)
+      if (t < 1) rafId = requestAnimationFrame(tick)
+    }
+
+    rafId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafId)
+  }, [inView, value])
+
+  const formatted = display.toLocaleString('ko-KR', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })
+
+  return (
+    <div ref={ref} className="rounded-xl border border-slate-200 bg-slate-50/70 p-4">
+      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <div className="mt-2 flex items-end gap-2">
+        <p className="text-3xl font-bold text-slate-900">
+          {formatted}
+          {suffix}
+        </p>
+        <span className="pb-1 text-xs font-semibold text-blue-500">{delta}</span>
       </div>
     </div>
   )
 }
 
-/* ───────── Animated Counter ───────── */
-function Counter({ end, suffix }: { end: number; suffix: string }) {
-  const [count, setCount] = useState(0)
-  const ref = useRef<HTMLSpanElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          let start = 0
-          const duration = 1500
-          const step = (timestamp: number) => {
-            if (!start) start = timestamp
-            const progress = Math.min((timestamp - start) / duration, 1)
-            setCount(Math.floor(progress * end))
-            if (progress < 1) requestAnimationFrame(step)
-          }
-          requestAnimationFrame(step)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.3 }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [end])
+function LiveAIDashboardSection() {
+  const bars = [64, 78, 52, 87, 68, 73, 58]
+  const analysis = [
+    { label: '리더십 역량', value: 92 },
+    { label: '커뮤니케이션', value: 87 },
+    { label: '문제해결력', value: 78 },
+    { label: '전략적 사고', value: 85 },
+  ]
 
   return (
-    <span ref={ref}>
-      {count}
-      {suffix}
-    </span>
+    <section className="snap-start mx-auto mt-16 w-full max-w-6xl px-6 pb-28 lg:px-8">
+      <div className="mb-8 flex flex-col items-center">
+        <div className="h-14 w-px bg-gradient-to-b from-[#3B82F6]/60 to-transparent" />
+        <div className="mt-2 text-2xl text-[#3B82F6]">↓</div>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.65 }}
+        className="mb-12 text-center"
+      >
+        <h2 className="text-balance text-3xl font-bold leading-tight text-white md:text-4xl">
+          데이터로 증명된 고성과자의 행동,
+          <br />
+          AI가 3초만에 분석합니다.
+        </h2>
+      </motion.div>
+
+      <div className="relative">
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.18)_0%,rgba(59,130,246,0)_68%)]" />
+        <motion.div
+          animate={{ y: [0, -6, 0] }}
+          transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
+          className="overflow-hidden rounded-2xl border border-slate-600/60 bg-white shadow-[0_40px_120px_rgba(2,6,23,0.5)]"
+        >
+          <div className="flex items-center gap-2 border-b border-slate-200 bg-slate-100 px-4 py-3">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ef4444]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#f59e0b]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#22c55e]" />
+          </div>
+
+          <div className="space-y-8 p-5 md:p-8">
+            <div className="grid gap-4 md:grid-cols-4">
+              <AnimatedMetric label="전체 해당 인원" value={128} delta="+12" />
+              <AnimatedMetric label="활용 팀가" value={34} delta="+2.1%" />
+              <AnimatedMetric label="평가 준비율" value={94.2} decimals={1} suffix="%" delta="+2.1%" />
+              <AnimatedMetric label="평균 신뢰도" value={0.91} decimals={2} delta="+0.03" />
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
+              <div className="rounded-xl border border-slate-200 p-5">
+                <div className="mb-5 flex items-center gap-2">
+                  <BarChart3 className="h-4 w-4 text-[#3B82F6]" />
+                  <h3 className="text-sm font-semibold text-slate-700">역량별 예측 타당도</h3>
+                </div>
+                <div className="grid h-44 grid-cols-7 items-end gap-2">
+                  {bars.map((bar, index) => (
+                    <motion.div
+                      key={`${bar}-${index}`}
+                      initial={{ scaleY: 0.05 }}
+                      whileInView={{ scaleY: 1 }}
+                      viewport={{ once: true, amount: 0.6 }}
+                      transition={{ duration: 0.55, delay: index * 0.07, ease: 'easeOut' }}
+                      className="origin-bottom rounded-md bg-[#3B82F6]/85"
+                      style={{ height: `${bar}%` }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-slate-200 p-5">
+                <div className="mb-5 flex items-center gap-2">
+                  <Network className="h-4 w-4 text-[#3B82F6]" />
+                  <h3 className="text-sm font-semibold text-slate-700">AI 분석 인사이트</h3>
+                </div>
+                <div className="space-y-4">
+                  {analysis.map((item, index) => (
+                    <div key={item.label}>
+                      <div className="mb-1.5 flex items-center justify-between text-sm">
+                        <span className="text-slate-700">{item.label}</span>
+                        <span className="font-semibold text-slate-900">{item.value}%</span>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          whileInView={{ width: `${item.value}%` }}
+                          viewport={{ once: true, amount: 0.6 }}
+                          transition={{ duration: 0.65, delay: index * 0.08, ease: 'easeOut' }}
+                          className="h-full rounded-full bg-[#3B82F6]"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   )
 }
 
-/* ───────── Page ───────── */
-export default function Page() {
+function SocialProof() {
+  const clients = [
+    '현**(제조)',
+    'L**(화학)',
+    '네**(IT)',
+    '카**(IT)',
+    '포**(철강)',
+    'K**(통신)',
+    'C**(유통)',
+    '한**(방산)',
+    '롯**(유통)',
+  ]
+
+  const metrics = [
+    { value: 500, suffix: '+', label: '완료 프로젝트' },
+    { value: 97, suffix: '%', label: '고객 만족도' },
+    { value: 25, suffix: '년+', label: '업력' },
+  ]
+
+  function Marquee({ items }: { items: string[] }) {
+    const loop = [...items, ...items]
+
+    return (
+      <div
+        className="relative overflow-hidden rounded-2xl"
+        style={{
+          WebkitMaskImage:
+            'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+          maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
+        }}
+      >
+        <div className="animate-chip-marquee flex w-max items-center gap-3 py-2">
+          {loop.map((client, index) => (
+            <span
+              key={`${client}-${index}`}
+              className="rounded-full border border-gray-200 bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700"
+            >
+              {client}
+            </span>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  function CountUpMetric({
+    value,
+    suffix,
+    label,
+    duration = 2000,
+  }: {
+    value: number
+    suffix: string
+    label: string
+    duration?: number
+  }) {
+    const ref = useRef<HTMLDivElement>(null)
+    const inView = useInView(ref, { once: true, amount: 0.5 })
+    const [display, setDisplay] = useState(0)
+
+    useEffect(() => {
+      if (!inView) return
+      let rafId = 0
+      const start = performance.now()
+
+      const tick = (now: number) => {
+        const t = Math.min((now - start) / duration, 1)
+        const eased = 1 - Math.pow(1 - t, 3)
+        setDisplay(Math.round(value * eased))
+        if (t < 1) rafId = requestAnimationFrame(tick)
+      }
+
+      rafId = requestAnimationFrame(tick)
+      return () => cancelAnimationFrame(rafId)
+    }, [duration, inView, value])
+
+    return (
+      <div
+        ref={ref}
+        className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-[0_12px_40px_rgba(15,23,42,0.08)] transition-transform duration-300 hover:scale-110"
+      >
+        <p className="text-5xl font-extrabold text-slate-900 md:text-6xl">
+          {display.toLocaleString('ko-KR')}
+          {suffix}
+        </p>
+        <p className="mt-3 text-sm text-slate-600">{label}</p>
+      </div>
+    )
+  }
+
   return (
-    <>
-      {/* ─── 1. Hero ─── */}
-      <section className="relative overflow-hidden pt-32 pb-20 lg:pt-44 lg:pb-28">
-        {/* Subtle bg accents */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-primary/5 blur-3xl" />
-          <div className="absolute -bottom-20 -left-40 h-[400px] w-[400px] rounded-full bg-primary/3 blur-3xl" />
-        </div>
+    <section className="snap-start mt-8 bg-gradient-to-b from-[#020617] via-[#1e293b] to-[#ffffff] pt-20">
+      <div className="mx-auto max-w-6xl px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.7 }}
+          className="text-center"
+        >
+          <h2 className="text-3xl font-bold leading-tight text-white md:text-4xl">
+            이미 업계 1위 기업들은 아스트라와 함께하고 있습니다
+          </h2>
+        </motion.div>
 
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid items-center gap-16 lg:grid-cols-2">
-            {/* Left copy */}
-            <div>
-              <ScrollReveal delay={0}>
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2">
-                  <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  <span className="text-xs font-medium text-muted-foreground">
-                    {"Korea's #1 Competency Assessment Organization"}
-                  </span>
-                </div>
-              </ScrollReveal>
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.65, delay: 0.1 }}
+          className="mt-16"
+        >
+          <Marquee items={clients} />
+        </motion.div>
 
-              <ScrollReveal delay={120}>
-                <h1 className="text-balance text-4xl font-extrabold leading-tight tracking-tight text-foreground md:text-5xl lg:text-[3.25rem]">
-                  심리학 전문성과 데이터로{" "}
-                  <span className="text-primary">HR을 혁신합니다</span>
-                </h1>
-              </ScrollReveal>
-
-              <ScrollReveal delay={240}>
-                <p className="mt-6 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground">
-                  국내 최고의 역사와 전문성을 보유한 역량평가 기관.
-                  AI 기반 플랫폼 ASTRA로 지속 가능한 HR 시스템을 구축하세요.
-                </p>
-              </ScrollReveal>
-
-              <ScrollReveal delay={360}>
-                <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-                  <Link
-                    href="/inquiry"
-                    className="group flex items-center justify-center gap-2 rounded-lg bg-primary px-8 py-3.5 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:brightness-110"
-                  >
-                    시작하기
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                  <Link
-                    href="/solutions"
-                    className="flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-8 py-3.5 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
-                  >
-                    솔루션 보기
-                  </Link>
-                </div>
-              </ScrollReveal>
-            </div>
-
-            {/* Right orbital visual */}
-            <ScrollReveal delay={200} direction="left" className="relative flex items-center justify-center">
-              <div className="relative h-80 w-80 lg:h-[400px] lg:w-[400px]">
-                <div
-                  className="absolute inset-0 animate-spin rounded-full border-2 border-dashed border-primary/15"
-                  style={{ animationDuration: "30s" }}
-                />
-                <div className="absolute inset-8 rounded-full bg-primary/5" />
-                <div className="absolute inset-16 rounded-full border border-border bg-card shadow-xl" />
-                <div className="absolute top-6 left-1/2 -translate-x-1/2 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card shadow-md">
-                  <Brain className="h-6 w-6 text-primary" />
-                </div>
-                <div className="absolute top-1/2 right-4 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card shadow-md">
-                  <Database className="h-6 w-6 text-primary/70" />
-                </div>
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card shadow-md">
-                  <BarChart3 className="h-6 w-6 text-primary" />
-                </div>
-                <div className="absolute top-1/2 left-4 -translate-y-1/2 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-card shadow-md">
-                  <Sparkles className="h-6 w-6 text-primary/70" />
-                </div>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <p className="text-xs font-semibold tracking-wider text-primary uppercase">
-                    Psychology
-                  </p>
-                  <p className="text-2xl font-bold text-foreground">+</p>
-                  <p className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                    Data / AI
-                  </p>
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
-
-          {/* Scroll down indicator */}
-          <div className="mt-16 flex flex-col items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">Scroll Down</span>
-            <ChevronDown className="h-4 w-4 animate-bounce text-muted-foreground" />
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 2. [Hook] Problem Statement ─── */}
-      <section className="py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          {/* Section question */}
-          <ScrollReveal className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-semibold tracking-widest text-primary uppercase">
-              Pain Point
-            </p>
-            <h2 className="mt-4 text-balance text-3xl font-bold text-foreground md:text-4xl lg:text-[2.5rem] leading-tight">
-              왜 스펙 좋은 인재가{" "}
-              <span className="relative inline-block">
-                <span className="relative z-10">실전에서는 성과를 못 낼까요?</span>
-                <span className="absolute -bottom-1 left-0 right-0 h-3 rounded-sm bg-primary/10" />
-              </span>
-            </h2>
-            <p className="mt-5 leading-relaxed text-muted-foreground">
-              채용 시 우수했던 인재가 현장에서 기대 이하의 성과를 보이는 이유,
-              문제는 평가 방식에 있습니다.
-            </p>
-          </ScrollReveal>
-
-          {/* Old Way vs New Way -- redesigned */}
-          <ScrollReveal delay={150} className="relative mt-16 grid gap-0 md:grid-cols-2">
-            {/* Center VS badge */}
-            <div className="absolute left-1/2 top-1/2 z-20 hidden -translate-x-1/2 -translate-y-1/2 md:flex">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full border-4 border-background bg-foreground shadow-xl">
-                <span className="text-xs font-black text-background tracking-wider">VS</span>
-              </div>
-            </div>
-
-            {/* Old Way Card */}
-            <div className="relative overflow-hidden rounded-t-2xl border border-border bg-card md:rounded-l-2xl md:rounded-tr-none">
-              {/* Top red accent line */}
-              <div className="h-1 w-full bg-destructive/60" />
-
-              <div className="p-8 lg:p-10">
-                {/* Badge */}
-                <div className="mb-5 inline-flex items-center gap-2 rounded-lg bg-destructive/8 px-3 py-1.5 ring-1 ring-destructive/15">
-                  <XCircle className="h-3.5 w-3.5 text-destructive" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-destructive">
-                    Old Way
-                  </span>
-                </div>
-
-                <h3 className="text-xl font-bold text-foreground">기존 방식</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">
-                  인지능력검사(IQ), 인성검사 중심
-                </p>
-
-                {/* Data rows */}
-                <div className="mt-8 space-y-0 divide-y divide-border">
-                  {[
-                    { label: "측정 대상", value: "잠재력 (Potential)" },
-                    { label: "검증 방식", value: "자기보고식 설문" },
-                    { label: "예측 정확도", value: "낮음 (0.1~0.3)", accent: true },
-                    { label: "결과", value: "성과 예측 실패", accent: true },
-                  ].map((item) => (
-                    <div key={item.label} className="flex items-center justify-between py-4">
-                      <span className="text-sm text-muted-foreground">{item.label}</span>
-                      <span
-                        className={`text-sm font-semibold ${
-                          item.accent ? "text-destructive" : "text-foreground"
-                        }`}
-                      >
-                        {item.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Bottom accuracy visualizer */}
-                <div className="mt-6 rounded-xl bg-destructive/5 p-4">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-muted-foreground">
-                      {'예측 타당도 (Validity)'}
-                    </span>
-                    <span className="font-bold text-destructive">0.2</span>
-                  </div>
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-destructive/10">
-                    <div className="h-full w-[20%] rounded-full bg-destructive/50" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* VS badge mobile */}
-            <div className="relative z-20 flex items-center justify-center py-2 md:hidden">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border-4 border-background bg-foreground shadow-xl">
-                <span className="text-[10px] font-black text-background tracking-wider">VS</span>
-              </div>
-            </div>
-
-            {/* Assessta Way Card */}
-            <div className="relative overflow-hidden rounded-b-2xl border border-border bg-card md:rounded-r-2xl md:rounded-bl-none md:border-l-0">
-              {/* Top blue accent line */}
-              <div className="h-1 w-full bg-primary" />
-
-              <div className="p-8 lg:p-10">
-                {/* Badge */}
-                <div className="mb-5 inline-flex items-center gap-2 rounded-lg bg-primary/8 px-3 py-1.5 ring-1 ring-primary/15">
-                  <CircleCheckBig className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
-                    Assessta Way
-                  </span>
-                </div>
-
-                <h3 className="text-xl font-bold text-foreground">어세스타 방식</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">
-                  ��제 업무 행동 시뮬레이션 기반
-                </p>
-
-                {/* Data rows */}
-                <div className="mt-8 space-y-0 divide-y divide-border">
-                  {[
-                    { label: "측정 대상", value: "수행 능력 (Performance)" },
-                    { label: "검증 방식", value: "행동 시뮬레이션 + AI 분석" },
-                    { label: "예측 정확도", value: "높음 (0.5~0.7)", accent: true },
-                    { label: "결과", value: "성공 DNA 발견", accent: true },
-                  ].map((item) => (
-                    <div key={item.label} className="flex items-center justify-between py-4">
-                      <span className="text-sm text-muted-foreground">{item.label}</span>
-                      <span
-                        className={`text-sm font-semibold ${
-                          item.accent ? "text-primary" : "text-foreground"
-                        }`}
-                      >
-                        {item.value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Bottom accuracy visualizer */}
-                <div className="mt-6 rounded-xl bg-primary/5 p-4">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-medium text-muted-foreground">
-                      {'예측 타당도 (Validity)'}
-                    </span>
-                    <span className="font-bold text-primary">0.6</span>
-                  </div>
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-primary/10">
-                    <div className="h-full w-[60%] rounded-full bg-primary" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
-
-          {/* Insight callout */}
-          <ScrollReveal delay={300} className="mx-auto mt-12 max-w-3xl overflow-hidden rounded-2xl border border-primary/15 bg-primary/[0.03] shadow-sm">
-            <div className="flex items-start gap-4 p-6 lg:p-8">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10">
-                <ArrowDownRight className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-foreground">
-                  {"\"아, ��리 회사가 겪는 문제가 바로 이거였어!\""}
-                </p>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  Schmidt & Hunter 메타분석에 따르면, 행동 기반 역량평가(Assessment Center)는
-                  기존 인지검사 대비{" "}
-                  <span className="font-semibold text-primary">2배 이상</span>의 직무 성과
-                  예측력을 보입니다.
-                </p>
-              </div>
-            </div>
-          </ScrollReveal>
-
-          {/* Performance Comparison Visual */}
-          <ScrollReveal delay={200} className="mx-auto mt-20 max-w-4xl">
-            <div className="text-center">
-              <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-                Performance Outcome
-              </p>
-              <h3 className="mt-2 text-xl font-bold text-foreground md:text-2xl">
-                평가 방식이 바뀌면, 성과가 달라집니다
-              </h3>
-            </div>
-
-            <div className="mt-10 space-y-5">
-              {[
-                {
-                  label: "채용 후 1년 내 이탈률",
-                  old: { value: 32, display: "32%", note: "3명 중 1명 이탈" },
-                  assessta: { value: 11, display: "11%", note: "90% 이상 정착" },
-                  invert: true,
-                },
-                {
-                  label: "신규 인력 목표 달성률",
-                  old: { value: 41, display: "41%", note: "절반 미달" },
-                  assessta: { value: 78, display: "78%", note: "목표 초과 달성" },
-                  invert: false,
-                },
-                {
-                  label: "고성과자 선발 적중률",
-                  old: { value: 23, display: "23%", note: "4명 중 1명" },
-                  assessta: { value: 67, display: "67%", note: "3명 중 2명" },
-                  invert: false,
-                },
-                {
-                  label: "평가-성과 상관계수 (Validity)",
-                  old: { value: 20, display: "r = .20", note: "약한 상관" },
-                  assessta: { value: 60, display: "r = .60", note: "강한 상관" },
-                  invert: false,
-                },
-              ].map((metric) => (
-                <div
-                  key={metric.label}
-                  className="overflow-hidden rounded-xl border border-border bg-card"
-                >
-                  {/* Metric label */}
-                  <div className="border-b border-border bg-muted/30 px-5 py-3">
-                    <p className="text-sm font-semibold text-foreground">{metric.label}</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 divide-x divide-border">
-                    {/* Old Way bar */}
-                    <div className="px-5 py-4">
-                      <div className="flex items-baseline justify-between">
-                        <span className="text-xs text-muted-foreground">{'기존 방식'}</span>
-                        <span className={`text-lg font-bold ${metric.invert ? "text-destructive" : "text-muted-foreground"}`}>
-                          {metric.old.display}
-                        </span>
-                      </div>
-                      <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-muted">
-                        <div
-                          className={`h-full rounded-full transition-all duration-1000 ${metric.invert ? "bg-destructive/60" : "bg-muted-foreground/30"}`}
-                          style={{ width: `${metric.old.value}%` }}
-                        />
-                      </div>
-                      <p className="mt-1.5 text-[11px] text-muted-foreground">{metric.old.note}</p>
-                    </div>
-
-                    {/* Assessta Way bar */}
-                    <div className="px-5 py-4">
-                      <div className="flex items-baseline justify-between">
-                        <span className="text-xs text-primary font-medium">{'어세스타 방식'}</span>
-                        <span className={`text-lg font-bold ${metric.invert ? "text-primary" : "text-primary"}`}>
-                          {metric.assessta.display}
-                        </span>
-                      </div>
-                      <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-primary/10">
-                        <div
-                          className="h-full rounded-full bg-primary transition-all duration-1000"
-                          style={{ width: `${metric.assessta.value}%` }}
-                        />
-                      </div>
-                      <p className="mt-1.5 text-[11px] text-primary/70 font-medium">{metric.assessta.note}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Source footnote */}
-            <p className="mt-6 text-center text-[11px] text-muted-foreground">
-              * 어세스타 고객사 평균 데이터 기반 (2020-2025). 개별 결과는 조직 특성에 따라 다를 수 있습니다.
-            </p>
-          </ScrollReveal>
-        </div>
-      </section>
-
-      {/* ─── 3. [Solution] AI Astra 소개 ─── */}
-      <section className="relative py-24 lg:py-32 bg-muted/40">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <ScrollReveal className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-semibold tracking-widest text-primary uppercase">
-              AI Platform
-            </p>
-            <h2 className="mt-4 text-balance text-3xl font-bold text-foreground md:text-4xl">
-              데이터로 증명된 고성과자의 행동,
-              <br className="hidden sm:block" />
-              <span className="text-primary">AI가 3초 만에 분석합니다</span>
-            </h2>
-            <p className="mt-5 text-muted-foreground leading-relaxed">
-              25년간 축적된 역량 데이터베이스와 AI 알고리즘이 결합된 ASTRA 플랫폼.
-              조직 맞춤형 역량 모델링의 새로운 기준을 제시합니다.
-            </p>
-          </ScrollReveal>
-
-          {/* 3-Column Key Features */}
-          <div className="mt-16 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                icon: Target,
-                title: "커스텀 분석",
-                desc: "우리 조직만의 핵심 역량을 도출합니다. 산업별, 직군별 맞춤형 모델링으로 정확도를 극대화합니다.",
-                badge: "Modeling",
-              },
-              {
-                icon: Zap,
-                title: "실시간 업데이트",
-                desc: "시장 트렌드와 조직 변화에 맞춰 역량 기준을 자동으로 업데이트합니다. 항상 최신 상태를 유지합니다.",
-                badge: "Dynamic",
-              },
-              {
-                icon: Scale,
-                title: "공정성 확보",
-                desc: "ORCE(관찰-기록-분류-평가) 알고리즘으로 편향 없는 평가를 보장합니다. 평가자 간 신뢰도 0.9 이상.",
-                badge: "Fairness",
-              },
-            ].map((feature, i) => (
-              <ScrollReveal key={feature.title} delay={i * 120}>
-                <div className="group h-full rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:border-primary/20 hover:shadow-md">
-                  <div className="mb-1 text-[10px] font-bold tracking-widest text-primary/60 uppercase">
-                    {feature.badge}
-                  </div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-colors group-hover:bg-primary/15">
-                    <feature.icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="mt-5 text-lg font-bold text-foreground">{feature.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {feature.desc}
-                  </p>
-                </div>
-              </ScrollReveal>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.35 }}
+          transition={{ duration: 0.7, delay: 0.12 }}
+          className="mt-16 pb-28"
+        >
+          <div className="grid gap-6 md:grid-cols-3">
+            {metrics.map((metric) => (
+              <CountUpMetric
+                key={metric.label}
+                value={metric.value}
+                suffix={metric.suffix}
+                label={metric.label}
+                duration={2000}
+              />
             ))}
           </div>
 
-          {/* Dashboard mockup - tilted */}
-          <ScrollReveal delay={200} className="mt-20 flex justify-center perspective-[1200px]">
-            <div className="w-full max-w-4xl" style={{ transform: "rotateX(2deg) rotateY(-2deg)" }}>
-              {/* Browser chrome */}
-              <div className="rounded-t-xl border border-border bg-muted/60 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-destructive/40" />
-                  <div className="h-3 w-3 rounded-full bg-chart-4/40" />
-                  <div className="h-3 w-3 rounded-full bg-chart-2/40" />
-                  <div className="ml-4 flex-1 rounded-md bg-background/60 px-3 py-1.5 text-[11px] text-muted-foreground">
-                    app.assessta.co.kr/astra/dashboard
-                  </div>
-                </div>
-              </div>
-              {/* Dashboard content */}
-              <div className="rounded-b-xl border-x border-b border-border bg-card p-6 shadow-lg lg:p-8">
-                {/* Top stats row */}
-                <div className="grid grid-cols-4 gap-4">
-                  {[
-                    { label: "전체 역량 모델", value: "128", change: "+12" },
-                    { label: "활성 평가", value: "34", change: "+5" },
-                    { label: "평가 완료율", value: "94.2%", change: "+2.1%" },
-                    { label: "평균 신뢰도", value: "0.91", change: "+0.03" },
-                  ].map((stat) => (
-                    <div key={stat.label} className="rounded-lg bg-muted/50 p-3">
-                      <p className="text-[10px] text-muted-foreground">{stat.label}</p>
-                      <p className="mt-1 text-lg font-bold text-foreground">{stat.value}</p>
-                      <p className="text-[10px] font-medium text-chart-2">{stat.change}</p>
-                    </div>
-                  ))}
-                </div>
-                {/* Simulated chart area */}
-                <div className="mt-6 grid gap-4 lg:grid-cols-3">
-                  <div className="col-span-2 rounded-lg border border-border bg-muted/20 p-4">
-                    <p className="text-xs font-medium text-muted-foreground">역량별 예측 타당도</p>
-                    <div className="mt-4 flex items-end gap-2">
-                      {[65, 82, 45, 90, 72, 88, 55, 78, 92, 60, 85, 70].map((h, i) => (
-                        <div
-                          key={i}
-                          className="flex-1 rounded-sm bg-primary/20"
-                          style={{ height: `${h}px` }}
-                        >
-                          <div
-                            className="w-full rounded-sm bg-primary transition-all"
-                            style={{ height: `${h * 0.7}px` }}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="rounded-lg border border-border bg-muted/20 p-4">
-                    <p className="text-xs font-medium text-muted-foreground">AI 분석 현황</p>
-                    <div className="mt-4 space-y-3">
-                      {[
-                        { label: "리더십 역량", pct: 92 },
-                        { label: "커뮤니케이션", pct: 87 },
-                        { label: "문제해결력", pct: 78 },
-                        { label: "전략적 사고", pct: 85 },
-                      ].map((item) => (
-                        <div key={item.label}>
-                          <div className="flex justify-between text-[10px]">
-                            <span className="text-muted-foreground">{item.label}</span>
-                            <span className="font-medium text-foreground">{item.pct}%</span>
-                          </div>
-                          <div className="mt-1 h-1.5 rounded-full bg-muted">
-                            <div
-                              className="h-full rounded-full bg-primary"
-                              style={{ width: `${item.pct}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
+          <div className="mt-10 text-center">
+            <button
+              type="button"
+              className="inline-flex items-center rounded-full bg-[#3B82F6] px-8 py-3 text-base font-semibold text-white transition-all duration-300 hover:bg-[#356DF3]"
+            >
+              무료 진단 문의하기
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  )
+}
 
-      {/* ─── 4. [Proof] 4-Step Process + Trust Badges ─── */}
-      <section className="py-24 lg:py-32">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <ScrollReveal className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-semibold tracking-widest text-primary uppercase">
-              Process
-            </p>
-            <h2 className="mt-4 text-balance text-3xl font-bold text-foreground md:text-4xl">
-              타협하지 않는 4단계 검증 프로세스
-            </h2>
-          </ScrollReveal>
+export default function Page() {
+  const heroVariants = {
+    hidden: { opacity: 0, y: 28 },
+    visible: (delay: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.65, ease: 'easeOut', delay },
+    }),
+  }
 
-          {/* 4 Step cards - horizontal scroll on mobile */}
-          <div className="mt-16 -mx-6 px-6 lg:mx-0 lg:px-0">
-            <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory lg:grid lg:grid-cols-4 lg:overflow-visible lg:pb-0">
-              {[
-                {
-                  step: "01",
-                  title: "직무 분석",
-                  desc: "SME 인터뷰 및 BEI를 통해 핵심 직무 행동을 도출합니다.",
-                  icon: Brain,
-                  color: "text-primary",
-                  bgColor: "bg-primary/10",
-                },
-                {
-                  step: "02",
-                  title: "역량 모델링",
-                  desc: "행동지표(Behavioral Indicator) 기반으로 역량 모델을 설계합니다.",
-                  icon: BarChart3,
-                  color: "text-primary",
-                  bgColor: "bg-primary/10",
-                },
-                {
-                  step: "03",
-                  title: "Assessta DB 매칭",
-                  desc: "25년간 축적된 독보적 역량 DB와 교차 검증하여 정확도를 극대화합니다.",
-                  icon: Database,
-                  color: "text-primary",
-                  bgColor: "bg-primary/10",
-                  exclusive: true,
-                },
-                {
-                  step: "04",
-                  title: "AI 최적화",
-                  desc: "ASTRA AI가 조직 특성에 맞춰 역량 모델을 최종 최적화합니다.",
-                  icon: Sparkles,
-                  color: "text-primary",
-                  bgColor: "bg-primary/10",
-                },
-              ].map((item, i) => (
-                <ScrollReveal key={item.step} delay={i * 100} className="min-w-[260px] snap-center lg:min-w-0">
-                  <div
-                    className={`relative flex h-full flex-col rounded-2xl border p-6 shadow-sm transition-all ${
-                      item.exclusive
-                        ? "border-primary/30 bg-primary/[0.04] ring-1 ring-primary/10"
-                        : "border-border bg-card"
-                    }`}
-                  >
-                    {item.exclusive && (
-                      <span className="absolute -top-3 right-4 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold text-primary-foreground uppercase tracking-wider">
-                        Exclusive
-                      </span>
-                    )}
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-primary/50">STEP</span>
-                      <span className="text-2xl font-extrabold text-foreground">{item.step}</span>
-                    </div>
-                    <div className={`mt-5 flex h-11 w-11 items-center justify-center rounded-xl ${item.bgColor}`}>
-                      <item.icon className={`h-5 w-5 ${item.color}`} />
-                    </div>
-                    <h3 className="mt-4 text-base font-bold text-foreground">{item.title}</h3>
-                    <p className="mt-2 flex-1 text-sm leading-relaxed text-muted-foreground">
-                      {item.desc}
-                    </p>
-                    {/* Connector arrow (not on last) */}
-                    {i < 3 && (
-                      <div className="absolute -right-3 top-1/2 -translate-y-1/2 hidden text-border lg:block">
-                        <ArrowRight className="h-5 w-5" />
-                      </div>
-                    )}
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
+  return (
+    <div className="relative overflow-hidden bg-[#020617] text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="nebula-orb nebula-orb-1" />
+        <div className="nebula-orb nebula-orb-2" />
+        <div className="nebula-orb nebula-orb-3" />
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.08)_1px,transparent_1px)] bg-[size:56px_56px] opacity-10" />
+
+      <section className="snap-start relative flex min-h-screen items-center justify-center px-6 pb-24 pt-36 text-center lg:px-8">
+        <QuantumParticleCanvas />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/35 to-[#020617]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0)_70%)]" />
+
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <div className="mt-8 flex flex-col items-center gap-8">
+            <motion.h1
+              custom={0.15}
+              variants={heroVariants}
+              initial="hidden"
+              animate="visible"
+              className="text-balance text-6xl font-extrabold leading-tight tracking-[-0.02em] md:text-7xl"
+            >
+              <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">고성과자의 </span>
+              <span style={{ color: ELECTRIC_BLUE }}>DNA</span>,
+              <br />
+              <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">AI가 </span>
+              <span style={{ color: ELECTRIC_BLUE }}>3초</span>
+              <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent"> 만에 </span>
+              <span style={{ color: ELECTRIC_BLUE }}>시각화</span>
+              <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">합니다.</span>
+            </motion.h1>
+
+            <motion.p
+              custom={0.3}
+              variants={heroVariants}
+              initial="hidden"
+              animate="visible"
+              className="mx-auto mt-6 mb-10 max-w-3xl text-pretty text-lg font-light leading-[1.8] text-gray-300"
+            >
+              3개월이 걸리던 고비용 역량 모델링, AI 자동화로 3일 만에 완성합니다.
+              <br />
+              비용은 1/10로 줄이고, 고성과자 예측 정확도는 94%까지 끌어올렸습니다.
+            </motion.p>
           </div>
 
-          {/* Trust badges */}
-          <ScrollReveal delay={100} className="mt-16 flex flex-wrap items-center justify-center gap-4">
-            {[
-              { icon: Award, label: "25년 데이터베이스" },
-              { icon: ScrollText, label: "ISO 국제 표준 준수" },
-              { icon: BarChart3, label: "Schmidt & Hunter 타당도 입증" },
-            ].map((badge) => (
-              <Link
-                key={badge.label}
-                href="/research"
-                className="group flex items-center gap-2.5 rounded-full border border-border bg-card px-5 py-2.5 text-sm shadow-sm transition-all hover:border-primary/20 hover:shadow-md"
-              >
-                <badge.icon className="h-4 w-4 text-primary" />
-                <span className="font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-                  {badge.label}
-                </span>
-                <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/50 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
-              </Link>
-            ))}
-          </ScrollReveal>
+          <motion.div custom={0.45} variants={heroVariants} initial="hidden" animate="visible" className="mt-0">
+            <button
+              type="button"
+              className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-8 py-4 text-lg font-medium text-white backdrop-blur-md shadow-[0_0_28px_rgba(59,130,246,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[#356DF3] hover:bg-[#356DF3] hover:text-white"
+            >
+              무료 진단 데모 보기
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </button>
+          </motion.div>
         </div>
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: [0, 6, 0] }}
+          transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+          className="pointer-events-none absolute inset-x-0 bottom-8 z-20 flex flex-col items-center text-center text-neutral-300"
+        >
+          <p className="text-xs tracking-[0.18em] uppercase">Scroll Down</p>
+          <ChevronDown className="mx-auto mt-1 h-4 w-4 text-cyan-300" />
+        </motion.div>
       </section>
 
-      {/* ─── 5. [Ending] Client Logos + CTA ─── */}
-      <section className="py-24 lg:py-32 bg-muted/40">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          {/* Client logos */}
-          <ScrollReveal>
-            <p className="text-center text-sm font-semibold text-foreground">
-              이미 업계 1위 기업들은 아스트라와 함께하고 있습니다
-            </p>
-            <div className="mt-8">
-              <LogoMarquee />
-            </div>
-          </ScrollReveal>
-
-          {/* Stats */}
-          <ScrollReveal delay={150} className="mx-auto mt-16 grid max-w-3xl grid-cols-3 gap-6 text-center">
-            {[
-              { value: 500, suffix: "+", label: "완료 프로젝트" },
-              { value: 97, suffix: "%", label: "고객 만족도" },
-              { value: 25, suffix: "년+", label: "업력" },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <p className="text-3xl font-extrabold text-foreground md:text-4xl">
-                  <Counter end={stat.value} suffix={stat.suffix} />
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
-              </div>
-            ))}
-          </ScrollReveal>
-
-          {/* Final CTA */}
-          <ScrollReveal delay={200} className="mx-auto mt-20 max-w-2xl text-center">
-            <h2 className="text-balance text-2xl font-bold text-foreground md:text-3xl">
-              우리 조직의 &lsquo;진짜 역량&rsquo;을 찾을 준비가 되셨나요?
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-muted-foreground leading-relaxed">
-              무료 진단을 통해 현재 HR 시스템의 개선 포인트를 확인하고
-              맞춤 솔루션을 제안받으세요.
-            </p>
-            <div className="mt-8">
-              <Link
-                href="/inquiry"
-                className="group inline-flex items-center gap-2 rounded-lg bg-primary px-10 py-4 text-base font-semibold text-primary-foreground shadow-md transition-all hover:brightness-110 hover:shadow-lg"
-              >
-                무료 진단 문의하기
-                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </div>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-5 text-xs text-muted-foreground">
-              {["무료 상담", "맞춤형 분석 리포트", "비밀 보장"].map((item) => (
-                <div key={item} className="flex items-center gap-1.5">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
-                  {item}
-                </div>
-              ))}
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-    </>
+      <SpotlightRevealSection />
+      <FeatureFlow />
+      <ROICalculator />
+      <LiveAIDashboardSection />
+      <SocialProof />
+    </div>
   )
 }

@@ -2,26 +2,20 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 
 const navLinks = [
   { label: "아스트라", href: "/solutions" },
   { label: "리서치", href: "/research" },
-  { label: "사례", href: "/cases" },
-  { label: "교육/컨설팅", href: "/education" },
+  { label: "HR컨설팅", href: "/education" },
+  { label: "프로젝트 사례", href: "/cases" },
 ]
 
 export function Navigation() {
-  const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20)
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   useEffect(() => {
     setMobileOpen(false)
@@ -29,19 +23,19 @@ export function Navigation() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-background/80 shadow-sm backdrop-blur-xl border-b border-border"
-          : "bg-background/50 backdrop-blur-sm"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/20 backdrop-blur-md transition-all duration-300"
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-        <Link href="/" className="flex items-center">
-          <img
+        <Link href="/" className="flex flex-col items-center leading-none">
+          <Image
             src="/images/logo.png"
-            alt="어세스타 HR"
-            className="h-7 w-auto"
+            alt="ASTRA"
+            width={107}
+            height={40}
+            priority
+            className="h-7 w-auto drop-shadow-[0_0_6px_rgba(255,255,255,0.25)]"
           />
+          <span className="mt-0.5 text-center text-[10px] font-medium tracking-wide text-slate-400">by Assesta</span>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">
@@ -51,8 +45,8 @@ export function Navigation() {
               href={link.href}
               className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                 pathname === link.href
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-white/10 text-white"
+                  : "text-slate-300 hover:bg-white/8 hover:text-white"
               }`}
             >
               {link.label}
@@ -63,10 +57,10 @@ export function Navigation() {
         <div className="hidden md:block">
           <Link
             href="/inquiry"
-            className={`rounded-lg px-5 py-2.5 text-sm font-semibold transition-all ${
+            className={`rounded-lg border px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${
               pathname === "/inquiry"
-                ? "bg-primary/10 text-primary ring-1 ring-primary/20"
-                : "bg-primary text-primary-foreground shadow-sm hover:brightness-110"
+                ? "border-[#356DF3] bg-[#356DF3] text-white"
+                : "border-white/30 bg-white text-[#111111] hover:border-[#356DF3] hover:bg-[#356DF3] hover:text-white"
             }`}
           >
             문의하기
@@ -74,7 +68,7 @@ export function Navigation() {
         </div>
 
         <button
-          className="text-foreground md:hidden"
+          className="text-white md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "메뉴 닫기" : "메뉴 열기"}
         >
@@ -83,7 +77,7 @@ export function Navigation() {
       </nav>
 
       {mobileOpen && (
-        <div className="border-t border-border bg-background/95 backdrop-blur-xl md:hidden">
+        <div className="border-t border-white/10 bg-black/70 backdrop-blur-xl md:hidden">
           <div className="flex flex-col gap-1 px-6 py-4">
             {navLinks.map((link) => (
               <Link
@@ -91,8 +85,8 @@ export function Navigation() {
                 href={link.href}
                 className={`rounded-lg px-4 py-3 text-sm transition-colors ${
                   pathname === link.href
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-white/10 text-white font-medium"
+                    : "text-slate-300 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {link.label}
@@ -100,7 +94,7 @@ export function Navigation() {
             ))}
             <Link
               href="/inquiry"
-              className="mt-2 rounded-lg bg-primary px-4 py-3 text-center text-sm font-semibold text-primary-foreground"
+              className="mt-2 rounded-lg border border-white/30 bg-white px-4 py-3 text-center text-sm font-semibold text-[#111111] transition-all duration-300 hover:border-[#356DF3] hover:bg-[#356DF3] hover:text-white"
             >
               문의하기
             </Link>

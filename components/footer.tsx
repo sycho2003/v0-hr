@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 const footerLinks = {
   services: [
@@ -16,18 +17,20 @@ const footerLinks = {
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-muted/30">
+    <footer className="border-t border-white/10 bg-[#020617]">
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
         <div className="grid gap-12 md:grid-cols-4">
           <div className="md:col-span-1">
             <Link href="/" className="inline-block">
-              <img
+              <Image
                 src="/images/logo.png"
-                alt="어세스타 HR"
-                className="h-6 w-auto"
+                alt="ASTRA"
+                width={107}
+                height={40}
+                className="h-6 w-auto drop-shadow-[0_0_6px_rgba(255,255,255,0.25)]"
               />
             </Link>
-            <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-4 text-sm leading-relaxed text-slate-400">
               국내 최고의 심리학 기반
               <br />
               역량평가 전문기관
@@ -36,43 +39,43 @@ export function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold tracking-wider text-foreground uppercase">서비스</p>
+            <p className="text-xs font-semibold tracking-wider text-slate-200 uppercase">서비스</p>
             <ul className="mt-4 space-y-3">
               {footerLinks.services.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">{item.label}</Link>
+                  <Link href={item.href} className="text-sm text-slate-400 transition-colors hover:text-white">{item.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <p className="text-xs font-semibold tracking-wider text-foreground uppercase">회사</p>
+            <p className="text-xs font-semibold tracking-wider text-slate-200 uppercase">회사</p>
             <ul className="mt-4 space-y-3">
               {footerLinks.company.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-sm text-muted-foreground transition-colors hover:text-foreground">{item.label}</Link>
+                  <Link href={item.href} className="text-sm text-slate-400 transition-colors hover:text-white">{item.label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
           <div>
-            <p className="text-xs font-semibold tracking-wider text-foreground uppercase">연락처</p>
-            <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+            <p className="text-xs font-semibold tracking-wider text-slate-200 uppercase">연락처</p>
+            <ul className="mt-4 space-y-3 text-sm text-slate-400">
               <li>서울특별시 강남구 테헤란로 123</li>
               <li>어세스타 빌딩 7층</li>
-              <li className="font-medium text-foreground">02-1234-5678</li>
-              <li className="font-medium text-foreground">contact@assessta.co.kr</li>
+              <li className="font-medium text-white">02-1234-5678</li>
+              <li className="font-medium text-white">contact@assessta.co.kr</li>
             </ul>
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 md:flex-row">
-          <p className="text-xs text-muted-foreground">&copy; 2026 ASSESSTA Inc. All rights reserved.</p>
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 md:flex-row">
+          <p className="text-xs text-slate-500">&copy; 2026 ASSESSTA Inc. All rights reserved.</p>
           <div className="flex gap-6">
             {["개인정보처리방침", "이용약관"].map((item) => (
-              <a key={item} href="#" className="text-xs text-muted-foreground transition-colors hover:text-foreground">{item}</a>
+              <a key={item} href="#" className="text-xs text-slate-500 transition-colors hover:text-white">{item}</a>
             ))}
           </div>
         </div>
