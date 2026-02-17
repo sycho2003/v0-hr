@@ -32,6 +32,9 @@ function QuantumParticleCanvas() {
     let height = 0
     let rafId = 0
     let pointer = { x: 0, y: 0, active: false }
+    let pointerTarget = { x: 0, y: 0, active: false }
+    let blueSprite: HTMLCanvasElement | null = null
+    let mintSprite: HTMLCanvasElement | null = null
 
     const particleCount = () => (window.innerWidth < 768 ? 110 : 220)
     const particles: Array<{
@@ -74,7 +77,7 @@ function QuantumParticleCanvas() {
           orbit,
           angle: Math.random() * Math.PI * 2,
           speed: Math.random() * 0.0014 + 0.00045,
-          radius: Math.random() * 1.9 + 1.25,
+          radius: Math.random() * 1.35 + 0.9,
           alpha: Math.random() * 0.36 + 0.5,
           color: isPrimary ? '59,130,246' : '94,234,212',
           jitter: (Math.random() - 0.5) * 18,
@@ -83,6 +86,30 @@ function QuantumParticleCanvas() {
           wobblePhase: Math.random() * Math.PI * 2,
         })
       }
+    }
+
+    const createGlowSprite = (r: number, g: number, b: number) => {
+      const spriteSize = 72
+      const sprite = document.createElement('canvas')
+      sprite.width = spriteSize
+      sprite.height = spriteSize
+      const spriteCtx = sprite.getContext('2d')
+      if (!spriteCtx) return null
+      const gradient = spriteCtx.createRadialGradient(
+        spriteSize * 0.5,
+        spriteSize * 0.5,
+        spriteSize * 0.06,
+        spriteSize * 0.5,
+        spriteSize * 0.5,
+        spriteSize * 0.5
+      )
+      gradient.addColorStop(0, `rgba(${r},${g},${b},1)`)
+      gradient.addColorStop(0.18, `rgba(${r},${g},${b},0.92)`)
+      gradient.addColorStop(0.52, `rgba(${r},${g},${b},0.42)`)
+      gradient.addColorStop(1, `rgba(${r},${g},${b},0)`)
+      spriteCtx.fillStyle = gradient
+      spriteCtx.fillRect(0, 0, spriteSize, spriteSize)
+      return sprite
     }
 
     const resize = () => {
@@ -94,6 +121,8 @@ function QuantumParticleCanvas() {
       canvas.style.width = `${width}px`
       canvas.style.height = `${height}px`
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      blueSprite = createGlowSprite(59, 130, 246)
+      mintSprite = createGlowSprite(94, 234, 212)
       createParticles()
     }
 
@@ -121,14 +150,21 @@ function QuantumParticleCanvas() {
         const trY = height * 0.22
         const titleNorm = Math.sqrt(((x - tx) / trX) ** 2 + ((y - ty) / trY) ** 2)
         const titleWeight = titleNorm < 1 ? 0.28 + titleNorm * 0.72 : 1
-        const particleAlpha = p.alpha * centerWeight * titleWeight
+        const particleAlpha = Math.min(1, p.alpha * centerWeight * titleWeight * 1.24)
+
+        const sprite = p.color === '59,130,246' ? blueSprite : mintSprite
+        if (sprite) {
+          const size = p.radius * 8.1
+          ctx.globalAlpha = Math.min(1, particleAlpha * 1.12)
+          ctx.drawImage(sprite, x - size * 0.5, y - size * 0.5, size, size)
+          ctx.globalAlpha = 1
+        }
 
         ctx.beginPath()
-        ctx.fillStyle = `rgba(${p.color}, ${particleAlpha})`
-        ctx.shadowColor = `rgba(${p.color}, ${Math.min(0.95, particleAlpha + 0.34)})`
-        ctx.shadowBlur = 18
-        ctx.arc(x, y, p.radius, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(${p.color}, ${Math.min(1, particleAlpha * 0.95)})`
+        ctx.arc(x, y, Math.max(0.9, p.radius * 0.62), 0, Math.PI * 2)
         ctx.fill()
+
         positions.push({ x, y, alpha: particleAlpha, color: p.color })
       }
 
@@ -176,45 +212,63 @@ function QuantumParticleCanvas() {
         ctx.stroke()
       }
 
+      // Smooth pointer interpolation to avoid jitter from raw pointer events.
+      if (pointerTarget.active || pointer.active) {
+        pointer.x += (pointerTarget.x - pointer.x) * 0.18
+        pointer.y += (pointerTarget.y - pointer.y) * 0.18
+        const dx = pointerTarget.x - pointer.x
+        const dy = pointerTarget.y - pointer.y
+        pointer.active = pointerTarget.active || dx * dx + dy * dy > 0.35
+      }
+
       if (pointer.active) {
         const radius = Math.min(190, Math.max(130, width * 0.12))
-        const near = positions.filter((p) => {
+        const radiusSq = radius * radius
+        const near: typeof positions = []
+        const maxNear = window.innerWidth < 768 ? 22 : 40
+
+        for (let i = 0; i < positions.length; i += 1) {
+          const p = positions[i]
           const dx = p.x - pointer.x
           const dy = p.y - pointer.y
-          return dx * dx + dy * dy < radius * radius
-        })
+          if (dx * dx + dy * dy < radiusSq) {
+            near.push(p)
+            if (near.length >= maxNear) break
+          }
+        }
 
         const edgeGradient = ctx.createRadialGradient(pointer.x, pointer.y, radius * 0.2, pointer.x, pointer.y, radius)
-        edgeGradient.addColorStop(0, 'rgba(59,130,246,0.34)')
-        edgeGradient.addColorStop(0.55, 'rgba(59,130,246,0.18)')
+        edgeGradient.addColorStop(0, 'rgba(59,130,246,0.46)')
+        edgeGradient.addColorStop(0.55, 'rgba(59,130,246,0.24)')
         edgeGradient.addColorStop(1, 'rgba(59,130,246,0)')
         ctx.fillStyle = edgeGradient
         ctx.beginPath()
         ctx.arc(pointer.x, pointer.y, radius, 0, Math.PI * 2)
         ctx.fill()
 
-        const coreGlow = ctx.createRadialGradient(pointer.x, pointer.y, radius * 0.02, pointer.x, pointer.y, radius * 0.68)
-        coreGlow.addColorStop(0, 'rgba(147,197,253,0.22)')
-        coreGlow.addColorStop(0.35, 'rgba(147,197,253,0.16)')
-        coreGlow.addColorStop(0.7, 'rgba(147,197,253,0.08)')
+        const coreGlow = ctx.createRadialGradient(pointer.x, pointer.y, radius * 0.02, pointer.x, pointer.y, radius * 0.72)
+        coreGlow.addColorStop(0, 'rgba(147,197,253,0.30)')
+        coreGlow.addColorStop(0.35, 'rgba(147,197,253,0.20)')
+        coreGlow.addColorStop(0.7, 'rgba(147,197,253,0.10)')
         coreGlow.addColorStop(1, 'rgba(147,197,253,0)')
         ctx.fillStyle = coreGlow
         ctx.beginPath()
         ctx.arc(pointer.x, pointer.y, radius * 0.68, 0, Math.PI * 2)
         ctx.fill()
 
-        ctx.strokeStyle = 'rgba(96,165,250,0.22)'
-        ctx.lineWidth = 1
+        ctx.strokeStyle = 'rgba(96,165,250,0.28)'
+        ctx.lineWidth = 1.1
         for (let i = 0; i < near.length; i += 1) {
           for (let j = i + 1; j < near.length; j += 1) {
             const a = near[i]
             const b = near[j]
             const dx = a.x - b.x
             const dy = a.y - b.y
-            const dist = Math.sqrt(dx * dx + dy * dy)
-            if (dist > 86) continue
-            const strength = 1 - dist / 86
-            ctx.strokeStyle = `rgba(96,165,250,${0.08 + strength * 0.35})`
+            const distSq = dx * dx + dy * dy
+            const maxDistSq = 78 * 78
+            if (distSq > maxDistSq) continue
+            const strength = 1 - Math.sqrt(distSq) / 78
+            ctx.strokeStyle = `rgba(96,165,250,${0.12 + strength * 0.42})`
             ctx.beginPath()
             ctx.moveTo(a.x, a.y)
             ctx.lineTo(b.x, b.y)
@@ -229,7 +283,7 @@ function QuantumParticleCanvas() {
           const dist = Math.sqrt(dx * dx + dy * dy)
           const strength = 1 - dist / radius
           if (strength <= 0) continue
-          ctx.strokeStyle = `rgba(94,234,212,${0.1 + strength * 0.3})`
+          ctx.strokeStyle = `rgba(94,234,212,${0.14 + strength * 0.36})`
           ctx.beginPath()
           ctx.moveTo(pointer.x, pointer.y)
           ctx.lineTo(p.x, p.y)
@@ -240,11 +294,11 @@ function QuantumParticleCanvas() {
       ctx.shadowBlur = 0
 
       const ringGradient = ctx.createRadialGradient(cx, cy, 40, cx, cy, Math.min(width, height) * 0.5)
-      ringGradient.addColorStop(0, 'rgba(59,130,246,0.34)')
-      ringGradient.addColorStop(0.45, 'rgba(59,130,246,0.18)')
+      ringGradient.addColorStop(0, 'rgba(59,130,246,0.44)')
+      ringGradient.addColorStop(0.45, 'rgba(59,130,246,0.24)')
       ringGradient.addColorStop(1, 'rgba(59,130,246,0)')
       ctx.strokeStyle = ringGradient
-      ctx.lineWidth = 1.2
+      ctx.lineWidth = 1.35
       for (let i = 0; i < 3; i += 1) {
         const r = Math.min(width, height) * (0.23 + i * 0.07)
         ctx.beginPath()
@@ -256,10 +310,13 @@ function QuantumParticleCanvas() {
     }
 
     const onMove = (event: PointerEvent) => {
-      pointer = { x: event.clientX, y: event.clientY, active: true }
+      pointerTarget = { x: event.clientX, y: event.clientY, active: true }
+      if (!pointer.active) {
+        pointer = { x: event.clientX, y: event.clientY, active: true }
+      }
     }
     const onLeave = () => {
-      pointer = { ...pointer, active: false }
+      pointerTarget = { ...pointerTarget, active: false }
     }
 
     resize()
@@ -625,7 +682,7 @@ function ROICalculator() {
   useEffect(() => {
     const from = prevRef.current
     const to = estimatedBenefit
-    const duration = 700
+    const duration = 1100
     let rafId = 0
     const start = performance.now()
 
@@ -694,23 +751,9 @@ function ROICalculator() {
 
           <div className="rounded-2xl border border-white/10 bg-[#0b1428]/50 p-6 md:p-8">
             <p className="text-sm text-slate-300">예상 연간 이익</p>
-            <motion.p
-              key={displayValue}
-              initial={{
-                opacity: 0.85,
-                scale: 0.98,
-                textShadow: '0 0 8px rgba(96,165,250,0.35)',
-              }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                textShadow: '0 0 22px rgba(96,165,250,0.4)',
-              }}
-              transition={{ duration: 0.45, ease: 'easeOut' }}
-              className="mt-4 text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400 md:text-6xl"
-            >
+            <p className="mt-4 text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400 md:text-6xl [font-variant-numeric:tabular-nums]">
               {formatManwonToKrw(displayValue)}
-            </motion.p>
+            </p>
 
             <div className="mt-7 space-y-3 border-t border-white/10 pt-5 text-left">
               <p className="text-sm text-green-400">

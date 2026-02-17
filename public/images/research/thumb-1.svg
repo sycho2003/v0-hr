@@ -1,19 +1,19 @@
-<svg width="800" height="800" viewBox="0 0 800 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="900" height="900" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="b1" x1="0" y1="0" x2="800" y2="800" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#0A1523"/>
-      <stop offset="1" stop-color="#15253D"/>
-    </linearGradient>
-    <radialGradient id="g1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(220 260) rotate(24) scale(270 200)">
-      <stop stop-color="#22D3EE" stop-opacity="0.25"/>
-      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    <radialGradient id="g1a" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(220 180) rotate(36) scale(460 380)">
+      <stop stop-color="#F472B6"/><stop offset="1" stop-color="#F472B6" stop-opacity="0"/>
     </radialGradient>
+    <radialGradient id="g1b" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(700 700) rotate(-18) scale(520 420)">
+      <stop stop-color="#FB923C"/><stop offset="1" stop-color="#FB923C" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="g1c" x1="120" y1="40" x2="840" y2="860" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A78BFA"/><stop offset="1" stop-color="#93C5FD"/>
+    </linearGradient>
   </defs>
-  <rect width="800" height="800" fill="url(#b1)"/>
-  <rect width="800" height="800" fill="url(#g1)"/>
-  <rect x="56" y="66" width="688" height="138" rx="22" fill="#020617" fill-opacity="0.5" stroke="#94A3B8" stroke-opacity="0.26"/>
-  <rect x="84" y="92" width="186" height="9" rx="4.5" fill="#E2E8F0" fill-opacity="0.28"/>
-  <rect x="84" y="115" width="558" height="10" rx="5" fill="#67E8F9" fill-opacity="0.76"/>
-  <rect x="84" y="138" width="620" height="10" rx="5" fill="#60A5FA" fill-opacity="0.62"/>
-  <rect x="84" y="160" width="474" height="10" rx="5" fill="#60A5FA" fill-opacity="0.45"/>
+  <rect width="900" height="900" rx="44" fill="url(#g1c)"/>
+  <rect width="900" height="900" rx="44" fill="url(#g1a)"/>
+  <rect width="900" height="900" rx="44" fill="url(#g1b)"/>
+  <rect x="310" y="310" width="280" height="280" rx="36" fill="#FFFFFF" fill-opacity="0.18" stroke="#FFFFFF" stroke-opacity="0.45"/>
+  <path d="M390 450H510" stroke="white" stroke-width="14" stroke-linecap="round"/>
+  <path d="M450 390V510" stroke="white" stroke-width="14" stroke-linecap="round"/>
 </svg>

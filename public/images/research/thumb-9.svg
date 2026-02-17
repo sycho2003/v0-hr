@@ -1,0 +1,15 @@
+<svg width="900" height="900" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="c" x1="40" y1="80" x2="860" y2="860" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A7F3D0"/>
+      <stop offset="0.55" stop-color="#67E8F9"/>
+      <stop offset="1" stop-color="#93C5FD"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="900" rx="44" fill="url(#c)"/>
+  <rect x="278" y="284" width="344" height="332" rx="34" fill="white" fill-opacity="0.8"/>
+  <rect x="318" y="334" width="264" height="22" rx="11" fill="#CBD5E1"/>
+  <rect x="318" y="374" width="232" height="16" rx="8" fill="#CBD5E1"/>
+  <rect x="318" y="420" width="264" height="128" rx="18" fill="#ECFEFF"/>
+  <text x="352" y="510" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="26" font-weight="700">AI Notes</text>
+</svg>

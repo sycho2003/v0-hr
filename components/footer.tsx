@@ -4,13 +4,13 @@ import Image from "next/image"
 const footerLinks = {
   services: [
     { label: "아스트라", href: "/solutions" },
-    { label: "교육/컨설팅", href: "/education" },
+    { label: "HR 교육", href: "/education" },
     { label: "HR 컨설팅", href: "/inquiry" },
   ],
   company: [
     { label: "회사 소개", href: "/" },
     { label: "리서치", href: "/research" },
-    { label: "성공 사례", href: "/cases" },
+    { label: "프로젝트 사례", href: "/cases" },
     { label: "문의하기", href: "/inquiry" },
   ],
 }
@@ -63,10 +63,10 @@ export function Footer() {
           <div>
             <p className="text-xs font-semibold tracking-wider text-slate-200 uppercase">연락처</p>
             <ul className="mt-4 space-y-3 text-sm text-slate-400">
-              <li>서울특별시 강남구 테헤란로 123</li>
-              <li>어세스타 빌딩 7층</li>
-              <li className="font-medium text-white">02-1234-5678</li>
-              <li className="font-medium text-white">contact@assessta.co.kr</li>
+              <li>서울특별시 영등포구 국회대로 68길 11 (여의도동)</li>
+              <li>삼보호정빌딩 5층</li>
+              <li className="font-medium text-white">02-787-1464</li>
+              <li className="font-medium text-white">assesta@assesta.com</li>
             </ul>
           </div>
         </div>

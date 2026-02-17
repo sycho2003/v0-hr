@@ -1,0 +1,14 @@
+<svg width="900" height="900" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="b" x1="90" y1="40" x2="860" y2="860" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1D4ED8"/>
+      <stop offset="1" stop-color="#60A5FA"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="900" rx="44" fill="url(#b)"/>
+  <rect x="166" y="172" width="568" height="556" rx="36" fill="#0F172A" fill-opacity="0.22" stroke="#BFDBFE" stroke-opacity="0.45"/>
+  <path d="M232 596C316 472 376 462 468 390C520 350 574 290 636 238" stroke="#BAE6FD" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="366" cy="472" r="96" fill="none" stroke="#BAE6FD" stroke-opacity="0.45" stroke-width="6"/>
+  <circle cx="366" cy="472" r="52" fill="none" stroke="#BAE6FD" stroke-opacity="0.45" stroke-width="6"/>
+  <text x="230" y="680" fill="white" font-family="Pretendard, Inter, sans-serif" font-size="50" font-weight="700">Trust Signal</text>
+</svg>

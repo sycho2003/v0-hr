@@ -1,0 +1,66 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse"><stop stop-color="#EEF3FF"/><stop offset="1" stop-color="#E4ECFA"/></linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#0F172A" flood-opacity="0.14"/></filter>
+  </defs>
+  <rect width="1440" height="900" rx="32" fill="url(#bg)"/>
+
+  <rect x="48" y="32" width="1344" height="58" rx="16" fill="#FFFFFF" stroke="#C4D4ED"/>
+  <text x="84" y="69" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="20" font-weight="700">ASTRA Interview Co-pilot</text>
+
+  <rect x="48" y="114" width="940" height="742" rx="24" fill="#FFFFFF" stroke="#C7D7EE" filter="url(#shadow)"/>
+  <rect x="82" y="150" width="872" height="110" rx="16" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <text x="116" y="196" fill="#334155" font-family="Pretendard, Inter, sans-serif" font-size="14" font-weight="600">Live Audio &amp; Transcript</text>
+  <g>
+    <rect x="116" y="214" width="20" height="12" rx="6" fill="url(#accent)"/>
+    <rect x="142" y="208" width="10" height="24" rx="5" fill="url(#accent)"/>
+    <rect x="158" y="202" width="16" height="36" rx="6" fill="url(#accent)"/>
+    <rect x="180" y="208" width="10" height="24" rx="5" fill="url(#accent)"/>
+    <rect x="196" y="214" width="20" height="12" rx="6" fill="url(#accent)"/>
+  </g>
+
+  <rect x="82" y="282" width="420" height="246" rx="16" fill="#FFFFFF" stroke="#D6E2F4"/>
+  <text x="114" y="322" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="16" font-weight="700">질문 가이드</text>
+  <rect x="114" y="342" width="356" height="1" fill="#D7E3F4"/>
+  <text x="114" y="372" fill="#475569" font-family="Pretendard, Inter, sans-serif" font-size="13">최근 프로젝트에서 갈등을 해결한 방식과 본인의 판단 기준을 설명해 주세요.</text>
+  <text x="114" y="394" fill="#475569" font-family="Pretendard, Inter, sans-serif" font-size="13">복잡한 의사결정 상황에서 우선순위를 정한 사례를 구체적으로 말씀해 주세요.</text>
+  <text x="114" y="416" fill="#475569" font-family="Pretendard, Inter, sans-serif" font-size="13">실패 경험 이후 성과를 회복한 과정을 수치 기반으로 설명해 주세요.</text>
+  <rect x="114" y="452" width="164" height="36" rx="10" fill="#EAF3FF" stroke="#B9D3FF"/>
+  <text x="151" y="475" fill="#1D4ED8" font-family="Pretendard, Inter, sans-serif" font-size="13" font-weight="700">질문 추천</text>
+
+  <rect x="534" y="282" width="420" height="246" rx="16" fill="#FFFFFF" stroke="#D6E2F4"/>
+  <text x="566" y="322" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="16" font-weight="700">Behavior Signal</text>
+  <circle cx="640" cy="410" r="72" fill="#F0F7FF" stroke="#C7DAF5"/>
+  <path d="M584 430C606 402 620 390 642 394C664 398 681 412 702 436" stroke="#0EA5E9" stroke-width="4" fill="none"/>
+  <rect x="738" y="372" width="178" height="10" rx="5" fill="#DFE8F5"/>
+  <rect x="738" y="372" width="154" height="10" rx="5" fill="url(#accent)"/>
+  <text x="738" y="356" fill="#0369A1" font-family="Pretendard, Inter, sans-serif" font-size="13" font-weight="700">Confidence 88%</text>
+
+  <rect x="82" y="550" width="872" height="270" rx="16" fill="#FFFFFF" stroke="#D6E2F4"/>
+  <text x="114" y="590" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="16" font-weight="700">Interview Summary</text>
+  <rect x="114" y="610" width="808" height="1" fill="#D7E3F4"/>
+  <text x="114" y="638" fill="#475569" font-family="Pretendard, Inter, sans-serif" font-size="13">지원자는 문제 정의 단계에서 이해관계자 의견을 구조화해 우선순위를 도출하는 경향이 뚜렷합니다.</text>
+  <text x="114" y="660" fill="#475569" font-family="Pretendard, Inter, sans-serif" font-size="13">답변의 일관성 점수는 0.89로 높으며, 실제 실행 경험을 근거로 판단을 제시하는 비율이 우수합니다.</text>
+  <text x="114" y="682" fill="#475569" font-family="Pretendard, Inter, sans-serif" font-size="13">협업 상황에서 책임 회피보다 역할 조정과 재실행 계획을 제안하는 패턴이 반복적으로 관측되었습니다.</text>
+  <text x="114" y="704" fill="#475569" font-family="Pretendard, Inter, sans-serif" font-size="13">최종 권고: 기술 역량은 기준 충족, 리더십 잠재력 검증을 위한 2차 인터뷰 진행 권장.</text>
+  <rect x="114" y="742" width="168" height="38" rx="10" fill="#EAF3FF" stroke="#B9D3FF"/>
+  <text x="152" y="766" fill="#1D4ED8" font-family="Pretendard, Inter, sans-serif" font-size="13" font-weight="700">리포트 저장</text>
+
+  <rect x="1012" y="114" width="380" height="742" rx="24" fill="#FFFFFF" stroke="#C7D7EE" filter="url(#shadow)"/>
+  <text x="1048" y="160" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="18" font-weight="700">Candidate Timeline</text>
+  <rect x="1048" y="184" width="308" height="130" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <text x="1072" y="220" fill="#64748B" font-family="Pretendard, Inter, sans-serif" font-size="12">00:02:14</text>
+  <text x="1072" y="250" fill="#334155" font-family="Pretendard, Inter, sans-serif" font-size="14">지원 동기 관련 가치관 정합도 높음</text>
+
+  <rect x="1048" y="330" width="308" height="130" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <text x="1072" y="366" fill="#64748B" font-family="Pretendard, Inter, sans-serif" font-size="12">00:04:55</text>
+  <text x="1072" y="396" fill="#334155" font-family="Pretendard, Inter, sans-serif" font-size="14">문제 해결 사례의 실행력/구체성 우수</text>
+
+  <rect x="1048" y="476" width="308" height="344" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <text x="1072" y="516" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="16" font-weight="700">AI Final Recommendation</text>
+  <text x="1072" y="570" fill="#0EA5E9" font-family="Pretendard, Inter, sans-serif" font-size="40" font-weight="800">Strong Hire</text>
+  <rect x="1072" y="588" width="236" height="10" rx="5" fill="#DFE8F5"/>
+  <rect x="1072" y="588" width="210" height="10" rx="5" fill="url(#accent)"/>
+  <text x="1072" y="628" fill="#475569" font-family="Pretendard, Inter, sans-serif" font-size="14">직무 적합도/성장 잠재력/문화 적응력 기준에서 상위 8%</text>
+</svg>

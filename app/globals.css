@@ -72,6 +72,110 @@
   animation: nebula-drift-c 31s ease-in-out infinite;
 }
 
+@keyframes reel-layer-1 {
+  0% { opacity: 1; transform: scale(1); }
+  25% { opacity: 1; transform: scale(1.05); }
+  33.33% { opacity: 0; transform: scale(1.05); }
+  91.66% { opacity: 0; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes reel-layer-2 {
+  0%, 24.99% { opacity: 0; transform: translateX(0); }
+  33.33% { opacity: 1; transform: translateX(0); }
+  58.33% { opacity: 1; transform: translateX(-2%); }
+  66.66%, 100% { opacity: 0; transform: translateX(-2%); }
+}
+
+@keyframes reel-layer-3 {
+  0%, 43.33% { opacity: 0; transform: scale(1); }
+  51.66% { opacity: 0.55; transform: scale(1.015); }
+  60% { opacity: 0; transform: scale(1.03); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes reel-layer-4 {
+  0%, 58.33% { opacity: 0; transform: scale(1); }
+  66.66% { opacity: 1; transform: scale(1); }
+  91.66% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+@keyframes reel-cursor-move {
+  0%, 20% { left: 40%; top: 70%; transform: scale(1); }
+  25% { left: 41%; top: 71%; transform: scale(0.9); }
+  33%, 50% { left: 72%; top: 42%; transform: scale(1); }
+  66% { left: 74%; top: 44%; transform: scale(0.9); }
+  72%, 90% { left: 78%; top: 26%; transform: scale(1); }
+  96% { left: 79%; top: 27%; transform: scale(0.9); }
+  100% { left: 40%; top: 70%; transform: scale(1); }
+}
+
+@keyframes reel-cursor-ring {
+  0%, 24% { left: 40%; top: 70%; opacity: 0; transform: scale(0.55); }
+  25% { left: 41%; top: 71%; opacity: 0.72; transform: scale(0.55); }
+  30% { left: 41%; top: 71%; opacity: 0; transform: scale(1.6); }
+  31%, 65% { left: 72%; top: 42%; opacity: 0; transform: scale(0.55); }
+  66% { left: 74%; top: 44%; opacity: 0.72; transform: scale(0.55); }
+  71% { left: 74%; top: 44%; opacity: 0; transform: scale(1.6); }
+  72%, 95% { left: 78%; top: 26%; opacity: 0; transform: scale(0.55); }
+  96% { left: 79%; top: 27%; opacity: 0.72; transform: scale(0.55); }
+  100% { left: 79%; top: 27%; opacity: 0; transform: scale(1.6); }
+}
+
+.reel-layer-1,
+.reel-layer-2,
+.reel-layer-3,
+.reel-layer-4 {
+  will-change: transform, opacity;
+  animation-duration: 12s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.reel-layer-1 { animation-name: reel-layer-1; }
+.reel-layer-2 { animation-name: reel-layer-2; }
+.reel-layer-3 { animation-name: reel-layer-3; }
+.reel-layer-4 { animation-name: reel-layer-4; }
+
+.reel-cursor {
+  will-change: transform;
+  animation: reel-cursor-move 12s linear infinite;
+}
+
+.reel-cursor-ring {
+  will-change: transform, opacity;
+  animation: reel-cursor-ring 12s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reel-layer-1,
+  .reel-layer-2,
+  .reel-layer-3,
+  .reel-layer-4,
+  .reel-cursor,
+  .reel-cursor-ring,
+  .animate-chip-marquee,
+  .nebula-orb-1,
+  .nebula-orb-2,
+  .nebula-orb-3 {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .reel-layer-2,
+  .reel-layer-3,
+  .reel-layer-4,
+  .reel-cursor,
+  .reel-cursor-ring {
+    opacity: 0 !important;
+  }
+
+  .reel-layer-1 {
+    opacity: 1 !important;
+  }
+}
+
 @layer base {
   :root {
     --background: 220 20% 98%;

@@ -1,0 +1,57 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse"><stop stop-color="#EEF3FF"/><stop offset="1" stop-color="#E4ECFA"/></linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#3B82F6"/></linearGradient>
+    <filter id="shadow"><feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#0F172A" flood-opacity="0.14"/></filter>
+  </defs>
+  <rect width="1440" height="900" rx="32" fill="url(#bg)"/>
+  <rect x="48" y="32" width="1344" height="58" rx="16" fill="#FFFFFF" stroke="#C4D4ED"/>
+  <text x="84" y="69" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="20" font-weight="700">ASTRA Insight Feed</text>
+
+  <rect x="48" y="114" width="360" height="742" rx="24" fill="#FFFFFF" stroke="#C7D7EE" filter="url(#shadow)"/>
+  <text x="84" y="162" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="18" font-weight="700">Priority Alerts</text>
+
+  <g>
+    <rect x="84" y="186" width="288" height="130" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+    <rect x="106" y="208" width="80" height="24" rx="12" fill="#EAF3FF" stroke="#B9D3FF"/>
+    <text x="126" y="224" fill="#1D4ED8" font-family="Pretendard, Inter, sans-serif" font-size="11" font-weight="700">CRITICAL</text>
+    <text x="106" y="256" fill="#1E293B" font-family="Pretendard, Inter, sans-serif" font-size="14" font-weight="600">리더십 역량 저평가 리스크 감지</text>
+    <text x="106" y="282" fill="#64748B" font-family="Pretendard, Inter, sans-serif" font-size="12">면접관 편차가 기준치 초과</text>
+  </g>
+  <g>
+    <rect x="84" y="332" width="288" height="130" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+    <rect x="106" y="354" width="72" height="24" rx="12" fill="#ECFEFF" stroke="#A5F3FC"/>
+    <text x="126" y="370" fill="#0891B2" font-family="Pretendard, Inter, sans-serif" font-size="11" font-weight="700">UPDATE</text>
+    <text x="106" y="402" fill="#1E293B" font-family="Pretendard, Inter, sans-serif" font-size="14" font-weight="600">신규 직무군 데이터 반영 완료</text>
+    <text x="106" y="428" fill="#64748B" font-family="Pretendard, Inter, sans-serif" font-size="12">최신 성과 변수 자동 업데이트</text>
+  </g>
+
+  <rect x="430" y="114" width="962" height="360" rx="24" fill="#FFFFFF" stroke="#C7D7EE" filter="url(#shadow)"/>
+  <text x="468" y="162" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="18" font-weight="700">Organizational Pulse</text>
+  <rect x="468" y="184" width="886" height="250" rx="16" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <line x1="504" y1="400" x2="1318" y2="400" stroke="#D3DFF1"/>
+  <polyline points="504,362 574,336 644,346 714,308 784,324 854,286 924,300 994,266 1064,280 1134,246 1204,256 1274,224" stroke="url(#accent)" stroke-width="4" fill="none"/>
+  <g fill="#38BDF8">
+    <circle cx="644" cy="346" r="4.5"/><circle cx="854" cy="286" r="4.5"/><circle cx="1064" cy="280" r="4.5"/><circle cx="1274" cy="224" r="4.5"/>
+  </g>
+
+  <rect x="430" y="494" width="470" height="362" rx="24" fill="#FFFFFF" stroke="#C7D7EE" filter="url(#shadow)"/>
+  <text x="468" y="542" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="18" font-weight="700">Action Queue</text>
+  <rect x="468" y="568" width="394" height="74" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <text x="492" y="607" fill="#1E293B" font-family="Pretendard, Inter, sans-serif" font-size="14" font-weight="600">면접관 캘리브레이션 세션 예약</text>
+  <rect x="468" y="660" width="394" height="74" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <text x="492" y="699" fill="#1E293B" font-family="Pretendard, Inter, sans-serif" font-size="14" font-weight="600">직무별 역량 사전 업데이트 승인</text>
+
+  <rect x="922" y="494" width="470" height="362" rx="24" fill="#FFFFFF" stroke="#C7D7EE" filter="url(#shadow)"/>
+  <text x="960" y="542" fill="#0F172A" font-family="Pretendard, Inter, sans-serif" font-size="18" font-weight="700">Impact Summary</text>
+  <rect x="960" y="568" width="170" height="110" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <text x="986" y="610" fill="#64748B" font-family="Pretendard, Inter, sans-serif" font-size="12">Retention</text>
+  <text x="986" y="648" fill="#0EA5E9" font-family="Pretendard, Inter, sans-serif" font-size="34" font-weight="800">+18%</text>
+  <rect x="1150" y="568" width="204" height="110" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <text x="1176" y="610" fill="#64748B" font-family="Pretendard, Inter, sans-serif" font-size="12">Hiring Accuracy</text>
+  <text x="1176" y="648" fill="#2563EB" font-family="Pretendard, Inter, sans-serif" font-size="34" font-weight="800">94.2%</text>
+  <rect x="960" y="700" width="394" height="116" rx="14" fill="#F8FBFF" stroke="#D6E2F4"/>
+  <text x="988" y="742" fill="#475569" font-family="Pretendard, Inter, sans-serif" font-size="14">추천 액션 적용 시 연간 채용 실패 비용 약 31% 절감 예상</text>
+  <text x="988" y="768" fill="#64748B" font-family="Pretendard, Inter, sans-serif" font-size="12">실행 우선순위: 면접관 캘리브레이션 → 역량 사전 업데이트 → 파일럿 검증</text>
+  <rect x="988" y="782" width="182" height="10" rx="5" fill="url(#accent)"/>
+</svg>

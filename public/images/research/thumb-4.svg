@@ -1,0 +1,14 @@
+<svg width="900" height="900" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g4a" x1="80" y1="60" x2="820" y2="860" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67E8F9"/><stop offset="1" stop-color="#FDE68A"/>
+    </linearGradient>
+    <radialGradient id="g4b" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(710 620) rotate(18) scale(360 280)">
+      <stop stop-color="#FB7185"/><stop offset="1" stop-color="#FB7185" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="900" height="900" rx="44" fill="url(#g4a)"/>
+  <rect width="900" height="900" rx="44" fill="url(#g4b)"/>
+  <text x="120" y="470" fill="white" font-family="Pretendard, Inter, sans-serif" font-size="70" font-weight="700">Assesta HR</text>
+  <text x="120" y="548" fill="white" font-family="Pretendard, Inter, sans-serif" font-size="66" font-weight="700">Insights</text>
+</svg>
