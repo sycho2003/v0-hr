@@ -37,7 +37,7 @@ const services = [
 export default function HRConsultingPage() {
   return (
     <div className="min-h-screen bg-neutral-950 pb-24 pt-32 text-white">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

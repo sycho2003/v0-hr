@@ -15,7 +15,7 @@ export default function InquiryPage() {
 
   return (
     <div className="min-h-screen bg-neutral-950 pb-24 pt-32 text-white">
-      <div className="mx-auto max-w-[640px] px-6">
+      <div className="mx-auto max-w-[640px] px-6 lg:px-10 xl:px-[120px]">
         <header className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-400">Inquiry</p>
           <h1 className="mt-3 text-3xl font-extrabold md:text-4xl">빠른 상담 접수</h1>

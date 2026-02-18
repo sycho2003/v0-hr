@@ -104,7 +104,7 @@ export default function ResearchPage() {
 
   return (
     <div className="min-h-screen bg-neutral-950 pb-24 pt-32 text-white">
-      <div className="mx-auto max-w-7xl px-6">
+      <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
         <header className="mb-6">
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Research Library</p>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">리서치</h1>
