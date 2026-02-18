@@ -218,11 +218,26 @@
   * {
     @apply border-border;
   }
+  html,
+  body {
+    overflow-x: hidden;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   }
   html {
     scroll-behavior: smooth;
+  }
+}
+
+@media (max-width: 359px) {
+  .compact-chip-320 {
+    padding: 0.55rem 0.9rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .compact-card-320 {
+    padding: 1rem !important;
   }
 }

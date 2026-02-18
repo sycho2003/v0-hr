@@ -226,7 +226,7 @@ export function CaseStudies() {
 
       {/* CTA */}
       <section className="bg-neutral-950 py-16">
-        <div className="mx-auto max-w-3xl px-6 text-center lg:px-8">
+        <div className="mx-auto max-w-3xl px-6 text-center lg:px-10 xl:px-[120px]">
           <h2 className="text-xl font-bold text-white md:text-2xl">우리 기업도 프로젝트 사례의 주인공이 될 수 있습니다</h2>
           <p className="mt-4 text-neutral-300">무료 진단을 통해 어세스타 솔루션의 기대 효과를 확인하세요.</p>
           <Link
