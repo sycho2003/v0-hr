@@ -35,6 +35,7 @@ function QuantumParticleCanvas() {
     let pointerTarget = { x: 0, y: 0, active: false }
     let blueSprite: HTMLCanvasElement | null = null
     let mintSprite: HTMLCanvasElement | null = null
+    let starSprite: HTMLCanvasElement | null = null
 
     const particleCount = () => (window.innerWidth < 768 ? 110 : 220)
     const particles: Array<{
@@ -48,6 +49,7 @@ function QuantumParticleCanvas() {
       wobbleAmp: number
       wobbleSpeed: number
       wobblePhase: number
+      eccentricity: number
     }> = []
     const meteors: Array<{
       x: number
@@ -62,28 +64,31 @@ function QuantumParticleCanvas() {
     const createParticles = () => {
       particles.length = 0
       const count = particleCount()
-      const maxOrbit = Math.max(210, Math.min(width, height) * 0.47)
-      const minOrbit = Math.max(150, Math.min(width, height) * 0.26)
-      const bands = 4
+      const maxOrbit = Math.max(180, Math.min(width, height) * 0.42)
+      const minOrbit = Math.max(34, Math.min(width, height) * 0.08)
+      const bands = 6
       const bandStep = (maxOrbit - minOrbit) / Math.max(1, bands - 1)
 
       for (let i = 0; i < count; i += 1) {
-        const isPrimary = i % 5 !== 0
+        const colorSeed = Math.random()
+        const color =
+          colorSeed > 0.88 ? '186,230,255' : colorSeed > 0.24 ? '59,130,246' : '94,234,212'
         const band = Math.floor(Math.random() * bands)
         const bandBase = minOrbit + bandStep * band
-        const ringBias = Math.pow(Math.random(), 0.5)
-        const orbit = bandBase + (ringBias - 0.5) * bandStep * 0.7
+        const ringBias = Math.pow(Math.random(), 0.67)
+        const orbit = bandBase + (ringBias - 0.5) * bandStep * 0.88
         particles.push({
           orbit,
           angle: Math.random() * Math.PI * 2,
-          speed: Math.random() * 0.0014 + 0.00045,
-          radius: Math.random() * 1.35 + 0.9,
-          alpha: Math.random() * 0.36 + 0.5,
-          color: isPrimary ? '59,130,246' : '94,234,212',
-          jitter: (Math.random() - 0.5) * 18,
-          wobbleAmp: Math.random() * 8 + 2,
-          wobbleSpeed: Math.random() * 0.012 + 0.004,
+          speed: Math.random() * 0.001 + 0.00024,
+          radius: Math.random() * 0.82 + 0.58,
+          alpha: Math.random() * 0.34 + 0.43,
+          color,
+          jitter: (Math.random() - 0.5) * 12,
+          wobbleAmp: Math.random() * 5.4 + 1.2,
+          wobbleSpeed: Math.random() * 0.009 + 0.002,
           wobblePhase: Math.random() * Math.PI * 2,
+          eccentricity: Math.random() * 0.24 - 0.06,
         })
       }
     }
@@ -123,14 +128,49 @@ function QuantumParticleCanvas() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       blueSprite = createGlowSprite(59, 130, 246)
       mintSprite = createGlowSprite(94, 234, 212)
+      starSprite = createGlowSprite(186, 230, 255)
       createParticles()
     }
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height)
+      const now = performance.now() * 0.001
       const cx = width * 0.5 + (pointer.active ? (pointer.x - width * 0.5) * 0.04 : 0)
       const cy = height * 0.45 + (pointer.active ? (pointer.y - height * 0.45) * 0.04 : 0)
       const positions: Array<{ x: number; y: number; alpha: number; color: string }> = []
+
+      const base = ctx.createLinearGradient(0, 0, 0, height)
+      base.addColorStop(0, '#030712')
+      base.addColorStop(0.55, '#02060f')
+      base.addColorStop(1, '#01040a')
+      ctx.fillStyle = base
+      ctx.fillRect(0, 0, width, height)
+
+      const aura = ctx.createRadialGradient(cx, cy, 24, cx, cy, Math.min(width, height) * 0.34)
+      aura.addColorStop(0, 'rgba(125, 245, 255, 0.30)')
+      aura.addColorStop(0.26, 'rgba(94, 234, 212, 0.20)')
+      aura.addColorStop(0.66, 'rgba(59, 130, 246, 0.12)')
+      aura.addColorStop(1, 'rgba(59, 130, 246, 0)')
+      ctx.fillStyle = aura
+      ctx.fillRect(0, 0, width, height)
+
+      const sideGlowL = ctx.createRadialGradient(width * 0.12, height * 0.5, 0, width * 0.12, height * 0.5, width * 0.44)
+      sideGlowL.addColorStop(0, 'rgba(59,130,246,0.20)')
+      sideGlowL.addColorStop(1, 'rgba(59,130,246,0)')
+      ctx.fillStyle = sideGlowL
+      ctx.fillRect(0, 0, width, height)
+
+      const sideGlowR = ctx.createRadialGradient(width * 0.88, height * 0.5, 0, width * 0.88, height * 0.5, width * 0.44)
+      sideGlowR.addColorStop(0, 'rgba(94,234,212,0.16)')
+      sideGlowR.addColorStop(1, 'rgba(94,234,212,0)')
+      ctx.fillStyle = sideGlowR
+      ctx.fillRect(0, 0, width, height)
+
+      const vignette = ctx.createRadialGradient(width * 0.5, height * 0.46, width * 0.14, width * 0.5, height * 0.5, width * 0.74)
+      vignette.addColorStop(0, 'rgba(0,0,0,0)')
+      vignette.addColorStop(1, 'rgba(0,0,0,0.72)')
+      ctx.fillStyle = vignette
+      ctx.fillRect(0, 0, width, height)
 
       for (let i = 0; i < particles.length; i += 1) {
         const p = particles[i]
@@ -138,23 +178,27 @@ function QuantumParticleCanvas() {
         p.wobblePhase += p.wobbleSpeed
 
         const orbit = p.orbit + Math.sin(p.wobblePhase) * p.wobbleAmp
-        const x = cx + Math.cos(p.angle) * orbit + Math.cos(p.wobblePhase * 0.8) * p.jitter * 0.2
-        const y = cy + Math.sin(p.angle) * orbit * 0.96 + Math.sin(p.wobblePhase * 0.9) * p.jitter * 0.2
+        const ellipseX = 1 + p.eccentricity
+        const ellipseY = 0.84 - p.eccentricity * 0.5
+        const x = cx + Math.cos(p.angle) * orbit * ellipseX + Math.cos(p.wobblePhase * 0.8) * p.jitter * 0.2
+        const y = cy + Math.sin(p.angle) * orbit * ellipseY + Math.sin(p.wobblePhase * 0.9) * p.jitter * 0.2
         const ndx = (x - cx) / Math.max(1, width * 0.24)
         const ndy = (y - cy) / Math.max(1, height * 0.17)
         const centerNorm = Math.sqrt(ndx * ndx + ndy * ndy)
-        const centerWeight = Math.min(1, Math.max(0.42, centerNorm))
+        const centerWeight = Math.min(1, Math.max(0.52, centerNorm))
         const tx = width * 0.5
         const ty = height * 0.47
-        const trX = width * 0.35
-        const trY = height * 0.22
+        const trX = width * 0.28
+        const trY = height * 0.18
         const titleNorm = Math.sqrt(((x - tx) / trX) ** 2 + ((y - ty) / trY) ** 2)
         const titleWeight = titleNorm < 1 ? 0.28 + titleNorm * 0.72 : 1
-        const particleAlpha = Math.min(1, p.alpha * centerWeight * titleWeight * 1.24)
+        const pulse = 0.78 + Math.sin(now * 1.7 + p.wobblePhase * 2.3) * 0.22
+        const particleAlpha = Math.min(1, p.alpha * centerWeight * titleWeight * 1.18 * pulse)
 
-        const sprite = p.color === '59,130,246' ? blueSprite : mintSprite
+        const sprite =
+          p.color === '59,130,246' ? blueSprite : p.color === '94,234,212' ? mintSprite : starSprite
         if (sprite) {
-          const size = p.radius * 8.1
+          const size = p.radius * 7.3
           ctx.globalAlpha = Math.min(1, particleAlpha * 1.12)
           ctx.drawImage(sprite, x - size * 0.5, y - size * 0.5, size, size)
           ctx.globalAlpha = 1
@@ -293,19 +337,6 @@ function QuantumParticleCanvas() {
 
       ctx.shadowBlur = 0
 
-      const ringGradient = ctx.createRadialGradient(cx, cy, 40, cx, cy, Math.min(width, height) * 0.5)
-      ringGradient.addColorStop(0, 'rgba(59,130,246,0.44)')
-      ringGradient.addColorStop(0.45, 'rgba(59,130,246,0.24)')
-      ringGradient.addColorStop(1, 'rgba(59,130,246,0)')
-      ctx.strokeStyle = ringGradient
-      ctx.lineWidth = 1.35
-      for (let i = 0; i < 3; i += 1) {
-        const r = Math.min(width, height) * (0.23 + i * 0.07)
-        ctx.beginPath()
-        ctx.arc(cx, cy, r, 0, Math.PI * 2)
-        ctx.stroke()
-      }
-
       rafId = requestAnimationFrame(draw)
     }
 
@@ -370,7 +401,7 @@ function SpotlightRevealSection() {
   const inverseMask = `radial-gradient(circle 250px at ${spot.x}% ${spot.y}%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,1) 100%)`
 
   return (
-    <section className="snap-start mx-auto mt-28 w-full max-w-6xl px-6 lg:px-8">
+    <section className="snap-start mx-auto w-full max-w-6xl px-6 pb-8 pt-[20vh] lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -599,13 +630,13 @@ function FeatureFlow() {
   ]
 
   return (
-    <section className="snap-start mx-auto mt-28 w-full max-w-5xl px-6 lg:px-8">
+    <section className="snap-start mx-auto flex min-h-[calc(100dvh-6rem)] w-full max-w-5xl flex-col justify-start px-6 pb-8 pt-12 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.7 }}
-        className="mb-10 text-center"
+        className="mb-7 text-center"
       >
         <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
           Real-time Competency Modeling
@@ -619,7 +650,7 @@ function FeatureFlow() {
         </p>
       </motion.div>
 
-      <div ref={flowRef} className="relative space-y-10 pl-2">
+      <div ref={flowRef} className="relative space-y-6 pl-2">
         <div className="absolute bottom-6 left-[22px] top-6 w-px bg-[#3B82F6]/25" />
         <motion.div
           className="absolute left-[22px] top-6 w-px origin-top bg-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.95)]"
@@ -635,7 +666,7 @@ function FeatureFlow() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.55, ease: 'easeOut', delay: 0.1 }}
-        className="mt-10 flex flex-wrap justify-center gap-4"
+        className="mt-7 flex flex-wrap justify-center gap-4"
       >
         {researchChips.map((chip) => {
           const Icon = chip.icon
@@ -700,7 +731,7 @@ function ROICalculator() {
   }, [estimatedBenefit])
 
   return (
-    <section className="snap-start mx-auto mt-28 w-full max-w-4xl px-6 lg:px-8">
+    <section className="snap-start mx-auto w-full max-w-4xl px-6 pt-10 lg:px-8">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -1087,7 +1118,7 @@ export default function Page() {
   }
 
   return (
-    <div className="relative overflow-hidden bg-[#020617] text-white">
+    <div className="relative h-[100dvh] snap-y snap-proximity scroll-pt-24 overflow-y-auto overflow-x-hidden bg-[#020617] text-white">
       <div className="pointer-events-none absolute inset-0">
         <div className="nebula-orb nebula-orb-1" />
         <div className="nebula-orb nebula-orb-2" />
@@ -1109,14 +1140,18 @@ export default function Page() {
               animate="visible"
               className="text-balance text-6xl font-extrabold leading-tight tracking-[-0.02em] md:text-7xl"
             >
-              <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">고성과자의 </span>
-              <span style={{ color: ELECTRIC_BLUE }}>DNA</span>,
-              <br />
-              <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">AI가 </span>
-              <span style={{ color: ELECTRIC_BLUE }}>3초</span>
-              <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent"> 만에 </span>
-              <span style={{ color: ELECTRIC_BLUE }}>시각화</span>
-              <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">합니다.</span>
+              <span className="block">
+                <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">고성과자의 </span>
+                <span style={{ color: ELECTRIC_BLUE }}>DNA</span>,
+              </span>
+              <span aria-hidden className="block h-[10px]" />
+              <span className="block">
+                <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">AI가 </span>
+                <span style={{ color: ELECTRIC_BLUE }}>3초</span>
+                <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent"> 만에 </span>
+                <span style={{ color: ELECTRIC_BLUE }}>시각화</span>
+                <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">합니다.</span>
+              </span>
             </motion.h1>
 
             <motion.p
