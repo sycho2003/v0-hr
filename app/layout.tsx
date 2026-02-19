@@ -22,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className="bg-neutral-950 font-sans antialiased text-white" suppressHydrationWarning>
+        <body className="relative bg-neutral-950 font-sans antialiased text-white" suppressHydrationWarning>
         <Navigation />
         <main className="relative min-h-screen bg-neutral-950">
           <PageTransition>{children}</PageTransition>

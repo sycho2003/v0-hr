@@ -223,6 +223,7 @@
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   }
   html {
+    position: relative;
     scroll-behavior: smooth;
   }
 }
