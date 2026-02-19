@@ -27,6 +27,8 @@ function QuantumParticleCanvas() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
+    const host = canvas.closest('[data-hero-canvas-host]') as HTMLElement | null
+    if (!host) return
 
     let width = 0
     let height = 0
@@ -119,9 +121,9 @@ function QuantumParticleCanvas() {
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
-      const rect = canvas.getBoundingClientRect()
-      width = Math.max(1, Math.floor(rect.width))
-      height = Math.max(1, Math.floor(rect.height))
+      const rect = host.getBoundingClientRect()
+      width = Math.max(1, Math.floor(Math.max(window.innerWidth, host.clientWidth, rect.width)))
+      height = Math.max(1, Math.floor(Math.max(window.innerHeight, host.clientHeight, rect.height)))
       canvas.width = Math.floor(width * dpr)
       canvas.height = Math.floor(height * dpr)
       canvas.style.width = `${width}px`
@@ -165,6 +167,14 @@ function QuantumParticleCanvas() {
       sideGlowR.addColorStop(0, 'rgba(94,234,212,0.16)')
       sideGlowR.addColorStop(1, 'rgba(94,234,212,0)')
       ctx.fillStyle = sideGlowR
+      ctx.fillRect(0, 0, width, height)
+
+      // Keep subtle glow alive near the scroll hint area.
+      const bottomAura = ctx.createRadialGradient(width * 0.5, height * 0.96, 0, width * 0.5, height * 0.96, width * 0.62)
+      bottomAura.addColorStop(0, 'rgba(59,130,246,0.16)')
+      bottomAura.addColorStop(0.45, 'rgba(59,130,246,0.08)')
+      bottomAura.addColorStop(1, 'rgba(59,130,246,0)')
+      ctx.fillStyle = bottomAura
       ctx.fillRect(0, 0, width, height)
 
       const vignette = ctx.createRadialGradient(width * 0.5, height * 0.46, width * 0.14, width * 0.5, height * 0.5, width * 0.74)
@@ -342,7 +352,7 @@ function QuantumParticleCanvas() {
     }
 
     const onMove = (event: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect()
+      const rect = host.getBoundingClientRect()
       const localX = event.clientX - rect.left
       const localY = event.clientY - rect.top
       const inside = localX >= 0 && localX <= rect.width && localY >= 0 && localY <= rect.height
@@ -361,6 +371,10 @@ function QuantumParticleCanvas() {
       pointerTarget = { ...pointerTarget, active: false }
     }
 
+    const resizeObserver = new ResizeObserver(() => {
+      resize()
+    })
+    resizeObserver.observe(host)
     resize()
     draw()
     window.addEventListener('resize', resize)
@@ -369,13 +383,14 @@ function QuantumParticleCanvas() {
 
     return () => {
       cancelAnimationFrame(rafId)
+      resizeObserver.disconnect()
       window.removeEventListener('resize', resize)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerleave', onLeave)
     }
   }, [])
 
-  return <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-0 opacity-90" aria-hidden />
+  return <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full z-0 opacity-90" aria-hidden />
 }
 
 function SpotlightRevealSection() {
@@ -1147,9 +1162,12 @@ export default function Page() {
       </div>
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.08)_1px,transparent_1px)] bg-[size:56px_56px] opacity-10" />
 
-      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-6 pb-14 pt-20 text-center max-[359px]:pb-12 max-[359px]:pt-16 md:pb-20 md:pt-24 lg:px-10 xl:px-[120px]">
+      <section
+        data-hero-canvas-host
+        className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-6 pb-14 pt-20 text-center max-[359px]:pb-12 max-[359px]:pt-16 md:pb-20 md:pt-24 lg:px-10 xl:px-[120px]"
+      >
         <QuantumParticleCanvas />
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.35)_48%,rgba(2,6,23,0.95)_78%,#020617_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.42)_0%,rgba(0,0,0,0.30)_52%,rgba(2,6,23,0.72)_90%,#020617_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0)_70%)]" />
 
         <div className="relative z-10 mx-auto max-w-4xl -translate-y-2 md:-translate-y-3">
