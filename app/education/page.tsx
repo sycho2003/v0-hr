@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import { CircularDiagram } from '@/components/circular-diagram'
 
 /* ── Ripple Effect Component ── */
@@ -23,26 +22,6 @@ function RippleEffect() {
         />
       ))}
     </span>
-  )
-}
-
-/* ── Donut Diagram Component ── */
-function DonutDiagram({
-  title,
-  imageSrc,
-  imageAlt,
-}: {
-  title: string
-  imageSrc: string
-  imageAlt: string
-}) {
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative h-[280px] w-[280px] md:h-[320px] md:w-[320px]">
-        <Image src={imageSrc} alt={imageAlt} fill className="object-contain" />
-      </div>
-      <p className="text-lg font-bold text-white">{title}</p>
-    </div>
   )
 }
 
@@ -185,10 +164,17 @@ export default function HRConsultingPage() {
               { label: '채용', startAngle: 270, endAngle: 360 },
             ]}
           />
-          <DonutDiagram
+          <CircularDiagram
             title="일반/공공기업"
-            imageSrc="/images/education/donut-corporate.png"
-            imageAlt="일반/공공기업 컨설팅 영역 다이어그램 - 갈등관리, 의사소통, 팀빌딩, 불안/스트레스, 문제해결, 리더십개발, 채용"
+            segments={[
+              { label: '갈등관리', startAngle: 0, endAngle: 51.4 },
+              { label: '의사소통', startAngle: 51.4, endAngle: 102.8 },
+              { label: '팀빌딩/\n팀워크', startAngle: 102.8, endAngle: 154.3 },
+              { label: '불안/\n스트레스', startAngle: 154.3, endAngle: 205.7 },
+              { label: '문제해결', startAngle: 205.7, endAngle: 257.1 },
+              { label: '리더십\n개발', startAngle: 257.1, endAngle: 308.6 },
+              { label: '채용', startAngle: 308.6, endAngle: 360 },
+            ]}
           />
         </motion.section>
 
