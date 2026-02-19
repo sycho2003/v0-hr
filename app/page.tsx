@@ -421,7 +421,7 @@ function SpotlightRevealSection() {
           </span>
         </motion.div>
         <h2 className="mt-3 text-3xl font-bold text-white">
-          실무자가 실전에서 좋은 성과를 내게 하려면 어떻게 해야 할까요?
+          실무자가 실전에서 좋은 성과를 내게 하려면 어떻�� 해야 할까요?
         </h2>
         <p className="mx-auto mt-4 max-w-4xl text-gray-400">
           채용 시 우수했던 인재가 현장에서 기대 이하의 성과를 보이는 이유, 문제는 평가 방식에 있습니다.
@@ -566,10 +566,11 @@ function FlowStep({
   )
 }
 
-function FeatureFlow() {
+function FeatureFlow({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
   const flowRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: flowRef,
+    container: containerRef,
     offset: ['start 75%', 'end 30%'],
   })
 
@@ -1108,6 +1109,7 @@ function SocialProof() {
 }
 
 export default function Page() {
+  const containerRef = useRef<HTMLDivElement>(null)
   const heroVariants = {
     hidden: { opacity: 0, y: 28 },
     visible: (delay: number) => ({
@@ -1118,7 +1120,7 @@ export default function Page() {
   }
 
   return (
-    <div className="relative h-[100dvh] snap-y snap-proximity scroll-pt-24 overflow-y-auto overflow-x-hidden bg-[#020617] text-white">
+    <div ref={containerRef} className="relative h-[100dvh] snap-y snap-proximity scroll-pt-24 overflow-y-auto overflow-x-hidden bg-[#020617] text-white">
       <div className="pointer-events-none absolute inset-0">
         <div className="nebula-orb nebula-orb-1" />
         <div className="nebula-orb nebula-orb-2" />
@@ -1189,7 +1191,7 @@ export default function Page() {
       </section>
 
       <SpotlightRevealSection />
-      <FeatureFlow />
+      <FeatureFlow containerRef={containerRef} />
       <ROICalculator />
       <LiveAIDashboardSection />
       <SocialProof />
