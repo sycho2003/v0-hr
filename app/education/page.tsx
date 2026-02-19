@@ -43,10 +43,25 @@ export default function HRConsultingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.55 }}
+          className="mb-20 text-center"
+        >
+          <h1 className="text-balance text-4xl font-extrabold leading-tight text-white md:text-5xl">
+            오프라인 컨설팅이 필요하신가요?
+          </h1>
+          <p className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-neutral-300 md:text-lg">
+            어세스타가 기존에 진행해온 컨설팅 서비스를 만나보세요.
+          </p>
+        </motion.section>
+
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.55 }}
           className="mb-16"
         >
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.18em]">Customized Consulting</p>
-          <h1 className="mt-3 text-3xl font-extrabold leading-tight text-white md:text-4xl">HR 컨설팅 서비스</h1>
+          <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white md:text-4xl">HR 컨설팅 서비스</h2>
           <p className="mt-5 max-w-4xl text-base leading-relaxed text-neutral-300 md:text-lg">
             조직의 특성에 맞춘 맞춤형 HR 시스템 구축. 25년간의 전문 노하우와 AI 기술을 결합한 데이터 기반 컨설팅입니다.
           </p>
