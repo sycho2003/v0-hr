@@ -122,12 +122,6 @@ export default function HRConsultingPage() {
             >
               무료 상담 신청
             </a>
-            <a
-              href="/solutions"
-              className="hover-border-brand-primary-soft inline-flex items-center rounded-xl border border-white/25 px-7 py-3.5 text-sm font-semibold text-white transition-colors hover-brand-primary"
-            >
-              ASTRA 플랫폼 보기
-            </a>
           </div>
         </motion.section>
       </div>
