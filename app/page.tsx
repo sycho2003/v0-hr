@@ -401,7 +401,7 @@ function SpotlightRevealSection() {
   const inverseMask = `radial-gradient(circle 250px at ${spot.x}% ${spot.y}%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,1) 100%)`
 
   return (
-    <section className="snap-start w-full px-6 pb-8 pt-[20vh] md:px-20 xl:px-[120px]">
+    <section className="w-full px-6 pb-8 pt-10 md:px-20 md:pt-14 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -421,7 +421,7 @@ function SpotlightRevealSection() {
           </span>
         </motion.div>
         <h2 className="mt-3 text-3xl font-bold text-white">
-          실무자가 실전에서 좋은 성과를 내게 하려면 어떻�� 해야 할까요?
+          실무자가 실전에서 좋은 성과를 내게 하려면 어떻게 해야 할까요?
         </h2>
         <p className="mx-auto mt-4 max-w-4xl text-gray-400">
           채용 시 우수했던 인재가 현장에서 기대 이하의 성과를 보이는 이유, 문제는 평가 방식에 있습니다.
@@ -566,11 +566,10 @@ function FlowStep({
   )
 }
 
-function FeatureFlow({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
+function FeatureFlow() {
   const flowRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({
     target: flowRef,
-    container: containerRef,
     offset: ['start 75%', 'end 30%'],
   })
 
@@ -631,7 +630,7 @@ function FeatureFlow({ containerRef }: { containerRef: React.RefObject<HTMLDivEl
   ]
 
   return (
-    <section className="snap-start mx-auto flex min-h-[calc(100dvh-6rem)] w-full max-w-5xl flex-col justify-start px-6 pb-8 pt-12 max-[359px]:pt-8 lg:px-10 xl:px-[120px]">
+    <section className="mx-auto flex min-h-[calc(100dvh-6rem)] w-full max-w-5xl flex-col justify-start px-6 pb-8 pt-12 max-[359px]:pt-8 lg:px-10 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -739,7 +738,7 @@ function ROICalculator() {
   }, [estimatedBenefit])
 
   return (
-    <section className="snap-start mx-auto w-full max-w-4xl px-6 pt-10 max-[359px]:pt-6 lg:px-10 xl:px-[120px]">
+    <section className="mx-auto w-full max-w-4xl px-6 pt-10 max-[359px]:pt-6 lg:px-10 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -878,7 +877,7 @@ function LiveAIDashboardSection() {
   ]
 
   return (
-    <section className="snap-start mt-16 w-full px-6 pb-28 md:px-20 xl:px-[120px]">
+    <section className="mt-16 w-full px-6 pb-28 md:px-20 xl:px-[120px]">
       <div className="mb-8 flex flex-col items-center">
         <div className="h-14 w-px bg-gradient-to-b from-[#3B82F6]/60 to-transparent" />
         <div className="mt-2 text-2xl text-[#3B82F6]">↓</div>
@@ -1061,7 +1060,7 @@ function SocialProof() {
   }
 
   return (
-    <section className="snap-start mt-8 bg-[#020617] pt-20">
+    <section className="mt-8 bg-[#020617] pt-20">
       <div className="mx-auto max-w-6xl px-6 lg:px-10 xl:px-[120px]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -1119,7 +1118,6 @@ function SocialProof() {
 }
 
 export default function Page() {
-  const containerRef = useRef<HTMLDivElement>(null)
   const heroVariants = {
     hidden: { opacity: 0, y: 28 },
     visible: (delay: number) => ({
@@ -1130,7 +1128,7 @@ export default function Page() {
   }
 
   return (
-    <div ref={containerRef} className="relative h-[100dvh] snap-y snap-proximity scroll-pt-24 overflow-y-auto overflow-x-hidden bg-[#020617] text-white">
+    <div className="relative overflow-hidden bg-[#020617] text-white">
       <div className="pointer-events-none absolute inset-0">
         <div className="nebula-orb nebula-orb-1" />
         <div className="nebula-orb nebula-orb-2" />
@@ -1138,7 +1136,7 @@ export default function Page() {
       </div>
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.08)_1px,transparent_1px)] bg-[size:56px_56px] opacity-10" />
 
-      <section className="snap-start relative flex min-h-screen items-center justify-center px-6 pb-24 pt-36 text-center max-[359px]:pb-16 max-[359px]:pt-32 lg:px-10 xl:px-[120px]">
+      <section className="relative flex min-h-[100svh] items-center justify-center px-6 pb-20 pt-28 text-center max-[359px]:pb-16 max-[359px]:pt-24 md:pb-24 md:pt-32 lg:px-10 xl:px-[120px]">
         <QuantumParticleCanvas />
         <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/35 to-[#020617]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0)_70%)]" />
@@ -1150,7 +1148,7 @@ export default function Page() {
               variants={heroVariants}
               initial="hidden"
               animate="visible"
-              className="text-balance text-4xl font-extrabold leading-tight tracking-[-0.02em] sm:text-5xl md:text-7xl"
+              className="text-balance text-4xl font-extrabold leading-tight tracking-[-0.02em] sm:text-5xl md:text-6xl lg:text-7xl"
             >
               <span className="block">
                 <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">고성과자의 </span>
@@ -1171,7 +1169,7 @@ export default function Page() {
               variants={heroVariants}
               initial="hidden"
               animate="visible"
-              className="mx-auto mt-6 mb-10 max-w-3xl break-keep text-pretty text-base font-light leading-[1.75] text-gray-300 sm:text-lg sm:leading-[1.8]"
+              className="mx-auto mt-5 mb-8 max-w-3xl break-keep text-pretty text-sm font-light leading-[1.7] text-gray-300 sm:text-base sm:leading-[1.75]"
             >
               3개월이 걸리던 고비용 역량 모델링, AI 자동화로 3일 만에 완성합니다.
               <br />
@@ -1179,10 +1177,10 @@ export default function Page() {
             </motion.p>
           </div>
 
-          <motion.div custom={0.45} variants={heroVariants} initial="hidden" animate="visible" className="mt-0">
+          <motion.div custom={0.45} variants={heroVariants} initial="hidden" animate="visible" className="mt-1">
             <button
               type="button"
-              className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-base font-medium text-white backdrop-blur-md shadow-[0_0_28px_rgba(59,130,246,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[#356DF3] hover:bg-[#356DF3] hover:text-white sm:px-8 sm:py-4 sm:text-lg"
+              className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-medium text-white backdrop-blur-md shadow-[0_0_28px_rgba(59,130,246,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[#356DF3] hover:bg-[#356DF3] hover:text-white sm:px-7 sm:py-3 sm:text-base"
             >
               무료 진단 데모 보기
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -1193,7 +1191,7 @@ export default function Page() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: [0, 6, 0] }}
           transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
-          className="pointer-events-none absolute inset-x-0 bottom-8 z-20 flex flex-col items-center text-center text-neutral-300"
+          className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex flex-col items-center text-center text-neutral-300 md:bottom-8"
         >
           <p className="text-xs tracking-[0.18em] uppercase">Scroll Down</p>
           <ChevronDown className="mx-auto mt-1 h-4 w-4 text-cyan-300" />
@@ -1201,7 +1199,7 @@ export default function Page() {
       </section>
 
       <SpotlightRevealSection />
-      <FeatureFlow containerRef={containerRef} />
+      <FeatureFlow />
       <ROICalculator />
       <LiveAIDashboardSection />
       <SocialProof />
