@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowRight, BarChart3, Building2, Layers, Workflow } from 'lucide-react'
+import { BarChart3, Building2, GraduationCap, Layers, Users, Workflow } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const services = [
@@ -32,18 +32,32 @@ const services = [
     desc: '기존 HR 프로세스를 ASTRA 플랫폼 기반으로 디지털 전환합니다. 역량 모델링부터 평가, 교육까지 End-to-End 자동화를 지원합니다.',
     chips: ['HR DX', 'Astra Adoption'],
   },
+  {
+    icon: GraduationCap,
+    title: '리더십 개발 프로그램',
+    meta: '리더십 / 차세대 인재  •  4~10주',
+    desc: '차세대 리더를 체계적으로 육성합니다. 리더십 역량 진단부터 개인별 맞춤 코칭까지 통합적 리더십 파이프라인을 구축합니다.',
+    chips: ['리더십 역량 진단', '코칭 프로그램', '승계 계획 수립'],
+  },
+  {
+    icon: Users,
+    title: '채용 프로세스 고도화',
+    meta: '채용 / 선발  •  4~8주',
+    desc: '과학적 선발 도구와 구조화된 면접 체계를 도입하여 채용의 정확도를 높입니다. 직무 적합성과 조직 적합성을 동시에 평가합니다.',
+    chips: ['구조화 면접 설계', '선발 도구 개발', '채용 브랜딩'],
+  },
 ]
 
 export default function HRConsultingPage() {
   return (
-    <div className="min-h-screen bg-neutral-950 pb-24 pt-32 text-white">
+    <div className="min-h-screen bg-neutral-950 pb-24 pt-48 text-white">
       <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.55 }}
-          className="mb-20 text-center"
+          className="mb-40 text-center"
         >
           <h1 className="text-balance text-4xl font-extrabold leading-tight text-white md:text-5xl">
             오프라인 컨설팅이 필요하신가요?
@@ -104,15 +118,7 @@ export default function HRConsultingPage() {
                   ))}
                 </div>
 
-                <div className="mt-8 border-t border-white/10 pt-5">
-                  <a
-                    href="/inquiry"
-                    className="inline-flex items-center gap-2 text-base font-semibold text-white transition-colors hover-brand-primary"
-                  >
-                    상담 신청
-                    <ArrowRight className="h-5 w-5" />
-                  </a>
-                </div>
+
               </article>
             )
           })}
