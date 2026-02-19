@@ -427,7 +427,7 @@ function SpotlightRevealSection() {
   const inverseMask = `radial-gradient(circle 250px at ${spot.x}% ${spot.y}%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,1) 100%)`
 
   return (
-    <section className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-8 pt-4 md:pt-8 lg:px-10 xl:px-[120px]">
+    <section className="relative z-10 mx-auto mt-4 w-full max-w-6xl px-6 pb-8 pt-12 max-[359px]:pt-8 md:mt-6 lg:px-10 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -440,9 +440,9 @@ function SpotlightRevealSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.35 }}
           transition={{ duration: 0.55, ease: 'easeOut' }}
-          className="mb-4 inline-flex rounded-full border border-[#3B82F6]/50 bg-[#3B82F6]/10 px-4 py-1.5"
+          className="mb-4"
         >
-          <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#3B82F6]">
+          <span className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
             ASTRA SOLUTION
           </span>
         </motion.div>
@@ -764,7 +764,7 @@ function ROICalculator() {
   }, [estimatedBenefit])
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-6 pt-10 max-[359px]:pt-6 lg:px-10 xl:px-[120px]">
+    <section className="mx-auto w-full max-w-6xl px-6 pt-12 max-[359px]:pt-8 lg:px-10 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -903,7 +903,7 @@ function LiveAIDashboardSection() {
   ]
 
   return (
-    <section className="mt-16 w-full px-6 pb-28 md:px-20 xl:px-[120px]">
+    <section className="w-full px-6 pb-28 pt-12 max-[359px]:pt-8 md:px-20 xl:px-[120px]">
       <div className="mb-8 flex flex-col items-center">
         <div className="h-14 w-px bg-gradient-to-b from-[#3B82F6]/60 to-transparent" />
         <div className="mt-2 text-2xl text-[#3B82F6]">↓</div>
