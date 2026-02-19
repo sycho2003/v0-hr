@@ -46,20 +46,20 @@ function DashboardProto() {
             onClick={() => setActiveMetric(i)}
             className={`rounded-lg border p-3.5 text-left transition-all ${
               activeMetric === i
-                ? 'border-emerald-400/40 bg-emerald-400/5'
+                ? 'border-[rgb(59_130_246/0.4)] bg-[rgb(59_130_246/0.05)]'
                 : 'border-white/[0.06] bg-white/[0.02] hover:border-white/10'
             }`}
           >
             <p className="text-[10px] font-medium text-neutral-500">{m.sub}</p>
             <p className="mt-1 text-2xl font-bold text-white">{m.value}</p>
             {m.change && (
-              <p className={`mt-0.5 text-xs font-semibold ${m.positive ? 'text-emerald-400' : 'text-red-400'}`}>
+              <p className={`mt-0.5 text-xs font-semibold ${m.positive ? 'text-[rgb(59_130_246)]' : 'text-red-400'}`}>
                 {m.change}
               </p>
             )}
             {!m.change && (
               <div className="mt-1.5 h-1.5 w-full rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-emerald-400 transition-all" style={{ width: '78%' }} />
+                <div className="h-full rounded-full bg-[rgb(59_130_246)] transition-all" style={{ width: '78%' }} />
               </div>
             )}
           </button>
@@ -72,7 +72,7 @@ function DashboardProto() {
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold text-neutral-400">부서별 역량 분포</p>
             <div className="flex gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              <span className="h-2 w-2 rounded-full bg-[rgb(59_130_246)]" />
               <span className="text-[10px] text-neutral-500">평균 대비</span>
             </div>
           </div>
@@ -80,7 +80,7 @@ function DashboardProto() {
             {barData.map((d) => (
               <div key={d.label} className="flex flex-1 flex-col items-center gap-1">
                 <div
-                  className="w-full rounded-t bg-emerald-400/25 transition-all duration-300 hover:bg-emerald-400/50"
+                  className="w-full rounded-t bg-[rgb(59_130_246/0.25)] transition-all duration-300 hover:bg-[rgb(59_130_246/0.5)]"
                   style={{ height: `${d.h}%` }}
                 />
                 <span className="text-[9px] text-neutral-500">{d.label}</span>
@@ -94,12 +94,12 @@ function DashboardProto() {
           <p className="text-xs font-semibold text-neutral-400">Research Notes</p>
           <div className="mt-3 space-y-2.5">
             {recentItems.map((item) => (
-              <div key={item.title} className="group cursor-pointer rounded-md border border-white/[0.04] bg-white/[0.02] p-2.5 transition-all hover:border-emerald-400/20 hover:bg-emerald-400/5">
+              <div key={item.title} className="group cursor-pointer rounded-md border border-white/[0.04] bg-white/[0.02] p-2.5 transition-all hover:border-[rgb(59_130_246/0.2)] hover:bg-[rgb(59_130_246/0.05)]">
                 <p className="text-[11px] font-medium text-neutral-300 group-hover:text-white">{item.title}</p>
                 <div className="mt-1 flex items-center gap-2">
                   <span className="text-[10px] text-neutral-500">{item.date}</span>
                   <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${
-                    item.status === '완료' ? 'bg-emerald-400/10 text-emerald-400' : 'bg-amber-400/10 text-amber-400'
+                    item.status === '완료' ? 'bg-[rgb(59_130_246/0.1)] text-[rgb(59_130_246)]' : 'bg-amber-400/10 text-amber-400'
                   }`}>{item.status}</span>
                 </div>
               </div>
@@ -165,7 +165,7 @@ function ReportProto() {
               onClick={() => setSelectedReport(i)}
               className={`w-full rounded-md px-3 py-2.5 text-left transition-all ${
                 selectedReport === i
-                  ? 'bg-emerald-400/10 text-white'
+                  ? 'bg-[rgb(59_130_246/0.1)] text-white'
                   : 'text-neutral-400 hover:bg-white/[0.04] hover:text-neutral-200'
               }`}
             >
@@ -187,7 +187,7 @@ function ReportProto() {
               <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{active.sections.reduce((a, s) => a + s.pages, 0)}p</span>
             </div>
           </div>
-          <span className="rounded-full bg-emerald-400/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-400">Published</span>
+          <span className="rounded-full bg-[rgb(59_130_246/0.1)] px-2.5 py-1 text-[10px] font-semibold text-[rgb(59_130_246)]">Published</span>
         </div>
 
         <div className="mt-5 space-y-2">
@@ -195,10 +195,10 @@ function ReportProto() {
           {active.sections.map((s, i) => (
             <div
               key={s.name}
-              className="group flex cursor-pointer items-center justify-between rounded-md border border-white/[0.04] bg-white/[0.02] px-4 py-2.5 transition-all hover:border-emerald-400/20 hover:bg-emerald-400/5"
+              className="group flex cursor-pointer items-center justify-between rounded-md border border-white/[0.04] bg-white/[0.02] px-4 py-2.5 transition-all hover:border-[rgb(59_130_246/0.2)] hover:bg-[rgb(59_130_246/0.05)]"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.06] text-[9px] font-bold text-neutral-400 group-hover:bg-emerald-400/20 group-hover:text-emerald-400">{i + 1}</span>
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.06] text-[9px] font-bold text-neutral-400 group-hover:bg-[rgb(59_130_246/0.2)] group-hover:text-[rgb(59_130_246)]">{i + 1}</span>
                 <span className="text-xs text-neutral-300 group-hover:text-white">{s.name}</span>
               </div>
               <span className="text-[10px] text-neutral-500">{s.pages}p</span>
@@ -226,14 +226,14 @@ function AssistantProto() {
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'ai' && (
-              <div className="mr-2.5 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-400/15">
-                <Bot className="h-3.5 w-3.5 text-emerald-400" />
+              <div className="mr-2.5 mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgb(59_130_246/0.15)]">
+                <Bot className="h-3.5 w-3.5 text-[rgb(59_130_246)]" />
               </div>
             )}
             <div
               className={`max-w-[75%] rounded-xl px-4 py-3 text-[12px] leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-emerald-400/15 text-neutral-200'
+                  ? 'bg-[rgb(59_130_246/0.15)] text-neutral-200'
                   : 'border border-white/[0.06] bg-white/[0.03] text-neutral-300'
               }`}
             >
@@ -257,7 +257,7 @@ function AssistantProto() {
             className="flex-1 bg-transparent text-xs text-neutral-300 placeholder:text-neutral-600 focus:outline-none"
             readOnly
           />
-          <button type="button" className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-400/20 text-emerald-400 transition-colors hover:bg-emerald-400/30">
+          <button type="button" className="flex h-7 w-7 items-center justify-center rounded-md bg-[rgb(59_130_246/0.2)] text-[rgb(59_130_246)] transition-colors hover:bg-[rgb(59_130_246/0.3)]">
             <Send className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -274,7 +274,7 @@ export function InteractiveFeatureShowcase() {
   return (
     <section className="mt-20 lg:mt-28">
         {/* Section header */}
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-400">Interactive Showcase</p>
+        <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Interactive Showcase</p>
         <h2 className="mt-3 text-2xl font-bold text-white md:text-3xl">
           ASTRA 플랫폼을 직접 체험해보세요
         </h2>
@@ -294,12 +294,12 @@ export function InteractiveFeatureShowcase() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`group flex items-center gap-2.5 rounded-xl border px-5 py-3.5 text-left transition-all ${
                   isActive
-                    ? 'border-emerald-400/40 bg-emerald-400/[0.08] shadow-[0_0_20px_rgba(52,211,153,0.08)]'
-                    : 'border-white/[0.08] bg-white/[0.02] hover:border-white/15 hover:bg-white/[0.04]'
+                    ? 'border-[rgb(59_130_246/0.4)] bg-[rgb(59_130_246/0.08)] shadow-[0_0_20px_rgba(37,99,235,0.08)]'
+                    : 'border-white/[0.08] bg-white/[0.02] hover:border-white/15 hover:bg-[rgb(59_130_246/0.04)]'
                 }`}
               >
                 <div className={`flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
-                  isActive ? 'bg-emerald-400/20 text-emerald-400' : 'bg-white/[0.06] text-neutral-500 group-hover:text-neutral-300'
+                  isActive ? 'bg-brand-primary-soft text-brand-primary' : 'bg-white/[0.06] text-neutral-500 group-hover:text-neutral-300'
                 }`}>
                   <Icon className="h-4 w-4" />
                 </div>
@@ -311,9 +311,9 @@ export function InteractiveFeatureShowcase() {
                 </div>
                 {/* Radio indicator */}
                 <div className={`ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                  isActive ? 'border-emerald-400' : 'border-white/15'
+                  isActive ? 'border-[rgb(59_130_246)]' : 'border-white/15'
                 }`}>
-                  {isActive && <div className="h-2.5 w-2.5 rounded-full bg-emerald-400" />}
+                  {isActive && <div className="bg-brand-primary h-2.5 w-2.5 rounded-full" />}
                 </div>
               </button>
             )
@@ -354,7 +354,7 @@ export function InteractiveFeatureShowcase() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-1.5 px-5 py-2.5 text-[11px] font-medium transition-colors ${
                     activeTab === tab.id
-                      ? 'border-b-2 border-emerald-400 bg-white/[0.03] text-white'
+                      ? 'border-b-2 border-[rgb(59_130_246)] bg-white/[0.03] text-white'
                       : 'text-neutral-500 hover:text-neutral-300'
                   }`}
                 >
