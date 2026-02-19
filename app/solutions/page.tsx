@@ -105,7 +105,7 @@ export default function SolutionsPage() {
       <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
         <section>
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Astra Product</p>
-          <h1 className="mt-3 max-w-4xl break-keep text-3xl font-extrabold leading-tight md:text-4xl">
+          <h1 className="mt-3 max-w-4xl break-keep text-3xl font-extrabold leading-[1.6] md:text-4xl">
             채용의 불확실성을 0으로 만드는 데이터 솔루션, ASTRA.
           </h1>
 
