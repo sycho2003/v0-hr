@@ -57,7 +57,7 @@ const processSteps = [
 export function CompetencySection() {
   return (
     <section className="py-20 lg:py-24 bg-muted/30">
-      <div className="mx-auto max-w-7xl px-6 lg:px-10 xl:px-[120px]">
+      <div className="mx-auto max-w-7xl px-6 md:px-20 xl:px-[120px]">
         {/* Section header */}
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm font-semibold tracking-widest text-primary uppercase">
