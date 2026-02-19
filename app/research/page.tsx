@@ -105,7 +105,7 @@ export default function ResearchPage() {
   return (
     <div className="min-h-screen bg-neutral-950 pb-24 pt-32 text-white">
       {/* Header section with consistent padding */}
-      <header className="mb-6 px-4 sm:px-6 lg:px-10 xl:px-[120px]">
+      <header className="mb-6 px-6 md:px-20 xl:px-[120px]">
         <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Research Library</p>
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">리서치</h1>
       </header>
@@ -113,7 +113,7 @@ export default function ResearchPage() {
       {/* Tab bar: full-width background, inner content aligned to 120px */}
       <div className="sticky top-16 z-40 mb-8 w-full bg-neutral-950/90 backdrop-blur-md">
         <div className="overflow-x-auto">
-          <div className="min-w-max border-b border-white/10 px-4 pt-4 pb-2 sm:px-6 lg:px-10 xl:px-[120px]">
+          <div className="min-w-max border-b border-white/10 px-6 pt-4 pb-2 md:px-20 xl:px-[120px]">
             <div className="flex items-center gap-6 text-sm">
               {categoryTabs.map((tab) => (
                 <button
@@ -131,7 +131,7 @@ export default function ResearchPage() {
       </div>
 
       {/* Main content with consistent padding */}
-      <div className="px-4 sm:px-6 lg:px-10 xl:px-[120px]">
+      <div className="px-6 md:px-20 xl:px-[120px]">
         <section className="mb-24">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
             <div className="hidden lg:sticky lg:top-[8rem] lg:block lg:h-[527.16px] lg:w-[70%]">
