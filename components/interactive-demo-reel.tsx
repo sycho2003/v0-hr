@@ -225,7 +225,7 @@ export function InteractiveDemoReel() {
                 <span className="text-[9px] text-neutral-500">Total Candidates</span>
               </div>
               <p className="mt-2 text-lg font-bold text-white">{dispCandidates.toLocaleString()}</p>
-              <p className="mt-1 text-[9px] text-emerald-400">+2,340 this month</p>
+              <p className="mt-1 text-[9px] text-[rgb(96_165_250)]">+2,340 this month</p>
             </div>
 
             {/* Trend */}
@@ -237,7 +237,7 @@ export function InteractiveDemoReel() {
                 <span className="text-[9px] text-neutral-500">Growth Trend</span>
               </div>
               <p className="mt-2 text-lg font-bold text-white">+{dispTrend.toFixed(1)}%</p>
-              <p className="mt-1 text-[9px] text-emerald-400">vs. last quarter</p>
+              <p className="mt-1 text-[9px] text-[rgb(96_165_250)]">vs. last quarter</p>
             </div>
           </div>
 
