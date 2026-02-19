@@ -1118,7 +1118,7 @@ export default function Page() {
   }
 
   return (
-    <div className="relative h-[100dvh] snap-y snap-proximity scroll-pt-24 overflow-y-auto overflow-x-hidden bg-[#020617] text-white">
+    <div className="relative h-auto min-h-screen snap-y snap-proximity scroll-pt-24 overflow-x-hidden bg-[#020617] text-white">
       <div className="pointer-events-none absolute inset-0">
         <div className="nebula-orb nebula-orb-1" />
         <div className="nebula-orb nebula-orb-2" />
