@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Brain, Bot, CheckCheck, ChevronDown, LayoutDashboard, FileText, Mic, Sparkles } from 'lucide-react'
+import { Brain, Bot, CheckCheck, ChevronDown } from 'lucide-react'
 import { InteractiveFeatureShowcase } from '@/components/interactive-feature-showcase'
 
 const processCards = [
@@ -31,13 +30,6 @@ const processCards = [
     detail:
       '산업/직무 전문가가 결과를 교차 검토해 맥락 오해와 편향 위험을 보정합니다. AI와 전문가의 하이브리드 체계로 최종 의사결정 신뢰도를 높입니다.',
   },
-]
-
-const featureShots = [
-  { title: 'Performance Dashboard', icon: LayoutDashboard, image: '/images/solutions/prototype-1.svg' },
-  { title: 'Predictive Report', icon: FileText, image: '/images/solutions/prototype-2.svg' },
-  { title: 'Interview Assistant', icon: Mic, image: '/images/solutions/prototype-3.svg' },
-  { title: 'Insight Feed', icon: Sparkles, image: '/images/solutions/prototype-4.svg' },
 ]
 
 function GeneratedDemoReel() {
@@ -158,33 +150,6 @@ export default function SolutionsPage() {
                     <p className="mt-4 border-t border-white/10 pt-4 text-neutral-300">{card.detail}</p>
                   </motion.div>
                 </button>
-              )
-            })}
-          </div>
-        </section>
-
-        <section className="mt-20">
-          <h2 className="text-xl font-bold md:text-2xl">Feature Grid</h2>
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
-            {featureShots.map((item, idx) => {
-              const Icon = item.icon
-              return (
-                <article
-                  key={item.title}
-                  className="overflow-hidden rounded-2xl border border-blue-300/35 bg-white/[0.04] shadow-[0_16px_40px_rgba(2,8,23,0.35)] backdrop-blur-sm"
-                >
-                  <div className="relative aspect-[16/10] overflow-hidden bg-neutral-900">
-                    <Image src={item.image} alt={`${item.title} prototype`} fill className="object-cover" />
-                    <div className="border-brand-primary-soft text-brand-primary-soft absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border bg-black/45 px-3 py-1 text-xs font-semibold shadow-[0_8px_20px_rgba(2,6,23,0.45)] backdrop-blur-md">
-                      <Icon className="h-3.5 w-3.5" />
-                      Prototype {idx + 1}
-                    </div>
-                    <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/70 to-transparent" />
-                  </div>
-                  <div className="p-4">
-                    <p className="text-base font-semibold text-white md:text-lg">{item.title}</p>
-                  </div>
-                </article>
               )
             })}
           </div>
