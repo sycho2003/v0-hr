@@ -177,12 +177,12 @@ export default function HRConsultingPage() {
         >
           <DonutDiagram
             title="정부/공공기관"
-            imageSrc="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-gikmmUDqRvht1GO021C8OGM4YZC5Fo.png"
+            imageSrc="/images/education/donut-government.png"
             imageAlt="정부/공공기관 컨설팅 영역 다이어그램 - 역량평가(AC), 역량개발(DC), 채용, 리더십개발"
           />
           <DonutDiagram
             title="일반/공공기업"
-            imageSrc="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-V2oOKvUkWpOvNwYtuqAEIdDqT8bKmW.png"
+            imageSrc="/images/education/donut-corporate.png"
             imageAlt="일반/공공기업 컨설팅 영역 다이어그램 - 갈등관리, 의사소통, 팀빌딩, 불안/스트레스, 문제해결, 리더십개발, 채용"
           />
         </motion.section>
