@@ -156,7 +156,7 @@ export function InquiryForm() {
 
   return (
     <section className="pb-24 lg:pb-32">
-      <div className="mx-auto max-w-2xl px-6 lg:px-10 xl:px-[120px]">
+      <div className="mx-auto max-w-2xl px-6 md:px-20 xl:px-[120px]">
         <div className="rounded-xl border border-border bg-card p-8 shadow-sm">
           {submitted ? (
             <div className="py-8 text-center">

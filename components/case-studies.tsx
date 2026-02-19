@@ -93,7 +93,7 @@ export function CaseStudies() {
     <>
       {/* Client logos */}
       <section className="bg-neutral-950 py-12">
-        <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
+        <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
           <div
             className="relative overflow-hidden"
             style={{
@@ -116,7 +116,7 @@ export function CaseStudies() {
 
       {/* Case study cards */}
       <section className="bg-neutral-950 py-16 lg:py-20">
-        <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
+        <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
           <div className="space-y-8">
             {caseStudies.map((cs, idx) => (
               <div key={idx} className="overflow-hidden rounded-xl border border-white/10 bg-neutral-900">
@@ -174,7 +174,7 @@ export function CaseStudies() {
 
       {/* Testimonials */}
       <section className="bg-neutral-950 py-16 lg:py-20">
-        <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
+        <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
           <h3 className="text-center text-xl font-bold text-white md:text-2xl">전문가들의 평가</h3>
           <p className="mt-2 text-center text-sm text-neutral-400">
             전문성과 열정에 대한 고객 후기

@@ -401,7 +401,7 @@ function SpotlightRevealSection() {
   const inverseMask = `radial-gradient(circle 250px at ${spot.x}% ${spot.y}%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,1) 100%)`
 
   return (
-    <section className="snap-start mx-auto w-full max-w-6xl px-6 pb-8 pt-[20vh] lg:px-10 xl:px-[120px]">
+    <section className="snap-start w-full px-6 pb-8 pt-[20vh] md:px-20 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -630,7 +630,7 @@ function FeatureFlow() {
   ]
 
   return (
-    <section className="snap-start mx-auto flex min-h-[calc(100dvh-6rem)] w-full max-w-5xl flex-col justify-start px-6 pb-8 pt-12 lg:px-10 xl:px-[120px]">
+    <section className="snap-start flex min-h-[calc(100dvh-6rem)] w-full flex-col justify-start px-6 pb-8 pt-12 md:px-20 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -731,7 +731,7 @@ function ROICalculator() {
   }, [estimatedBenefit])
 
   return (
-    <section className="snap-start mx-auto w-full max-w-4xl px-6 pt-10 lg:px-10 xl:px-[120px]">
+    <section className="snap-start w-full px-6 pt-10 md:px-20 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -864,7 +864,7 @@ function LiveAIDashboardSection() {
   ]
 
   return (
-    <section className="snap-start mx-auto mt-16 w-full max-w-6xl px-6 pb-28 lg:px-10 xl:px-[120px]">
+    <section className="snap-start mt-16 w-full px-6 pb-28 md:px-20 xl:px-[120px]">
       <div className="mb-8 flex flex-col items-center">
         <div className="h-14 w-px bg-gradient-to-b from-[#3B82F6]/60 to-transparent" />
         <div className="mt-2 text-2xl text-[#3B82F6]">↓</div>
@@ -1051,7 +1051,7 @@ function SocialProof() {
 
   return (
     <section className="snap-start mt-8 bg-gradient-to-b from-[#020617] via-[#1e293b] to-[#ffffff] pt-20">
-      <div className="mx-auto max-w-6xl px-6 lg:px-10 xl:px-[120px]">
+      <div className="px-6 md:px-20 xl:px-[120px]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1126,7 +1126,7 @@ export default function Page() {
       </div>
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.08)_1px,transparent_1px)] bg-[size:56px_56px] opacity-10" />
 
-      <section className="snap-start relative flex min-h-screen items-center justify-center px-6 pb-24 pt-36 text-center lg:px-10 xl:px-[120px]">
+      <section className="snap-start relative flex min-h-screen items-center justify-center px-6 pb-24 pt-36 text-center md:px-20 xl:px-[120px]">
         <QuantumParticleCanvas />
         <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/35 to-[#020617]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0)_70%)]" />

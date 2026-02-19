@@ -88,7 +88,7 @@ export default function FeaturedResearchDetailPage() {
   return (
     <div className="min-h-screen bg-neutral-950 pb-28 pt-32 text-white">
       <article>
-        <header className="mx-auto max-w-3xl px-6 lg:px-10 xl:px-[120px]">
+        <header className="mx-auto max-w-3xl px-6 md:px-20 xl:px-[120px]">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-400">VALIDITY STUDY</p>
           <h1 className="mt-5 break-keep text-4xl font-extrabold leading-tight md:text-5xl">
             다차원 AI 역량 모델링의 예측 타당도 검증: Schmidt & Hunter 이론의 현대적 재해석
@@ -98,7 +98,7 @@ export default function FeaturedResearchDetailPage() {
 
         <CorrelationVisual />
 
-        <div className="mx-auto mt-12 max-w-3xl px-6 lg:px-10 xl:px-[120px]">
+        <div className="mx-auto mt-12 max-w-3xl px-6 md:px-20 xl:px-[120px]">
           <p className="text-lg leading-relaxed text-neutral-200">
             채용의 본질은 '미래의 성과'를 예측하는 것입니다. 1998년 Frank Schmidt와 John Hunter의 메타 분석 이후,
             우리는 지난 30년간 구조화된 면접(Structured Interview)이 가장 강력한 도구임을 믿어왔습니다. 하지만 AI의
@@ -168,7 +168,7 @@ export default function FeaturedResearchDetailPage() {
         </div>
       </article>
 
-      <section className="mx-auto mt-20 max-w-7xl px-6 lg:px-10 xl:px-[120px]">
+      <section className="mx-auto mt-20 max-w-7xl px-6 md:px-20 xl:px-[120px]">
         <h3 className="text-2xl font-bold text-white">Recommended Articles</h3>
         <div className="mt-6 grid gap-6 md:grid-cols-3">
           {[

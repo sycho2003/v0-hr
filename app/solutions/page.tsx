@@ -102,7 +102,7 @@ export default function SolutionsPage() {
 
   return (
     <div className="min-h-screen bg-neutral-950 pb-24 pt-32 text-white">
-      <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
+      <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
         <section>
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Astra Product</p>
           <h1 className="mt-3 max-w-4xl break-keep text-3xl font-extrabold leading-tight md:text-4xl">
