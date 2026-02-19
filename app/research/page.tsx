@@ -110,18 +110,22 @@ export default function ResearchPage() {
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">리서치</h1>
         </header>
 
-        <div className="sticky top-16 z-40 mb-8 border-b border-white/10 bg-neutral-950/90 pt-4 pb-2 backdrop-blur-md">
-          <div className="flex flex-wrap items-center gap-6 text-sm">
-            {categoryTabs.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`transition-colors ${activeTab === tab ? 'text-brand-primary font-semibold' : 'text-neutral-400 hover:text-white'}`}
-              >
-                {tab}
-              </button>
-            ))}
+        <div className="sticky top-16 z-40 mb-8 bg-neutral-950/90 backdrop-blur-md">
+          <div className="-mx-6 overflow-x-auto lg:-mx-10 xl:-mx-[120px]">
+            <div className="min-w-max border-b border-white/10 px-6 pt-4 pb-2 lg:px-10 xl:px-[120px]">
+              <div className="flex items-center gap-6 text-sm">
+                {categoryTabs.map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setActiveTab(tab)}
+                    className={`flex-shrink-0 whitespace-nowrap transition-colors ${activeTab === tab ? 'text-brand-primary font-semibold' : 'text-neutral-400 hover:text-white'}`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
