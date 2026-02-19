@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
-import { AnimatePresence, motion } from "framer-motion"
+import { AnimatePresence, motion, useInView } from "framer-motion"
 import {
   ArrowRight,
   ChevronLeft,
@@ -10,6 +10,7 @@ import {
   Quote,
   Star,
   Building2,
+  Calendar,
 } from "lucide-react"
 
 const clients = [
@@ -80,6 +81,62 @@ const testimonials = [
       "구성원들이 직접 '평가가 공정해졌다'고 이야기하기 시작했습니다. 데이터에 기반한 역량 모델이 조직 신뢰를 회복시켜 주었습니다.",
     author: "박OO 부장",
     role: "C사 인재개발팀",
+  },
+]
+
+const consultingHistory = [
+  {
+    year: "2024 - 현재",
+    projects: [
+      "글로벌 반도체 기업 — AI 역량 모델링 및 ASTRA 플랫폼 구축",
+      "대형 금융지주 — 그룹사 통합 리더십 역량 체계 재설계",
+      "공공기관 — 디지털 전환 인재 역량 진단 프레임워크 개발",
+    ],
+  },
+  {
+    year: "2021 - 2023",
+    projects: [
+      "국내 Top 3 IT기업 — 애자일 조직 역량 모델링 및 평가 체계",
+      "글로벌 자동차 그룹 — 해외법인 통합 역량 프레임워크 구축",
+      "대형 유통그룹 — 직무별 핵심 역량 모델 및 평가센터(AC) 설계",
+      "에너지 공기업 — ESG 경영 연계 리더십 역량 진단",
+    ],
+  },
+  {
+    year: "2018 - 2020",
+    projects: [
+      "국내 주요 통신사 — DT 인재상 수립 및 역량 평가 고도화",
+      "글로벌 화학기업 — R&D 직군 전문 역량 체계 구축",
+      "대형 건설사 — 프로젝트 리더 역량 모델링 및 AC 운영",
+      "방산기업 — 핵심 기술인력 역량 진단 및 육성 로드맵",
+    ],
+  },
+  {
+    year: "2015 - 2017",
+    projects: [
+      "국내 대형 은행 — 전사 역량 모델 리뉴얼 및 평가 연계",
+      "글로벌 철강기업 — 글로벌 리더 파이프라인 역량 체계",
+      "대형 보험사 — 영업 직군 성과 예측 역량 모델 개발",
+      "공공기관 — 고위공무원단 리더십 역량 진단 체계 설계",
+    ],
+  },
+  {
+    year: "2011 - 2014",
+    projects: [
+      "국내 Top 전자기업 — 글로벌 인재 선발 역량 평가 체계",
+      "대형 석유화학 그룹 — 사업부별 역량 모델 및 승진 평가",
+      "대형 항공사 — 서비스 직군 행동 역량 모델링",
+      "국내 주요 대학 — 교직원 역량 진단 및 개발 체계 구축",
+    ],
+  },
+  {
+    year: "2005 - 2010",
+    projects: [
+      "국내 주요 그룹사 — 그룹 공통 리더십 역량 모델 최초 수립",
+      "글로벌 제조기업 — 생산직 역량 기반 인사 체계 도입",
+      "대형 통신사 — 역량 기반 채용 면접 구조화 프로젝트",
+      "금융권 다수 — 역량 평가 제도 도입 및 평가자 양성",
+    ],
   },
 ]
 
@@ -224,6 +281,9 @@ export function CaseStudies() {
         </div>
       </section>
 
+      {/* Consulting History Timeline */}
+      <ConsultingTimeline />
+
       {/* CTA */}
       <section className="bg-neutral-950 py-16">
         <div className="mx-auto max-w-3xl px-6 text-center lg:px-8">
@@ -239,5 +299,106 @@ export function CaseStudies() {
         </div>
       </section>
     </>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Consulting Timeline                                                */
+/* ------------------------------------------------------------------ */
+
+function TimelineEntry({
+  entry,
+  index,
+}: {
+  entry: (typeof consultingHistory)[number]
+  index: number
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once: true, margin: "-60px" })
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 24 }}
+      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
+      className="relative flex gap-6 pb-10 last:pb-0 md:gap-10"
+    >
+      {/* Vertical line + dot */}
+      <div className="relative flex flex-col items-center">
+        <div className="bg-brand-primary z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
+          <Calendar className="h-4 w-4 text-white" />
+        </div>
+        {index < consultingHistory.length - 1 && (
+          <div className="absolute top-9 bottom-0 w-px bg-gradient-to-b from-blue-500/40 to-transparent" />
+        )}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 pb-2">
+        <p className="text-brand-primary text-sm font-bold tracking-wide">
+          {entry.year}
+        </p>
+        <ul className="mt-3 space-y-2">
+          {entry.projects.map((project, pIdx) => (
+            <li
+              key={pIdx}
+              className="flex items-start gap-2.5 text-sm leading-relaxed text-neutral-300"
+            >
+              <span className="bg-brand-primary mt-[7px] block h-1.5 w-1.5 shrink-0 rounded-full opacity-60" />
+              {project}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </motion.div>
+  )
+}
+
+function ConsultingTimeline() {
+  return (
+    <section className="bg-neutral-950 py-16 lg:py-24">
+      <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
+        {/* Section header */}
+        <div className="mb-12">
+          <p className="text-brand-primary text-xs font-semibold tracking-[0.22em] uppercase">
+            Since 2005
+          </p>
+          <h3 className="mt-3 text-xl font-bold text-white md:text-2xl">
+            20년간의 컨설팅 연혁
+          </h3>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-neutral-400">
+            어세스타는 2005년부터 국내외 주요 기업 및 기관과 함께
+            역량 기반 HR 혁신을 이끌어왔습니다.
+          </p>
+        </div>
+
+        {/* Summary chips */}
+        <div className="mb-10 flex flex-wrap gap-3">
+          {[
+            { label: "누적 프로젝트", value: "500+" },
+            { label: "파트너 기업/기관", value: "200+" },
+            { label: "컨설팅 업력", value: "20년+" },
+          ].map((chip) => (
+            <div
+              key={chip.label}
+              className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-neutral-900 px-5 py-3"
+            >
+              <span className="text-brand-primary text-lg font-extrabold">
+                {chip.value}
+              </span>
+              <span className="text-xs text-neutral-400">{chip.label}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Timeline */}
+        <div className="rounded-xl border border-white/10 bg-neutral-900 p-6 md:p-10">
+          {consultingHistory.map((entry, idx) => (
+            <TimelineEntry key={entry.year} entry={entry} index={idx} />
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }
