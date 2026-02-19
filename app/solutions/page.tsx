@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Brain, Bot, CheckCheck, ChevronDown } from 'lucide-react'
 import { InteractiveFeatureShowcase } from '@/components/interactive-feature-showcase'
+import { InteractiveDemoReel } from '@/components/interactive-demo-reel'
 
 const processCards = [
   {
@@ -32,62 +33,6 @@ const processCards = [
   },
 ]
 
-function GeneratedDemoReel() {
-  const [fallbacks, setFallbacks] = useState([false, false, false, false])
-  const layers = [
-    { src: '/images/solutions/reel-1.png', fallback: '/images/solutions/prototype-1.svg', className: 'reel-layer-1', alt: 'Form scene' },
-    { src: '/images/solutions/reel-2.png', fallback: '/images/solutions/prototype-2.svg', className: 'reel-layer-2', alt: 'Dashboard scene' },
-    { src: '/images/solutions/reel-3.png', fallback: '/images/solutions/prototype-3.svg', className: 'reel-layer-3', alt: 'Node scene' },
-    { src: '/images/solutions/reel-4.png', fallback: '/images/solutions/prototype-4.svg', className: 'reel-layer-4', alt: 'Modal scene' },
-  ]
-
-  return (
-    <div className="relative mt-4 h-[20rem] overflow-hidden rounded-xl border border-white/10 bg-[#050914] md:h-[24rem] lg:h-[28rem]">
-      <div className="absolute inset-x-3 top-3 z-20 flex h-7 items-center justify-between rounded-md border border-white/10 bg-black/45 px-2">
-        <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-red-300/80" />
-          <span className="h-2 w-2 rounded-full bg-amber-300/80" />
-          <span className="h-2 w-2 rounded-full bg-emerald-300/80" />
-          <p className="text-[10px] font-medium tracking-wide text-slate-200">ASTRA Live Simulation • Auto Demo Reel</p>
-        </div>
-        <p className="font-mono text-[10px] text-slate-300">00:12 LOOP</p>
-      </div>
-      <div className="relative h-full w-full overflow-hidden rounded-lg bg-gray-900">
-        {layers.map((layer, idx) => (
-          <img
-            key={layer.className}
-            src={fallbacks[idx] ? layer.fallback : layer.src}
-            alt={layer.alt}
-            className={`absolute inset-0 h-full w-full object-cover ${layer.className}`}
-            loading={idx === 0 ? 'eager' : 'lazy'}
-            onError={() =>
-              setFallbacks((prev) => {
-                if (prev[idx]) return prev
-                const next = [...prev]
-                next[idx] = true
-                return next
-              })
-            }
-          />
-        ))}
-      </div>
-      <div className="pointer-events-none absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_50%,transparent_58%,rgba(0,0,0,0.36)_100%)]" />
-      <div className="reel-cursor-ring pointer-events-none absolute left-0 top-0 z-20 h-8 w-8 rounded-full border border-cyan-200/80" />
-      <div className="reel-cursor pointer-events-none absolute left-0 top-0 z-20">
-        <svg width="28" height="34" viewBox="0 0 28 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path
-            d="M3.2 2.4L24.6 17.3L14.6 18.6L11.2 31.6L3.2 2.4Z"
-            fill="white"
-            stroke="#0F172A"
-            strokeWidth="1.6"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
-  )
-}
-
 export default function SolutionsPage() {
   const [openCard, setOpenCard] = useState('data')
   const { scrollYProgress } = useScroll()
@@ -108,7 +53,7 @@ export default function SolutionsPage() {
           >
             <div className="rounded-2xl border border-white/10 bg-neutral-900 p-4">
               <p className="text-sm text-neutral-300">Competency Prediction Demo Reel</p>
-              <GeneratedDemoReel />
+              <InteractiveDemoReel />
             </div>
           </motion.div>
         </section>
