@@ -68,7 +68,7 @@ const archiveArticles = [
 function HeroVisual() {
   return (
     <div className="relative h-[260px] overflow-hidden rounded-[10px] border border-white/10 bg-neutral-900 lg:h-[230px]">
-      <Image src="/images/research/hero-mockup.svg" alt="Research hero mockup" fill className="object-cover" />
+      <Image src="/images/research/hero-mockup.svg" alt="Research hero mockup" fill className="object-cover" priority />
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
     </div>
   )
