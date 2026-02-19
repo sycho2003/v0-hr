@@ -119,8 +119,9 @@ function QuantumParticleCanvas() {
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
-      width = window.innerWidth
-      height = Math.max(680, Math.floor(window.innerHeight * 0.95))
+      const rect = canvas.getBoundingClientRect()
+      width = Math.max(1, Math.floor(rect.width))
+      height = Math.max(1, Math.floor(rect.height))
       canvas.width = Math.floor(width * dpr)
       canvas.height = Math.floor(height * dpr)
       canvas.style.width = `${width}px`
@@ -341,9 +342,19 @@ function QuantumParticleCanvas() {
     }
 
     const onMove = (event: PointerEvent) => {
-      pointerTarget = { x: event.clientX, y: event.clientY, active: true }
+      const rect = canvas.getBoundingClientRect()
+      const localX = event.clientX - rect.left
+      const localY = event.clientY - rect.top
+      const inside = localX >= 0 && localX <= rect.width && localY >= 0 && localY <= rect.height
+
+      if (!inside) {
+        pointerTarget = { ...pointerTarget, active: false }
+        return
+      }
+
+      pointerTarget = { x: localX, y: localY, active: true }
       if (!pointer.active) {
-        pointer = { x: event.clientX, y: event.clientY, active: true }
+        pointer = { x: localX, y: localY, active: true }
       }
     }
     const onLeave = () => {
@@ -401,7 +412,7 @@ function SpotlightRevealSection() {
   const inverseMask = `radial-gradient(circle 250px at ${spot.x}% ${spot.y}%, rgba(255,255,255,0) 0%, rgba(255,255,255,0.04) 55%, rgba(255,255,255,1) 100%)`
 
   return (
-    <section className="w-full px-6 pb-8 pt-10 md:px-20 md:pt-14 xl:px-[120px]">
+    <section className="relative z-10 mx-auto w-full max-w-6xl px-6 pb-8 pt-4 md:pt-8 lg:px-10 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -423,7 +434,7 @@ function SpotlightRevealSection() {
         <h2 className="mt-3 text-3xl font-bold text-white">
           실무자가 실전에서 좋은 성과를 내게 하려면 어떻게 해야 할까요?
         </h2>
-        <p className="mx-auto mt-4 max-w-4xl text-gray-400">
+        <p className="mx-auto mt-4 max-w-4xl text-sm leading-[1.7] text-gray-400 sm:text-base sm:leading-[1.75]">
           채용 시 우수했던 인재가 현장에서 기대 이하의 성과를 보이는 이유, 문제는 평가 방식에 있습니다.
         </p>
       </motion.div>
@@ -738,15 +749,15 @@ function ROICalculator() {
   }, [estimatedBenefit])
 
   return (
-    <section className="mx-auto w-full max-w-4xl px-6 pt-10 max-[359px]:pt-6 lg:px-10 xl:px-[120px]">
+    <section className="mx-auto w-full max-w-6xl px-6 pt-10 max-[359px]:pt-6 lg:px-10 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.7 }}
-        className="rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl shadow-[0_0_45px_rgba(59,130,246,0.16)] md:p-10"
+        className="rounded-3xl border border-white/10 bg-white/[0.04] p-10 backdrop-blur-xl shadow-[0_0_45px_rgba(59,130,246,0.16)] md:p-14"
       >
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="grid gap-12 md:grid-cols-[1fr_1.12fr] md:gap-14">
           <div>
             <div className="mb-8">
               <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">ROI Calculator</p>
@@ -793,7 +804,7 @@ function ROICalculator() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-[#0b1428]/50 p-6 md:p-8">
+          <div className="rounded-2xl border border-white/10 bg-[#0b1428]/50 p-8 md:p-12">
             <p className="text-sm text-slate-300">예상 연간 이익</p>
             <p className="mt-4 break-keep text-[clamp(1.95rem,9.2vw,3.75rem)] font-extrabold leading-[1.05] tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400 [font-variant-numeric:tabular-nums]">
               {formatManwonToKrw(displayValue)}
@@ -1136,25 +1147,25 @@ export default function Page() {
       </div>
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.08)_1px,transparent_1px)] bg-[size:56px_56px] opacity-10" />
 
-      <section className="relative flex min-h-[100svh] items-center justify-center px-6 pb-20 pt-28 text-center max-[359px]:pb-16 max-[359px]:pt-24 md:pb-24 md:pt-32 lg:px-10 xl:px-[120px]">
+      <section className="relative flex min-h-[100svh] items-center justify-center overflow-hidden px-6 pb-14 pt-20 text-center max-[359px]:pb-12 max-[359px]:pt-16 md:pb-20 md:pt-24 lg:px-10 xl:px-[120px]">
         <QuantumParticleCanvas />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/35 to-[#020617]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.45)_0%,rgba(0,0,0,0.35)_48%,rgba(2,6,23,0.95)_78%,#020617_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0)_70%)]" />
 
-        <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mt-8 flex flex-col items-center gap-8">
+        <div className="relative z-10 mx-auto max-w-4xl -translate-y-2 md:-translate-y-3">
+          <div className="mt-6 flex flex-col items-center gap-6">
             <motion.h1
               custom={0.15}
               variants={heroVariants}
               initial="hidden"
               animate="visible"
-              className="text-balance text-4xl font-extrabold leading-tight tracking-[-0.02em] sm:text-5xl md:text-6xl lg:text-7xl"
+              className="text-balance text-3xl font-extrabold leading-[1.08] tracking-[-0.02em] sm:text-4xl md:text-5xl lg:text-6xl"
             >
               <span className="block">
                 <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">고성과자의 </span>
                 <span style={{ color: ELECTRIC_BLUE }}>DNA</span>,
               </span>
-              <span aria-hidden className="block h-[10px]" />
+              <span aria-hidden className="block h-2" />
               <span className="block">
                 <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">AI가 </span>
                 <span style={{ color: ELECTRIC_BLUE }}>3초</span>
@@ -1169,7 +1180,7 @@ export default function Page() {
               variants={heroVariants}
               initial="hidden"
               animate="visible"
-              className="mx-auto mt-5 mb-8 max-w-3xl break-keep text-pretty text-sm font-light leading-[1.7] text-gray-300 sm:text-base sm:leading-[1.75]"
+              className="mx-auto mt-3 mb-5 max-w-3xl break-keep text-pretty text-sm font-light leading-[1.7] text-gray-300 sm:text-base sm:leading-[1.75]"
             >
               3개월이 걸리던 고비용 역량 모델링, AI 자동화로 3일 만에 완성합니다.
               <br />
