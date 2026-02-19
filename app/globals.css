@@ -34,6 +34,22 @@
   100% { transform: translateX(-50%); }
 }
 
+@keyframes hr-card-glow-sync {
+  0%,
+  100% {
+    box-shadow: 0 0 6px rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(59, 130, 246, 0.52);
+    border-color: rgba(96, 165, 250, 0.95);
+  }
+}
+
+.hr-card-glow-sync {
+  animation: hr-card-glow-sync 1.3s ease-in-out infinite;
+}
+
 .animate-chip-marquee {
   animation: chip-marquee 26s linear infinite;
 }
@@ -156,6 +172,7 @@
   .reel-cursor,
   .reel-cursor-ring,
   .animate-chip-marquee,
+  .hr-card-glow-sync,
   .nebula-orb-1,
   .nebula-orb-2,
   .nebula-orb-3 {

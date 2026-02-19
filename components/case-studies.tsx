@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import { AnimatePresence, motion, useInView } from "framer-motion"
+import { AnimatePresence, motion } from "framer-motion"
 import {
   ArrowRight,
   ChevronLeft,
@@ -10,7 +10,6 @@ import {
   Quote,
   Star,
   Building2,
-  Calendar,
 } from "lucide-react"
 
 const clients = [
@@ -84,60 +83,28 @@ const testimonials = [
   },
 ]
 
-const consultingHistory = [
+const consultingTimeline = [
   {
-    year: "2024 - 현재",
-    projects: [
-      "글로벌 반도체 기업 — AI 역량 모델링 및 ASTRA 플랫폼 구축",
-      "대형 금융지주 — 그룹사 통합 리더십 역량 체계 재설계",
-      "공공기관 — 디지털 전환 인재 역량 진단 프레임워크 개발",
+    year: "현재",
+    history: [
+      "현재 컨설팅 사례 더미 텍스트 01",
+      "현재 컨설팅 사례 더미 텍스트 02",
+      "현재 컨설팅 사례 더미 텍스트 03",
+      "현재 컨설팅 사례 더미 텍스트 04",
     ],
   },
-  {
-    year: "2021 - 2023",
-    projects: [
-      "국내 Top 3 IT기업 — 애자일 조직 역량 모델링 및 평가 체계",
-      "글로벌 자동차 그룹 — 해외법인 통합 역량 프레임워크 구축",
-      "대형 유통그룹 — 직무별 핵심 역량 모델 및 평가센터(AC) 설계",
-      "에너지 공기업 — ESG 경영 연계 리더십 역량 진단",
-    ],
-  },
-  {
-    year: "2018 - 2020",
-    projects: [
-      "국내 주요 통신사 — DT 인재상 수립 및 역량 평가 고도화",
-      "글로벌 화학기업 — R&D 직군 전문 역량 체계 구축",
-      "대형 건설사 — 프로젝트 리더 역량 모델링 및 AC 운영",
-      "방산기업 — 핵심 기술인력 역량 진단 및 육성 로드맵",
-    ],
-  },
-  {
-    year: "2015 - 2017",
-    projects: [
-      "국내 대형 은행 — 전사 역량 모델 리뉴얼 및 평가 연계",
-      "글로벌 철강기업 — 글로벌 리더 파이프라인 역량 체계",
-      "대형 보험사 — 영업 직군 성과 예측 역량 모델 개발",
-      "공공기관 — 고위공무원단 리더십 역량 진단 체계 설계",
-    ],
-  },
-  {
-    year: "2011 - 2014",
-    projects: [
-      "국내 Top 전자기업 — 글로벌 인재 선발 역량 평가 체계",
-      "대형 석유화학 그룹 — 사업부별 역량 모델 및 승진 평가",
-      "대형 항공사 — 서비스 직군 행동 역량 모델링",
-      "국내 주요 대학 — 교직원 역량 진단 및 개발 체계 구축",
-    ],
-  },
-  {
-    year: "2005 - 2010",
-    projects: [
-      "국내 주요 그룹사 — 그룹 공통 리더십 역량 모델 최초 수립",
-      "글로벌 제조기업 — 생산직 역량 기반 인사 체계 도입",
-      "대형 통신사 — 역량 기반 채용 면접 구조화 프로젝트",
-      "금융권 다수 — 역량 평가 제도 도입 및 평가자 양성",
-    ],
-  },
+  ...Array.from({ length: 21 }, (_, index) => {
+    const year = 2025 - index
+    return {
+      year: `${year}년`,
+      history: [
+        `${year}년 컨설팅 사례 더미 텍스트 01`,
+        `${year}년 컨설팅 사례 더미 텍스트 02`,
+        `${year}년 컨설팅 사례 더미 텍스트 03`,
+        `${year}년 컨설팅 사례 더미 텍스트 04`,
+      ],
+    }
+  }),
 ]
 
 export function CaseStudies() {
@@ -328,7 +295,7 @@ export function CaseStudies() {
       <ConsultingTimeline />
 
       {/* CTA */}
-      <section className="bg-neutral-950 py-16">
+      <section className="bg-neutral-950 pt-16 pb-28 md:pb-36">
         <div className="mx-auto max-w-3xl px-6 text-center lg:px-10 xl:px-[120px]">
           <h2 className="text-xl font-bold text-white md:text-2xl">우리 기업도 프로젝트 사례의 주인공이 될 수 있습니다</h2>
           <p className="mt-4 text-neutral-300">무료 진단을 통해 어세스타 솔루션의 기대 효과를 확인하세요.</p>
@@ -380,79 +347,119 @@ function TestimonialCardContent({
 /*  Consulting Timeline                                                */
 /* ------------------------------------------------------------------ */
 
-function TimelineEntry({
-  entry,
-  index,
-}: {
-  entry: (typeof consultingHistory)[number]
-  index: number
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const isInView = useInView(ref, { once: true, margin: "-60px" })
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
-      transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
-      className="relative flex gap-6 pb-10 last:pb-0 md:gap-10"
-    >
-      {/* Vertical line + dot */}
-      <div className="relative flex flex-col items-center">
-        <div className="bg-brand-primary z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full">
-          <Calendar className="h-4 w-4 text-white" />
-        </div>
-        {index < consultingHistory.length - 1 && (
-          <div className="absolute top-9 bottom-0 w-px bg-gradient-to-b from-blue-500/40 to-transparent" />
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 pb-2">
-        <p className="text-brand-primary text-sm font-bold tracking-wide">
-          {entry.year}
-        </p>
-        <ul className="mt-3 space-y-2">
-          {entry.projects.map((project, pIdx) => (
-            <li
-              key={pIdx}
-              className="flex items-start gap-2.5 text-sm leading-relaxed text-neutral-300"
-            >
-              <span className="bg-brand-primary mt-[7px] block h-1.5 w-1.5 shrink-0 rounded-full opacity-60" />
-              {project}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </motion.div>
-  )
-}
-
 function ConsultingTimeline() {
+  const [activeYear, setActiveYear] = useState(consultingTimeline[0]?.year ?? "2025")
+  const activeIndex = consultingTimeline.findIndex((entry) => entry.year === activeYear)
+  const safeActiveIndex = activeIndex >= 0 ? activeIndex : 0
+  const hintIndex = safeActiveIndex < consultingTimeline.length - 1 ? safeActiveIndex + 1 : -1
+
   return (
     <section className="bg-neutral-950 py-16 lg:py-24">
-      <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
-        {/* Section header */}
-        <div className="mb-10">
+      <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
+        <div className="mb-14 md:mb-16">
           <p className="text-brand-primary text-xs font-semibold tracking-[0.22em] uppercase">
             Since 2005
           </p>
-          <h3 className="mt-3 text-xl font-bold text-white md:text-2xl">
+          <h3 className="mt-3 text-balance text-3xl font-extrabold tracking-tight text-white md:text-4xl">
             20년간의 컨설팅 연혁
           </h3>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-neutral-400">
-            어세스타는 2005년부터 국내외 주요 기업 및 기관과 함께
-            역량 기반 HR 혁신을 이끌어왔습니다.
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-neutral-300 md:text-lg">
+            어세스타는 2005년부터 국내외 주요 기업 및 기관과 함께 역량 기반 HR 혁신을 이끌어왔습니다.
           </p>
         </div>
 
-        {/* Timeline */}
-        <div className="rounded-xl border border-white/10 bg-neutral-900 p-6 md:p-10">
-          {consultingHistory.map((entry, idx) => (
-            <TimelineEntry key={entry.year} entry={entry} index={idx} />
-          ))}
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 36 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.25 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full pb-44 md:pb-52 md:pl-24 lg:pl-28"
+        >
+          <ul className="relative space-y-3 md:space-y-4">
+            {consultingTimeline.map((entry, index) => {
+              const isActive = activeYear === entry.year
+              const isHint = index === hintIndex
+
+              return (
+                <li
+                  key={entry.year}
+                  className="timeline-item relative h-14 before:absolute before:bottom-[-18px] before:left-[119px] before:top-[28px] before:w-[2px] before:bg-gradient-to-b before:from-[#5f7394] before:via-[#4a5b76] before:to-[#36445d] last:before:hidden md:before:left-[192px]"
+                >
+                  <button
+                    type="button"
+                    onClick={() => setActiveYear(entry.year)}
+                    className="group grid h-14 w-full grid-cols-[104px_24px] items-start gap-x-3 text-left md:grid-cols-[160px_24px] md:gap-x-5"
+                    aria-pressed={isActive}
+                  >
+                    <span
+                      className={`pt-0.5 text-xl font-semibold leading-none tracking-tight transition-colors duration-200 md:text-2xl ${
+                        isActive ? "text-white" : "text-[#4a5870] group-hover:text-[#7c8aa2]"
+                      }`}
+                    >
+                      {entry.year}
+                    </span>
+
+                    <span
+                      className={`relative mt-[2px] h-6 w-6 rounded-full transition-all duration-200 ${
+                        isActive
+                          ? "border-[4px] border-white bg-[#0d1320]"
+                          : "border border-[#5b6d89] bg-[#0d1320]"
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.span
+                          key={`ring-${activeYear}`}
+                          initial={{ scale: 0.35, opacity: 0.95 }}
+                          animate={{ scale: 2.25, opacity: 0 }}
+                          transition={{ duration: 0.55, ease: "easeOut" }}
+                          className="pointer-events-none absolute inset-0 rounded-full border-[4px] border-white"
+                        />
+                      )}
+                      {isActive ? (
+                        <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0d1320]" />
+                      ) : (
+                        <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#617595]" />
+                      )}
+                      {!isActive && isHint && (
+                        <motion.span
+                          key={`hint-${entry.year}`}
+                          initial={{ scale: 0.55, opacity: 0.75 }}
+                          animate={{ scale: [0.55, 1.85, 1.85], opacity: [0.75, 0, 0] }}
+                          transition={{ duration: 1.25, ease: "easeOut", repeat: Infinity, repeatDelay: 0.3 }}
+                          className="pointer-events-none absolute inset-0 rounded-full border-[3px] border-white"
+                        />
+                      )}
+                    </span>
+                  </button>
+
+                  <AnimatePresence initial={false} mode="wait">
+                    {isActive && (
+                      <motion.ul
+                        key={`details-${entry.year}`}
+                        initial={{ opacity: 0, y: 18 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.34, ease: "easeOut" }}
+                        className="absolute left-[140px] top-[2px] z-20 w-[min(760px,calc(100%-148px))] space-y-3 md:left-[220px] md:w-[min(900px,calc(100%-228px))]"
+                      >
+                        {entry.history.map((item, idx) => (
+                          <motion.li
+                            key={`${entry.year}-${idx}`}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.24, delay: idx * 0.06, ease: "easeOut" }}
+                          >
+                            <p className="text-base font-medium leading-snug text-white md:text-lg">{item}</p>
+                          </motion.li>
+                        ))}
+                      </motion.ul>
+                    )}
+                  </AnimatePresence>
+                </li>
+              )
+            })}
+          </ul>
+        </motion.div>
       </div>
     </section>
   )

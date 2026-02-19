@@ -723,24 +723,51 @@ function FeatureFlow() {
 function ROICalculator() {
   const [hires, setHires] = useState(120)
   const [salary, setSalary] = useState(6000)
+  const [tenureYears, setTenureYears] = useState(3)
+  const [costPerHire, setCostPerHire] = useState(300)
   const [displayValue, setDisplayValue] = useState(0)
   const prevRef = useRef(0)
 
-  const failureReduction = useMemo(() => hires * salary * 0.05, [hires, salary])
-  const productivityGain = useMemo(() => hires * salary * 1.5 * 0.1, [hires, salary])
+  // Schmidt-Hunter utility model (incremental):
+  // ΔU = N × T × (r_astra - r_base) × SD_y × Z_x - (N × C)
+  const validityBaseline = 0.3
+  const validityAstra = 0.65
+  const sdYRatio = 0.4
+  const selectedZScore = 0.5
+  const failureShare = 0.25
+  const performanceStdDev = useMemo(() => salary * sdYRatio, [salary, sdYRatio])
+
+  const baselineUtility = useMemo(() => {
+    return hires * tenureYears * validityBaseline * performanceStdDev * selectedZScore
+  }, [hires, tenureYears, validityBaseline, performanceStdDev, selectedZScore])
+
+  const astraUtility = useMemo(() => {
+    return hires * tenureYears * validityAstra * performanceStdDev * selectedZScore
+  }, [hires, tenureYears, validityAstra, performanceStdDev, selectedZScore])
+
+  const grossUtility = useMemo(() => {
+    return astraUtility - baselineUtility
+  }, [astraUtility, baselineUtility])
+
+  // Decompose incremental utility for readability.
+  const failureReduction = useMemo(() => grossUtility * failureShare, [grossUtility, failureShare])
+  const productivityGain = useMemo(() => grossUtility * (1 - failureShare), [grossUtility, failureShare])
+  const totalCost = useMemo(() => hires * costPerHire, [hires, costPerHire])
 
   const estimatedBenefit = useMemo(() => {
-    return failureReduction + productivityGain
-  }, [failureReduction, productivityGain])
+    return grossUtility - totalCost
+  }, [grossUtility, totalCost])
 
   const formatManwonToKrw = (value: number) => {
-    const safe = Math.max(0, Math.round(value))
+    const rounded = Math.round(value)
+    const sign = rounded < 0 ? '-' : ''
+    const safe = Math.abs(rounded)
     const eok = Math.floor(safe / 10000)
     const man = safe % 10000
 
-    if (eok > 0 && man > 0) return `${eok.toLocaleString('ko-KR')}억 ${man.toLocaleString('ko-KR')}만 원`
-    if (eok > 0) return `${eok.toLocaleString('ko-KR')}억 원`
-    return `${man.toLocaleString('ko-KR')}만 원`
+    if (eok > 0 && man > 0) return `${sign}${eok.toLocaleString('ko-KR')}억 ${man.toLocaleString('ko-KR')}만 원`
+    if (eok > 0) return `${sign}${eok.toLocaleString('ko-KR')}억 원`
+    return `${sign}${man.toLocaleString('ko-KR')}만 원`
   }
 
   useEffect(() => {
@@ -810,12 +837,44 @@ function ROICalculator() {
                   className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-[#3B82F6]"
                 />
               </div>
+
+              <div>
+                <div className="mb-3 flex items-center justify-between text-sm text-slate-300">
+                  <span>평균 근무 기간</span>
+                  <span className="font-semibold text-white">{tenureYears}년</span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={5}
+                  step={1}
+                  value={tenureYears}
+                  onChange={(e) => setTenureYears(Number(e.target.value))}
+                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-[#3B82F6]"
+                />
+              </div>
+
+              <div>
+                <div className="mb-3 flex items-center justify-between text-sm text-slate-300">
+                  <span>인당 채용 비용</span>
+                  <span className="font-semibold text-white">{costPerHire.toLocaleString('ko-KR')}만원</span>
+                </div>
+                <input
+                  type="range"
+                  min={50}
+                  max={1000}
+                  step={10}
+                  value={costPerHire}
+                  onChange={(e) => setCostPerHire(Number(e.target.value))}
+                  className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-[#3B82F6]"
+                />
+              </div>
             </div>
 
             <p className="mt-6 text-xs leading-relaxed text-[color:var(--astra-text-muted)]">
-              예상 연간 이익은 오차가 있을 수 있습니다.
+              기준값: r_base = 0.30, r_astra = 0.65, SD_y = 연봉의 40%, Z_x = 0.5
               <br />
-              자세한 내용은 상담 문의 주시면 도와드리겠습니다.
+              ΔU = N × T × (r_astra - r_base) × SD_y × Z_x - (N × C)
             </p>
           </div>
 
@@ -831,6 +890,9 @@ function ROICalculator() {
               </p>
               <p className="text-sm text-blue-400">
                 📈 생산성 증대: <span className="font-semibold">{formatManwonToKrw(productivityGain).replace(' 원', '')}</span>
+              </p>
+              <p className="text-sm text-rose-300">
+                💸 비용 차감: <span className="font-semibold">{formatManwonToKrw(totalCost).replace(' 원', '')}</span>
               </p>
             </div>
           </div>

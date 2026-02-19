@@ -1,116 +1,103 @@
 'use client'
 
+import { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { CircularDiagram } from '@/components/circular-diagram'
+import { Check, ChevronDown } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
 
-/* ── Ripple Effect Component ── */
-function RippleEffect() {
-  return (
-    <span className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
-      {[0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
-          className="absolute rounded-full border border-sky-400/40"
-          initial={{ width: 20, height: 20, opacity: 0.6 }}
-          animate={{ width: 180, height: 180, opacity: 0 }}
-          transition={{
-            duration: 2.8,
-            repeat: Infinity,
-            delay: i * 0.9,
-            ease: 'easeOut',
-          }}
-        />
-      ))}
-    </span>
-  )
+type AudienceType = 'government' | 'public' | 'enterprise' | 'stateOwned'
+type AudienceChipType = 'government' | 'public' | 'stateOwned' | 'largeEnterprise' | 'midSizedEnterprise' | 'sme' | 'startup'
+
+type ConsultingItem = {
+  id: string
+  title: string
+  description: string
+  audiences: AudienceType[]
 }
 
-/* ── Service Card Component ── */
-function ServiceCard({ title, desc, chips }: { title: string; desc: string; chips: string[] }) {
-  return (
-    <article className="hover-border-brand-primary-soft rounded-2xl border border-white/10 bg-neutral-900 p-7 transition-colors">
-      <h3 className="text-xl font-bold text-white">{title}</h3>
-      <p className="mt-4 text-sm leading-relaxed text-neutral-300 md:text-base">{desc}</p>
-      <div className="mt-5 flex flex-wrap gap-2">
-        {chips.map((chip) => (
-          <span
-            key={chip}
-            className="rounded-full border border-white/15 bg-white/[0.03] px-3 py-1.5 text-sm text-neutral-200"
-          >
-            {chip}
-          </span>
-        ))}
-      </div>
-    </article>
-  )
+const audienceLabels: {
+  id: AudienceChipType
+  label: string
+}[] = [
+  { id: 'government', label: '정부' },
+  { id: 'public', label: '공공기관' },
+  { id: 'largeEnterprise', label: '대기업' },
+  { id: 'midSizedEnterprise', label: '중견기업' },
+  { id: 'sme', label: '중소기업' },
+  { id: 'startup', label: '스타트업' },
+  { id: 'stateOwned', label: '공기업' },
+]
+
+const isEnterpriseChip = (audience: AudienceChipType) => {
+  return audience === 'largeEnterprise' || audience === 'midSizedEnterprise' || audience === 'sme' || audience === 'startup'
 }
 
-/* ── Data ── */
-const govServices = [
-  {
-    title: '역량평가 (AC)',
-    desc: 'Assessment Center 방식의 역량평가를 통해 공공기관 인재의 핵심역량을 객관적으로 측정합니다. 시뮬레이션, 발표, 토론 등 다면적 평가 기법을 활용하여 승진 및 보직 배치의 공정성을 확보합니다.',
-    chips: ['시뮬레이션 평가', '구조화 면접', '역량 프로파일링'],
-  },
-  {
-    title: '역량개발 (DC)',
-    desc: 'Development Center 기반으로 개인별 역량 격차를 진단하고 맞춤형 개발 계획을 수립합니다. 평가 결과를 즉각적인 피드백과 코칭으로 연결하여 실질적인 역량 향상을 이끌어냅니다.',
-    chips: ['갭 분석', '개발 피드백', '개인별 IDP 수립'],
-  },
-  {
-    title: '채용',
-    desc: '공공기관 특성에 맞는 블라인드 채용 체계를 설계하고 NCS 기반의 직무능력 평가 도구를 개발합니다. 공정성과 전문성을 겸비한 채용 프로세스로 우수 인재를 선발합니다.',
-    chips: ['NCS 기반 평가', '블라인드 채용 설계', '면접관 교육'],
-  },
-  {
-    title: '리더십개발',
-    desc: '공직 리더에게 요구되는 전략적 사고, 소통, 변화관리 역량을 체계적으로 개발합니다. 정부 조직의 특수성을 반영한 리더십 모델 수립부터 실행까지 원스톱으로 지원합니다.',
-    chips: ['공직 리더십 모델', '코칭 프로그램', '승계 계획'],
-  },
-]
+const isItemActiveForAudience = (item: ConsultingItem, audience: AudienceChipType) => {
+  if (isEnterpriseChip(audience)) {
+    return item.audiences.includes('enterprise')
+  }
+  return item.audiences.includes(audience)
+}
 
-const corpServices = [
-  {
-    title: '갈등관리',
-    desc: '조직 내 갈등의 근본 원인을 구조적으로 진단하고, 건설적 갈등 해결 역량을 강화합니다. 이해관계 조정과 합의 도출 기법을 통해 협력적 조직문화를 조성합니다.',
-    chips: ['갈등 진단', '조정·중재 기법', '협력 문화 구축'],
-  },
-  {
-    title: '의사소통',
-    desc: '효과적인 조직 커뮤니케이션 체계를 설계하고 구성원의 소통 역량을 체계적으로 향상시킵니다. 수직·수평 소통 채널을 최적화하여 조직 내 정보 흐름과 협업 효율을 극대화합니다.',
-    chips: ['소통 역량 진단', '커뮤니케이션 코칭', '피드백 문화'],
-  },
-  {
-    title: '팀빌딩/팀워크',
-    desc: '팀 역동성을 과학적으로 분석하고 고성과 팀으로 도약하기 위한 맞춤형 팀빌딩 프로그램을 제공합니다. 신뢰 구축부터 공동 목표 설정까지 팀 시너지를 극대화합니다.',
-    chips: ['팀 진단', '워크숍 설계', '팀 성과 관리'],
-  },
-  {
-    title: '불안/스트레스',
-    desc: '직무 스트레스와 조직 내 심리적 위험 요인을 정밀 진단하고 EAP(근로자 지원 프로그램) 기반의 예방·관리 체계를 구축합니다. 구성원의 심리적 안정과 회복탄력성을 높입니다.',
-    chips: ['스트레스 진단', 'EAP 프로그램', '심리 상담 체계'],
-  },
-  {
-    title: '문제해결',
-    desc: '복잡한 비즈니스 문제를 구조화하고 데이터 기반으로 최적의 해결책을 도출하는 역량을 개발합니다. 디자인 씽킹과 시스템 사고를 결합한 실전형 문제해결 교육을 제공합니다.',
-    chips: ['문제 구조화 기법', '의사결정 프레임워크', '실전 시뮬레이션'],
-  },
-  {
-    title: '리더십개발',
-    desc: '기업 환경에 최적화된 리더십 역량 모델을 설계하고 계층별 맞춤형 리더십 개발 프로그램을 운영합니다. 360도 피드백과 코칭을 결합하여 지속 가능한 리더십 파이프라인을 구축합니다.',
-    chips: ['360도 리더십 진단', '코칭 & 멘토링', '차세대 리더 육성'],
-  },
-  {
-    title: '채용',
-    desc: '기업의 인재상과 직무 요건에 기반한 과학적 채용 체계를 구축합니다. 구조화 면접 설계부터 역량 기반 선발 도구 개발까지 채용 전 과정의 정확도와 효율성을 높입니다.',
-    chips: ['구조화 면접 설계', '역량 기반 선발', '채용 브랜딩'],
-  },
-]
+const consultingCatalog: { hrm: ConsultingItem[]; hrd: ConsultingItem[] } = {
+  hrm: [
+    { id: 'hrm-1', title: '직무역량 체계 재정비', description: '직무 기준에 맞춰 역량 모델을 표준화합니다.', audiences: ['government', 'public'] },
+    { id: 'hrm-2', title: '성과평가 체계 개선', description: '성과지표와 연동된 평가 운영 기준을 재설계합니다.', audiences: ['government', 'public', 'stateOwned'] },
+    { id: 'hrm-3', title: '채용 기준 고도화', description: '구조화 면접 중심으로 선발 정확도를 높입니다.', audiences: ['government', 'enterprise'] },
+    { id: 'hrm-4', title: '조직문화 진단', description: '협업 구조와 몰입 요인을 데이터로 분석합니다.', audiences: ['public', 'enterprise'] },
+    { id: 'hrm-5', title: '인재선발 기준 정교화', description: '공정성과 실효성을 반영해 기준을 고도화합니다.', audiences: ['public', 'stateOwned'] },
+    { id: 'hrm-6', title: '직무 재설계 컨설팅', description: '중복 업무를 줄이고 역할 책임을 명확화합니다.', audiences: ['public', 'enterprise', 'stateOwned'] },
+  ],
+  hrd: [
+    { id: 'hrd-1', title: '신임 관리자 리더십', description: '초기 관리자 대상 실무형 리더십을 강화합니다.', audiences: ['government', 'public'] },
+    { id: 'hrd-2', title: '정책 실행 역량 강화', description: '현장 실행력을 높이는 직무별 교육을 설계합니다.', audiences: ['government', 'public'] },
+    { id: 'hrd-3', title: '학습 성과 측정 체계', description: '교육 효과를 KPI와 연결해 정량 검증합니다.', audiences: ['government', 'enterprise'] },
+    { id: 'hrd-4', title: '핵심인재 육성 체계', description: '선발부터 육성 로드맵까지 통합 설계합니다.', audiences: ['public', 'stateOwned', 'enterprise'] },
+    { id: 'hrd-5', title: '직무 전환 교육', description: '전환 배치 대상자의 성과 안착을 지원합니다.', audiences: ['public', 'stateOwned'] },
+    { id: 'hrd-6', title: '교육 운영 고도화', description: '강사 체계와 운영 프로세스를 표준화합니다.', audiences: ['public', 'enterprise'] },
+  ],
+}
 
 export default function HRConsultingPage() {
+  const [activeAudience, setActiveAudience] = useState<AudienceChipType>('government')
+  const [visibleCountHRM, setVisibleCountHRM] = useState(4)
+  const [visibleCountHRD, setVisibleCountHRD] = useState(4)
+  const [mobileDetail, setMobileDetail] = useState<ConsultingItem | null>(null)
+
+  const hrmCards = useMemo<ConsultingItem[]>(() => consultingCatalog.hrm, [])
+  const hrdCards = useMemo<ConsultingItem[]>(() => consultingCatalog.hrd, [])
+  const hrmVisible = hrmCards.slice(0, visibleCountHRM)
+  const hrdVisible = hrdCards.slice(0, visibleCountHRD)
+
+  const hrmActiveCount = useMemo(
+    () => hrmCards.filter((item) => isItemActiveForAudience(item, activeAudience)).length,
+    [activeAudience, hrmCards]
+  )
+  const hrdActiveCount = useMemo(
+    () => hrdCards.filter((item) => isItemActiveForAudience(item, activeAudience)).length,
+    [activeAudience, hrdCards]
+  )
+
+  useEffect(() => {
+    setVisibleCountHRM((prev) => Math.min(Math.max(prev, 4), hrmCards.length))
+    setVisibleCountHRD((prev) => Math.min(Math.max(prev, 4), hrdCards.length))
+  }, [hrdCards.length, hrmCards.length])
+
   return (
-    <div className="min-h-screen bg-neutral-950 pb-24 pt-48 text-white">
-      <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
+    <div className="min-h-screen bg-neutral-950 pb-20 pt-32 text-white">
+      <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
 
         {/* ── Hero ── */}
         <motion.section
@@ -118,16 +105,15 @@ export default function HRConsultingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.55 }}
-          className="mb-40 text-center"
+          className="relative mb-14 py-10 text-center md:mb-20 md:py-14"
         >
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-blue-500/10 blur-3xl" />
+          </div>
           <h1 className="text-balance text-4xl font-extrabold leading-tight text-white md:text-5xl">
-            <span className="relative inline-block">
-              오프라인
-              <RippleEffect />
-            </span>{' '}
-            컨설팅이 필요하신가요?
+            오프라인 컨설팅이 필요하신가요?
           </h1>
-          <p className="mx-auto mt-5 max-w-3xl text-base leading-relaxed text-neutral-300 md:text-lg">
+          <p className="mx-auto mt-3 max-w-3xl text-base leading-relaxed text-neutral-300 md:text-lg">
             어세스타가 기존에 진행해온 컨설팅 서비스를 만나보세요.
           </p>
         </motion.section>
@@ -138,76 +124,202 @@ export default function HRConsultingPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.55 }}
-          className="mb-16"
+          className="mb-8"
         >
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.18em]">Customized Consulting</p>
-          <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white md:text-4xl">HR 컨설팅 서비스</h2>
-          <p className="mt-5 max-w-4xl text-base leading-relaxed text-neutral-300 md:text-lg">
+          <h2 className="mt-2 text-2xl font-extrabold leading-tight text-white md:text-3xl">HR 컨설팅 서비스</h2>
+          <p className="mt-3 max-w-4xl text-sm leading-relaxed text-neutral-300 md:text-base">
             조직의 특성에 맞춘 맞춤형 HR 시스템 구축. 25년간의 전문 노하우와 AI 기술을 결합한 데이터 기반 컨설팅입니다.
           </p>
         </motion.section>
 
-        {/* ── Donut Diagrams ── */}
+        {/* ── HRM / HRD Matrix ── */}
         <motion.section
-          initial={{ opacity: 0, y: 22 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="mb-20 grid gap-12 md:grid-cols-2"
+          transition={{ duration: 0.55 }}
+          className="mb-10 min-w-0"
         >
-          <CircularDiagram
-            title="정부/공공기관"
-            segments={[
-              { label: '역량평가\n(AC)', startAngle: 0, endAngle: 90 },
-              { label: '역량개발\n(DC)', startAngle: 90, endAngle: 180 },
-              { label: '리더십개발', startAngle: 180, endAngle: 270 },
-              { label: '채용', startAngle: 270, endAngle: 360 },
-            ]}
-          />
-          <CircularDiagram
-            title="일반/공공기업"
-            segments={[
-              { label: '갈등관리', startAngle: 0, endAngle: 51.4 },
-              { label: '의사소통', startAngle: 51.4, endAngle: 102.8 },
-              { label: '팀빌딩/\n팀워크', startAngle: 102.8, endAngle: 154.3 },
-              { label: '불안/\n스트레스', startAngle: 154.3, endAngle: 205.7 },
-              { label: '문제해결', startAngle: 205.7, endAngle: 257.1 },
-              { label: '리더십\n개발', startAngle: 257.1, endAngle: 308.6 },
-              { label: '채용', startAngle: 308.6, endAngle: 360 },
-            ]}
-          />
-        </motion.section>
-
-        {/* ── 정부/공공기관 Cards (4개) ── */}
-        <motion.section
-          initial={{ opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="mb-24"
-        >
-          <h2 className="mb-8 text-2xl font-extrabold text-white md:text-3xl">정부/공공기관</h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            {govServices.map((item) => (
-              <ServiceCard key={item.title} {...item} />
-            ))}
+          <div className="sticky top-20 z-20 mb-4 rounded-xl bg-neutral-950/88 py-2 backdrop-blur-md md:static md:bg-transparent md:py-0">
+            <div className="flex flex-wrap items-center gap-2">
+              {audienceLabels.map((item) => {
+                const isActive = activeAudience === item.id
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setActiveAudience(item.id)}
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
+                      isActive
+                        ? 'border-brand-primary/80 bg-brand-primary/20 text-white shadow-[0_0_16px_rgba(59,130,246,0.3)]'
+                        : 'border-white/20 bg-white/[0.02] text-neutral-300 hover:border-brand-primary/60 hover:text-white'
+                    }`}
+                  >
+                    {item.label}
+                    {isActive && <Check className="h-3.5 w-3.5 text-brand-primary" />}
+                  </button>
+                )
+              })}
+            </div>
           </div>
-        </motion.section>
 
-        {/* ── 일반/공공기업 Cards (7개) ── */}
-        <motion.section
-          initial={{ opacity: 0, y: 22 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.6 }}
-          className="mb-20"
-        >
-          <h2 className="mb-8 text-2xl font-extrabold text-white md:text-3xl">{'일반/공공기업'}</h2>
-          <div className="grid gap-6 md:grid-cols-2">
-            {corpServices.map((item) => (
-              <ServiceCard key={item.title} {...item} />
-            ))}
-          </div>
+          <TooltipProvider delayDuration={100}>
+            <div className="grid min-w-0 gap-4 lg:grid-cols-2 lg:gap-8">
+              <div className="min-w-0">
+                <div className="mb-2 flex items-center gap-2">
+                  <p className="text-brand-primary text-xl font-extrabold uppercase tracking-[0.16em] md:text-2xl">HRM</p>
+                  <span className="rounded-full border border-brand-primary/60 bg-brand-primary/15 px-2 py-0.5 text-xs font-semibold text-brand-primary">
+                    {hrmActiveCount}개
+                  </span>
+                </div>
+                <div className="grid min-w-0 grid-cols-2 gap-3">
+                  {hrmVisible.map((item) => {
+                    const isActive = isItemActiveForAudience(item, activeAudience)
+                    return (
+                      <Tooltip key={`${item.id}-${activeAudience}`}>
+                        <TooltipTrigger asChild>
+                          <article
+                            className={`relative flex min-h-[173px] min-w-0 flex-col rounded-lg border px-4 pt-4 pb-2 transition-colors duration-200 ${
+                              isActive
+                                ? 'border-brand-primary/70 bg-brand-primary/12 hr-card-glow-sync'
+                                : 'border-white/10 bg-white/[0.01] opacity-45'
+                            }`}
+                          >
+                            {isActive && (
+                              <span className="absolute right-3 top-3 rounded-full border border-brand-primary/70 bg-brand-primary/20 p-1">
+                                <Check className="h-3.5 w-3.5 text-brand-primary" />
+                              </span>
+                            )}
+                            <p className={`pr-7 text-[15px] font-bold leading-snug break-keep ${isActive ? 'text-white' : 'text-neutral-400'}`}>
+                              {item.title}
+                            </p>
+                            <p className={`mt-2 text-sm leading-snug ${isActive ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                              {item.description}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setMobileDetail(item)
+                              }}
+                              className="mt-auto pt-3 text-left text-xs font-medium text-brand-primary underline-offset-2 hover:underline md:hidden"
+                            >
+                              자세히 보기
+                            </button>
+                          </article>
+                        </TooltipTrigger>
+                        <TooltipContent className="hidden max-w-[280px] border-white/20 bg-neutral-900 text-neutral-100 md:block">
+                          <p className="text-sm font-semibold">{item.title}</p>
+                          <p className="mt-1 text-xs text-neutral-300">{item.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )
+                  })}
+                </div>
+                {hrmCards.length > 4 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setVisibleCountHRM((prev) =>
+                        prev >= hrmCards.length ? 4 : Math.min(prev + 2, hrmCards.length)
+                      )
+                    }
+                    className="mt-3 inline-flex items-center gap-1 rounded-full border border-white/15 px-3 py-1.5 text-xs text-neutral-300 hover:text-white"
+                  >
+                    {visibleCountHRM >= hrmCards.length ? '접기' : '더보기'}
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 transition-transform ${
+                        visibleCountHRM >= hrmCards.length ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                )}
+              </div>
+
+              <div className="min-w-0">
+                <div className="mb-2 flex items-center gap-2">
+                  <p className="text-brand-primary text-xl font-extrabold uppercase tracking-[0.16em] md:text-2xl">HRD</p>
+                  <span className="rounded-full border border-brand-primary/60 bg-brand-primary/15 px-2 py-0.5 text-xs font-semibold text-brand-primary">
+                    {hrdActiveCount}개
+                  </span>
+                </div>
+                <div className="grid min-w-0 grid-cols-2 gap-3">
+                  {hrdVisible.map((item) => {
+                    const isActive = isItemActiveForAudience(item, activeAudience)
+                    return (
+                      <Tooltip key={`${item.id}-${activeAudience}`}>
+                        <TooltipTrigger asChild>
+                          <article
+                            className={`relative flex min-h-[173px] min-w-0 flex-col rounded-lg border px-4 pt-4 pb-2 transition-colors duration-200 ${
+                              isActive
+                                ? 'border-brand-primary/70 bg-brand-primary/12 hr-card-glow-sync'
+                                : 'border-white/10 bg-white/[0.01] opacity-45'
+                            }`}
+                          >
+                            {isActive && (
+                              <span className="absolute right-3 top-3 rounded-full border border-brand-primary/70 bg-brand-primary/20 p-1">
+                                <Check className="h-3.5 w-3.5 text-brand-primary" />
+                              </span>
+                            )}
+                            <p className={`pr-7 text-[15px] font-bold leading-snug break-keep ${isActive ? 'text-white' : 'text-neutral-400'}`}>
+                              {item.title}
+                            </p>
+                            <p className={`mt-2 text-sm leading-snug ${isActive ? 'text-neutral-300' : 'text-neutral-500'}`}>
+                              {item.description}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setMobileDetail(item)
+                              }}
+                              className="mt-auto pt-3 text-left text-xs font-medium text-brand-primary underline-offset-2 hover:underline md:hidden"
+                            >
+                              자세히 보기
+                            </button>
+                          </article>
+                        </TooltipTrigger>
+                        <TooltipContent className="hidden max-w-[280px] border-white/20 bg-neutral-900 text-neutral-100 md:block">
+                          <p className="text-sm font-semibold">{item.title}</p>
+                          <p className="mt-1 text-xs text-neutral-300">{item.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )
+                  })}
+                </div>
+                {hrdCards.length > 4 && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setVisibleCountHRD((prev) =>
+                        prev >= hrdCards.length ? 4 : Math.min(prev + 2, hrdCards.length)
+                      )
+                    }
+                    className="mt-3 inline-flex items-center gap-1 rounded-full border border-white/15 px-3 py-1.5 text-xs text-neutral-300 hover:text-white"
+                  >
+                    {visibleCountHRD >= hrdCards.length ? '접기' : '더보기'}
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 transition-transform ${
+                        visibleCountHRD >= hrdCards.length ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                )}
+              </div>
+            </div>
+          </TooltipProvider>
+
+          <Dialog open={!!mobileDetail} onOpenChange={(open) => !open && setMobileDetail(null)}>
+            <DialogContent className="max-w-[92vw] border-white/15 bg-neutral-900 text-white">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold">{mobileDetail?.title}</DialogTitle>
+                <DialogDescription className="pt-2 text-sm leading-relaxed text-neutral-200">
+                  {mobileDetail?.description}
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
         </motion.section>
 
         {/* ── CTA ── */}
