@@ -348,14 +348,27 @@ function TestimonialCardContent({
 /* ------------------------------------------------------------------ */
 
 function ConsultingTimeline() {
-  const [activeYear, setActiveYear] = useState<string | null>(null)
+  const [activeYear, setActiveYear] = useState<string>(consultingTimeline[0].year)
   const [edgePad, setEdgePad] = useState(0)
   const [lineRange, setLineRange] = useState({ start: 84, end: 84 })
   const railRef = useRef<HTMLDivElement>(null)
   const itemRefs = useRef<Array<HTMLLIElement | null>>([])
   const anchorViewportXRef = useRef<number | null>(null)
-  const activeIndex = activeYear ? consultingTimeline.findIndex((entry) => entry.year === activeYear) : -1
-  const hintIndex = activeIndex >= 0 && activeIndex < consultingTimeline.length - 1 ? activeIndex + 1 : 1
+  const scrollRafRef = useRef<number | null>(null)
+  const activeIndex = consultingTimeline.findIndex((entry) => entry.year === activeYear)
+  const hintIndex = activeIndex >= 0 && activeIndex < consultingTimeline.length - 1 ? activeIndex + 1 : -1
+  const landingCenterIndex = consultingTimeline.findIndex((entry) => entry.year === "2024년")
+  const autoAlignStartIndex = consultingTimeline.findIndex((entry) => entry.year === "2023년")
+  const resolveFocusIndex = (selectedIndex: number) => {
+    if (selectedIndex < 0) return landingCenterIndex >= 0 ? landingCenterIndex : 0
+    if (autoAlignStartIndex >= 0 && selectedIndex >= autoAlignStartIndex) return selectedIndex
+    return landingCenterIndex >= 0 ? landingCenterIndex : selectedIndex
+  }
+  const alignBySelection = (selectedIndex: number, behavior: ScrollBehavior) => {
+    anchorViewportXRef.current = resolveAnchorViewportX()
+    alignTimelineItemToAnchor(resolveFocusIndex(selectedIndex), behavior)
+    updateLineRange()
+  }
   const resolveAnchorViewportX = () => {
     const rail = railRef.current
     if (!rail) return 0
@@ -376,6 +389,41 @@ function ConsultingTimeline() {
     return rail.clientWidth / 2
   }
 
+  const stopScrollAnimation = () => {
+    if (scrollRafRef.current !== null) {
+      cancelAnimationFrame(scrollRafRef.current)
+      scrollRafRef.current = null
+    }
+  }
+
+  const animateRailScroll = (rail: HTMLDivElement, targetLeft: number, duration = 420) => {
+    stopScrollAnimation()
+    const startLeft = rail.scrollLeft
+    const delta = targetLeft - startLeft
+    if (Math.abs(delta) < 1) {
+      rail.scrollLeft = targetLeft
+      return
+    }
+
+    const startTime = performance.now()
+    const step = (now: number) => {
+      const progress = Math.min(1, (now - startTime) / duration)
+      const eased =
+        progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2
+      rail.scrollLeft = startLeft + delta * eased
+
+      if (progress < 1) {
+        scrollRafRef.current = requestAnimationFrame(step)
+      } else {
+        scrollRafRef.current = null
+      }
+    }
+
+    scrollRafRef.current = requestAnimationFrame(step)
+  }
+
   const alignTimelineItemToAnchor = (index: number, behavior: ScrollBehavior = "smooth") => {
     const rail = railRef.current
     const item = itemRefs.current[index]
@@ -384,8 +432,16 @@ function ConsultingTimeline() {
     const anchorViewportX = anchorViewportXRef.current ?? fallbackAnchor
     const target = item.offsetLeft + item.clientWidth / 2 - anchorViewportX
     const max = rail.scrollWidth - rail.clientWidth
+    const clampedTarget = Math.min(Math.max(0, target), Math.max(0, max))
+
+    if (behavior === "smooth") {
+      animateRailScroll(rail, clampedTarget)
+      return
+    }
+
+    stopScrollAnimation()
     rail.scrollTo({
-      left: Math.min(Math.max(0, target), Math.max(0, max)),
+      left: clampedTarget,
       behavior,
     })
   }
@@ -418,23 +474,15 @@ function ConsultingTimeline() {
   useEffect(() => {
     if (edgePad <= 0) return
     requestAnimationFrame(() => {
-      anchorViewportXRef.current = resolveAnchorViewportX()
-      alignTimelineItemToAnchor(0, "auto")
-      updateLineRange()
+      alignBySelection(activeIndex, "auto")
     })
   }, [edgePad])
 
   useEffect(() => {
-    if (!activeYear) return
-    const index = consultingTimeline.findIndex((entry) => entry.year === activeYear)
-    if (index < 0) return
-    const rafId = requestAnimationFrame(() => {
-      anchorViewportXRef.current = resolveAnchorViewportX()
-      alignTimelineItemToAnchor(index, "smooth")
-      updateLineRange()
-    })
-    return () => cancelAnimationFrame(rafId)
-  }, [activeYear])
+    return () => {
+      stopScrollAnimation()
+    }
+  }, [])
 
   return (
     <section className="bg-neutral-950 py-16 lg:py-24">
@@ -499,7 +547,7 @@ function ConsultingTimeline() {
                           type="button"
                           onClick={() => {
                             setActiveYear(entry.year)
-                            alignTimelineItemToAnchor(index, "smooth")
+                            alignBySelection(index, "smooth")
                           }}
                           aria-pressed={isActive}
                           className={`relative mt-8 h-6 w-6 rounded-full transition-all duration-200 ${
