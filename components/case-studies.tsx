@@ -237,46 +237,89 @@ export function CaseStudies() {
             전문성과 열정에 대한 고객 후기
           </p>
 
-          <div className="mx-auto mt-10 max-w-2xl">
-            <div className="relative">
-              <div className="overflow-hidden rounded-xl border border-white/10 bg-neutral-900 p-7 pb-20">
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    key={testimonialIdx}
-                    initial={{ opacity: 0, x: 16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -16 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
+          {/* Carousel with blurred side cards */}
+          <div className="relative mt-10 overflow-hidden">
+            <AnimatePresence mode="popLayout" initial={false}>
+              <div className="flex items-stretch justify-center gap-5">
+                {/* Previous (left blurred card) */}
+                <motion.div
+                  key={`prev-${testimonialIdx}`}
+                  className="hidden w-full max-w-sm shrink-0 select-none md:block"
+                  initial={{ opacity: 0, x: -60 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -60 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                >
+                  <div
+                    className="h-full rounded-xl border border-white/[0.06] bg-neutral-900/60 p-7"
+                    style={{ filter: "blur(2.5px)" }}
+                    aria-hidden="true"
                   >
-                    <Quote className="text-brand-primary h-8 w-8 opacity-40" />
-                    <p className="mt-4 text-base leading-relaxed text-neutral-200">{t.quote}</p>
-                    <div className="mt-6 flex items-center gap-1">
-                      {[...Array(5)].map((_, j) => (
-                        <Star key={j} className="text-brand-primary fill-current h-4 w-4" />
-                      ))}
-                    </div>
-                    <div className="mt-3 border-t border-white/10 pt-4">
-                      <p className="text-sm font-bold text-white">{t.author}</p>
-                      <p className="text-xs text-neutral-400">{t.role}</p>
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+                    <TestimonialCardContent
+                      testimonial={testimonials[(testimonialIdx - 1 + testimonials.length) % testimonials.length]}
+                    />
+                  </div>
+                </motion.div>
 
-              <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-3">
-                <button onClick={prevT} className="hover-border-brand-primary-soft flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors" aria-label="이전 후기">
-                  <ChevronLeft className="h-4 w-4 text-neutral-200" />
-                </button>
-                <div className="flex gap-1.5">
-                  {testimonials.map((_, i) => (
-                    <div key={i} className={`h-2 w-2 rounded-full transition-colors ${i === testimonialIdx ? "bg-brand-primary" : "bg-neutral-700"}`} />
-                  ))}
-                </div>
-                <button onClick={nextT} className="hover-border-brand-primary-soft flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors" aria-label="다음 후기">
-                  <ChevronRight className="h-4 w-4 text-neutral-200" />
-                </button>
+                {/* Center (active card) */}
+                <motion.div
+                  key={`active-${testimonialIdx}`}
+                  className="w-full max-w-sm shrink-0 md:max-w-lg"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                >
+                  <div className="h-full rounded-xl border border-white/10 bg-neutral-900 p-7 shadow-lg shadow-black/20">
+                    <TestimonialCardContent testimonial={t} />
+                  </div>
+                </motion.div>
+
+                {/* Next (right blurred card) */}
+                <motion.div
+                  key={`next-${testimonialIdx}`}
+                  className="hidden w-full max-w-sm shrink-0 select-none md:block"
+                  initial={{ opacity: 0, x: 60 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 60 }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
+                >
+                  <div
+                    className="h-full rounded-xl border border-white/[0.06] bg-neutral-900/60 p-7"
+                    style={{ filter: "blur(2.5px)" }}
+                    aria-hidden="true"
+                  >
+                    <TestimonialCardContent
+                      testimonial={testimonials[(testimonialIdx + 1) % testimonials.length]}
+                    />
+                  </div>
+                </motion.div>
               </div>
+            </AnimatePresence>
+
+            {/* Left/right fade masks */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-16 bg-gradient-to-r from-neutral-950 to-transparent md:block" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-16 bg-gradient-to-l from-neutral-950 to-transparent md:block" />
+          </div>
+
+          {/* Navigation */}
+          <div className="mt-8 flex items-center justify-center gap-3">
+            <button onClick={prevT} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors hover:border-white/40" aria-label="이전 후기">
+              <ChevronLeft className="h-4 w-4 text-neutral-200" />
+            </button>
+            <div className="flex gap-1.5">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setTestimonialIdx(i)}
+                  className={`h-2 w-2 rounded-full transition-colors ${i === testimonialIdx ? "bg-brand-primary" : "bg-neutral-700 hover:bg-neutral-500"}`}
+                  aria-label={`후기 ${i + 1}번`}
+                />
+              ))}
             </div>
+            <button onClick={nextT} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors hover:border-white/40" aria-label="다음 후기">
+              <ChevronRight className="h-4 w-4 text-neutral-200" />
+            </button>
           </div>
         </div>
       </section>
@@ -298,6 +341,37 @@ export function CaseStudies() {
           </Link>
         </div>
       </section>
+    </>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/*  Testimonial Card Content                                           */
+/* ------------------------------------------------------------------ */
+
+function TestimonialCardContent({
+  testimonial,
+}: {
+  testimonial: (typeof testimonials)[number]
+}) {
+  return (
+    <>
+      <Quote className="text-brand-primary h-8 w-8 opacity-40" />
+      <p className="mt-4 text-base leading-relaxed text-neutral-200">
+        {testimonial.quote}
+      </p>
+      <div className="mt-6 flex items-center gap-1">
+        {[...Array(5)].map((_, j) => (
+          <Star
+            key={j}
+            className="text-brand-primary fill-current h-4 w-4"
+          />
+        ))}
+      </div>
+      <div className="mt-3 border-t border-white/10 pt-4">
+        <p className="text-sm font-bold text-white">{testimonial.author}</p>
+        <p className="text-xs text-neutral-400">{testimonial.role}</p>
+      </div>
     </>
   )
 }
