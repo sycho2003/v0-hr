@@ -72,7 +72,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 md:flex-row">
-          <p className="text-xs text-slate-500">&copy; 2026 ASSESSTA Inc. All rights reserved.</p>
+          <p className="text-xs text-slate-500">&copy; 2026 ASSESTA Inc. All rights reserved.</p>
           <div className="flex gap-6">
             {["개인정보처리방침", "이용약관"].map((item) => (
               <a key={item} href="#" className="text-xs text-slate-500 transition-colors hover:text-white">{item}</a>
