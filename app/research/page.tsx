@@ -110,7 +110,7 @@ export default function ResearchPage() {
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">리서치</h1>
         </header>
 
-        <div className="sticky top-[72px] z-40 mb-8 border-b border-white/10 bg-neutral-950/90 py-3 backdrop-blur-md">
+        <div className="sticky top-[72px] z-[900] mb-8 border-b border-white/10 bg-neutral-950 py-3 opacity-100">
           <div className="flex flex-nowrap items-center gap-6 overflow-x-auto pr-2 text-sm whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {categoryTabs.map((tab) => (
               <button
@@ -124,10 +124,7 @@ export default function ResearchPage() {
             ))}
           </div>
         </div>
-      </div>
 
-      {/* Main content with consistent padding */}
-      <div className="px-6 md:px-20 xl:px-[120px]">
         <section className="mb-24">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
             <div className="hidden lg:sticky lg:top-36 lg:block lg:h-[527.16px] lg:w-[70%]">

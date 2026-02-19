@@ -23,7 +23,7 @@ export function Navigation() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/20 backdrop-blur-md transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-[1000] border-b border-white/10 bg-[#0a0a0a] opacity-100 transition-all duration-300"
     >
       <nav className="mx-auto flex w-full items-center justify-between px-6 py-4 lg:px-10 xl:px-[120px]">
         <Link href="/" className="flex flex-col items-center leading-none">
@@ -77,7 +77,7 @@ export function Navigation() {
       </nav>
 
       {mobileOpen && (
-        <div className="border-t border-white/10 bg-black/70 backdrop-blur-xl md:hidden">
+        <div className="border-t border-white/10 bg-[#0a0a0a] opacity-100 md:hidden">
           <div className="flex flex-col gap-1 px-6 py-4">
             {navLinks.map((link) => (
               <Link

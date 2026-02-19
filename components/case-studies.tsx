@@ -434,7 +434,7 @@ function ConsultingTimeline() {
     <section className="bg-neutral-950 py-16 lg:py-24">
       <div className="mx-auto w-full px-6 lg:px-10 xl:px-[120px]">
         {/* Section header */}
-        <div className="mb-12">
+        <div className="mb-10">
           <p className="text-brand-primary text-xs font-semibold tracking-[0.22em] uppercase">
             Since 2005
           </p>
@@ -445,25 +445,6 @@ function ConsultingTimeline() {
             어세스타는 2005년부터 국내외 주요 기업 및 기관과 함께
             역량 기반 HR 혁신을 이끌어왔습니다.
           </p>
-        </div>
-
-        {/* Summary chips */}
-        <div className="mb-10 flex flex-wrap gap-3">
-          {[
-            { label: "누적 프로젝트", value: "500+" },
-            { label: "파트너 기업/기관", value: "200+" },
-            { label: "컨설팅 업력", value: "20년+" },
-          ].map((chip) => (
-            <div
-              key={chip.label}
-              className="flex items-center gap-2.5 rounded-lg border border-white/10 bg-neutral-900 px-5 py-3"
-            >
-              <span className="text-brand-primary text-lg font-extrabold">
-                {chip.value}
-              </span>
-              <span className="text-xs text-neutral-400">{chip.label}</span>
-            </div>
-          ))}
         </div>
 
         {/* Timeline */}
