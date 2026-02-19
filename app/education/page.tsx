@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { CircularDiagram } from '@/components/circular-diagram'
 
 /* ── Ripple Effect Component ── */
 function RippleEffect() {
@@ -175,10 +176,14 @@ export default function HRConsultingPage() {
           transition={{ duration: 0.6 }}
           className="mb-20 grid gap-12 md:grid-cols-2"
         >
-          <DonutDiagram
+          <CircularDiagram
             title="정부/공공기관"
-            imageSrc="/images/education/donut-government.png"
-            imageAlt="정부/공공기관 컨설팅 영역 다이어그램 - 역량평가(AC), 역량개발(DC), 채용, 리더십개발"
+            segments={[
+              { label: '역량평가\n(AC)', startAngle: 0, endAngle: 90 },
+              { label: '역량개발\n(DC)', startAngle: 90, endAngle: 180 },
+              { label: '리더십개발', startAngle: 180, endAngle: 270 },
+              { label: '채용', startAngle: 270, endAngle: 360 },
+            ]}
           />
           <DonutDiagram
             title="일반/공공기업"
