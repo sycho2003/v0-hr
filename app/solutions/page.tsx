@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Brain, Bot, CheckCheck, ChevronDown, LayoutDashboard, FileText, Mic, Sparkles } from 'lucide-react'
+import { InteractiveFeatureShowcase } from '@/components/interactive-feature-showcase'
 
 const processCards = [
   {
@@ -188,6 +189,9 @@ export default function SolutionsPage() {
             })}
           </div>
         </section>
+
+        {/* Interactive Feature Showcase */}
+        <InteractiveFeatureShowcase />
       </div>
     </div>
   )
