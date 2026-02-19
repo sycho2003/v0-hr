@@ -471,7 +471,7 @@ function SpotlightRevealSection() {
           >
             <div className="grid h-full gap-4 p-5 md:grid-cols-3 md:p-8">
               <div className="md:col-span-3">
-                <p className="text-sm font-semibold tracking-[0.04em] text-red-500/50">🔴 기존 방식</p>
+                <p className="text-sm font-semibold tracking-[0.04em] text-red-500/60">🔴 기존 방식</p>
               </div>
               {points.map((point) => {
                 const Icon = point.icon
@@ -483,7 +483,7 @@ function SpotlightRevealSection() {
                       </div>
                       <p className="text-xs font-semibold tracking-[0.12em] text-[#374151]">{point.title}</p>
                     </div>
-                    <p className="text-2xl font-semibold text-[#374151]">{point.left}</p>
+                    <p className="text-2xl font-semibold text-red-900/85">{point.left}</p>
                     <p className="mt-2 text-sm text-[#374151]">{point.leftSub}</p>
                   </div>
                 )
@@ -549,12 +549,12 @@ function FlowStep({
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0.3, y: 24 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0.3, y: 24 }}
+      initial={{ opacity: 0.3 }}
+      animate={inView ? { opacity: 1 } : { opacity: 0.3 }}
       transition={{ duration: 0.55, ease: 'easeOut' }}
       className="relative flex gap-5"
     >
-      <div className="relative z-10 mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#0E1424] shadow-[0_0_20px_rgba(59,130,246,0.35)]">
+      <div className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/20 bg-[#0E1424] shadow-[0_0_20px_rgba(59,130,246,0.35)]">
         <Icon className="h-5 w-5 text-[#3B82F6]" />
       </div>
       <div className="w-full rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md">
@@ -631,7 +631,7 @@ function FeatureFlow({ containerRef }: { containerRef: React.RefObject<HTMLDivEl
   ]
 
   return (
-    <section className="snap-start flex min-h-[calc(100dvh-6rem)] w-full flex-col justify-start px-6 pb-8 pt-12 md:px-20 xl:px-[120px]">
+    <section className="snap-start mx-auto flex min-h-[calc(100dvh-6rem)] w-full max-w-5xl flex-col justify-start px-6 pb-8 pt-12 max-[359px]:pt-8 lg:px-10 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -651,16 +651,23 @@ function FeatureFlow({ containerRef }: { containerRef: React.RefObject<HTMLDivEl
         </p>
       </motion.div>
 
-      <div ref={flowRef} className="relative space-y-6 pl-2">
-        <div className="absolute bottom-6 left-[22px] top-6 w-px bg-[#3B82F6]/25" />
+      <motion.div
+        ref={flowRef}
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="relative space-y-6"
+      >
+        <div className="absolute bottom-6 left-6 top-6 z-0 w-px bg-gradient-to-b from-[#3B82F6]/30 via-[#3B82F6]/22 to-transparent" />
         <motion.div
-          className="absolute left-[22px] top-6 w-px origin-top bg-[#3B82F6] shadow-[0_0_12px_rgba(59,130,246,0.95)]"
-          style={{ scaleY: scrollYProgress, height: 'calc(100% - 48px)' }}
+          className="absolute bottom-6 left-6 top-6 z-0 w-px origin-top bg-gradient-to-b from-[#60A5FA] via-[#3B82F6] to-transparent shadow-[0_0_10px_rgba(59,130,246,0.75)]"
+          style={{ scaleY: scrollYProgress }}
         />
         {steps.map((step, index) => (
           <FlowStep key={step.title} index={index} title={step.title} desc={step.desc} icon={step.icon} />
         ))}
-      </div>
+      </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -675,7 +682,7 @@ function FeatureFlow({ containerRef }: { containerRef: React.RefObject<HTMLDivEl
             <Link
               key={chip.label}
               href={chip.href}
-              className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-gray-300 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:text-white"
+              className="compact-chip-320 group inline-flex min-w-0 cursor-pointer items-center gap-2 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium text-gray-300 backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:text-white"
             >
               <Icon className="h-4 w-4 text-[#3B82F6]" />
               <span>{chip.label}</span>
@@ -732,7 +739,7 @@ function ROICalculator() {
   }, [estimatedBenefit])
 
   return (
-    <section className="snap-start w-full px-6 pt-10 md:px-20 xl:px-[120px]">
+    <section className="snap-start mx-auto w-full max-w-4xl px-6 pt-10 max-[359px]:pt-6 lg:px-10 xl:px-[120px]">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -779,11 +786,17 @@ function ROICalculator() {
                 />
               </div>
             </div>
+
+            <p className="mt-6 text-xs leading-relaxed text-[color:var(--astra-text-muted)]">
+              예상 연간 이익은 오차가 있을 수 있습니다.
+              <br />
+              자세한 내용은 상담 문의 주시면 도와드리겠습니다.
+            </p>
           </div>
 
           <div className="rounded-2xl border border-white/10 bg-[#0b1428]/50 p-6 md:p-8">
             <p className="text-sm text-slate-300">예상 연간 이익</p>
-            <p className="mt-4 text-4xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400 md:text-6xl [font-variant-numeric:tabular-nums]">
+            <p className="mt-4 break-keep text-[clamp(1.95rem,9.2vw,3.75rem)] font-extrabold leading-[1.05] tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400 [font-variant-numeric:tabular-nums]">
               {formatManwonToKrw(displayValue)}
             </p>
 
@@ -878,7 +891,7 @@ function LiveAIDashboardSection() {
         transition={{ duration: 0.65 }}
         className="mb-12 text-center"
       >
-        <h2 className="text-balance text-3xl font-bold leading-tight text-white md:text-4xl">
+        <h2 className="text-balance text-3xl font-bold leading-[1.3] text-white md:text-4xl md:leading-[1.35]">
           데이터로 증명된 고성과자의 행동,
           <br />
           AI가 3초만에 분석합니다.
@@ -1037,22 +1050,19 @@ function SocialProof() {
     }, [duration, inView, value])
 
     return (
-      <div
-        ref={ref}
-        className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-[0_12px_40px_rgba(15,23,42,0.08)] transition-transform duration-300 hover:scale-110"
-      >
-        <p className="text-5xl font-extrabold text-slate-900 md:text-6xl">
+      <div ref={ref} className="p-4 text-center transition-transform duration-300 hover:scale-110">
+        <p className="text-5xl font-extrabold text-[color:var(--astra-text)] md:text-6xl">
           {display.toLocaleString('ko-KR')}
           {suffix}
         </p>
-        <p className="mt-3 text-sm text-slate-600">{label}</p>
+        <p className="mt-3 text-sm text-[color:var(--astra-text-muted)]">{label}</p>
       </div>
     )
   }
 
   return (
-    <section className="snap-start mt-8 bg-gradient-to-b from-[#020617] via-[#1e293b] to-[#ffffff] pt-20">
-      <div className="px-6 md:px-20 xl:px-[120px]">
+    <section className="snap-start mt-8 bg-[#020617] pt-20">
+      <div className="mx-auto max-w-6xl px-6 lg:px-10 xl:px-[120px]">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -1128,7 +1138,7 @@ export default function Page() {
       </div>
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(59,130,246,0.08)_1px,transparent_1px)] bg-[size:56px_56px] opacity-10" />
 
-      <section className="snap-start relative flex min-h-screen items-center justify-center px-6 pb-24 pt-36 text-center md:px-20 xl:px-[120px]">
+      <section className="snap-start relative flex min-h-screen items-center justify-center px-6 pb-24 pt-36 text-center max-[359px]:pb-16 max-[359px]:pt-32 lg:px-10 xl:px-[120px]">
         <QuantumParticleCanvas />
         <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/35 to-[#020617]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.6)_0%,rgba(0,0,0,0)_70%)]" />
@@ -1140,7 +1150,7 @@ export default function Page() {
               variants={heroVariants}
               initial="hidden"
               animate="visible"
-              className="text-balance text-6xl font-extrabold leading-tight tracking-[-0.02em] md:text-7xl"
+              className="text-balance text-4xl font-extrabold leading-tight tracking-[-0.02em] sm:text-5xl md:text-7xl"
             >
               <span className="block">
                 <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">고성과자의 </span>
@@ -1161,7 +1171,7 @@ export default function Page() {
               variants={heroVariants}
               initial="hidden"
               animate="visible"
-              className="mx-auto mt-6 mb-10 max-w-3xl text-pretty text-lg font-light leading-[1.8] text-gray-300"
+              className="mx-auto mt-6 mb-10 max-w-3xl break-keep text-pretty text-base font-light leading-[1.75] text-gray-300 sm:text-lg sm:leading-[1.8]"
             >
               3개월이 걸리던 고비용 역량 모델링, AI 자동화로 3일 만에 완성합니다.
               <br />
@@ -1172,7 +1182,7 @@ export default function Page() {
           <motion.div custom={0.45} variants={heroVariants} initial="hidden" animate="visible" className="mt-0">
             <button
               type="button"
-              className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-8 py-4 text-lg font-medium text-white backdrop-blur-md shadow-[0_0_28px_rgba(59,130,246,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[#356DF3] hover:bg-[#356DF3] hover:text-white"
+              className="group inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-6 py-3 text-base font-medium text-white backdrop-blur-md shadow-[0_0_28px_rgba(59,130,246,0.35)] transition-all duration-300 ease-out hover:scale-[1.02] hover:border-[#356DF3] hover:bg-[#356DF3] hover:text-white sm:px-8 sm:py-4 sm:text-lg"
             >
               무료 진단 데모 보기
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />

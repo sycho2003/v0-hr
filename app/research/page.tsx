@@ -79,10 +79,10 @@ function SideThumb({ index, title, date, image }: { index: number; title: string
     <article className="group cursor-pointer">
       <div className="relative aspect-square overflow-hidden rounded-[10px] border border-white/10 bg-neutral-900 transition-transform duration-300 group-hover:scale-[1.03]">
         <Image src={image} alt={`${title} mockup`} fill className="scale-[1.015] object-cover" />
-        <div className="text-brand-primary-soft absolute right-4 top-4 text-[10px]">#{index + 1}</div>
+        <div className="text-brand-primary-soft absolute right-4 top-4 text-sm font-semibold">#{index + 1}</div>
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent p-3">
-          <p className="truncate text-xs font-medium text-white">{title}</p>
-          <p className="mt-1 text-[10px] text-neutral-400">{date}</p>
+          <p className="truncate text-base font-medium text-white">{title}</p>
+          <p className="mt-1 text-sm text-neutral-400">{date}</p>
         </div>
       </div>
     </article>
@@ -104,28 +104,24 @@ export default function ResearchPage() {
 
   return (
     <div className="min-h-screen bg-neutral-950 pb-24 pt-32 text-white">
-      {/* Header section with consistent padding */}
-      <header className="mb-6 px-6 md:px-20 xl:px-[120px]">
-        <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Research Library</p>
-        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">리서치</h1>
-      </header>
+      <div className="mx-auto max-w-7xl px-6">
+        <header className="mb-6">
+          <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Research Library</p>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">리서치</h1>
+        </header>
 
-      {/* Tab bar: full-width background, inner content aligned to 120px */}
-      <div className="sticky top-16 z-40 mb-8 w-full bg-neutral-950/90 backdrop-blur-md">
-        <div className="overflow-x-auto">
-          <div className="min-w-max border-b border-white/10 px-6 pt-4 pb-2 md:px-20 xl:px-[120px]">
-            <div className="flex items-center gap-6 text-sm">
-              {categoryTabs.map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className={`flex-shrink-0 whitespace-nowrap transition-colors ${activeTab === tab ? 'text-brand-primary font-semibold' : 'text-neutral-400 hover:text-white'}`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
+        <div className="sticky top-[72px] z-40 mb-8 border-b border-white/10 bg-neutral-950/90 py-3 backdrop-blur-md">
+          <div className="flex flex-nowrap items-center gap-6 overflow-x-auto pr-2 text-sm whitespace-nowrap [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {categoryTabs.map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`shrink-0 transition-colors ${activeTab === tab ? 'text-brand-primary font-semibold' : 'text-neutral-400 hover:text-white'}`}
+              >
+                {tab}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -134,7 +130,7 @@ export default function ResearchPage() {
       <div className="px-6 md:px-20 xl:px-[120px]">
         <section className="mb-24">
           <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-            <div className="hidden lg:sticky lg:top-[8rem] lg:block lg:h-[527.16px] lg:w-[70%]">
+            <div className="hidden lg:sticky lg:top-36 lg:block lg:h-[527.16px] lg:w-[70%]">
               <article className="h-full">
                 <div className="flex h-full flex-col rounded-[10px] border border-white/10 bg-white/[0.03] p-5 backdrop-blur-md md:p-7">
                   <Link href="/research/featured" aria-label="핵심 연구 상세 보기">
@@ -159,7 +155,7 @@ export default function ResearchPage() {
               </article>
             </div>
 
-            <aside className="w-full lg:w-[30%]">
+            <aside className="w-full min-w-0 lg:w-[30%]">
               <div className="space-y-8 lg:space-y-10">
                 {filteredSideArticles.map((item, idx) => (
                   <SideThumb key={`${item.title}-${item.date}`} index={idx} title={item.title} date={item.date} image={item.image} />
