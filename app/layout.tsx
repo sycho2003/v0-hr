@@ -6,7 +6,7 @@ import { PageTransition } from '@/components/page-transition'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'ASSESSTA | 국내 최고의 심리학 기반 역량평가 전문기관',
+  title: 'ASSESTA | 국내 최고의 심리학 기반 역량평가 전문기관',
   description:
     'HRD, HRM 전문 역량평가기관 어세스타. AI 기반 역량 모델링 플랫폼 ASTRA로 지속 가능한 HR 시스템을 구축하세요.',
 }
