@@ -107,7 +107,7 @@ export default function ResearchPage() {
       <div className="px-6 md:px-20 xl:px-[120px]">
         <header className="mb-6">
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Research Library</p>
-          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white md:text-4xl">리서치</h1>
+          <h1 className="title-group__heading text-3xl font-extrabold tracking-tight text-white md:text-4xl">리서치</h1>
         </header>
 
         <div className="sticky top-[72px] z-[900] mb-8 border-b border-white/10 bg-neutral-950 py-3 opacity-100">
@@ -185,7 +185,7 @@ export default function ResearchPage() {
 
         <section>
           <div className="mb-8 flex items-end justify-between">
-            <h3 className="text-3xl font-bold text-white">Archive</h3>
+            <h3 className="text-3xl font-bold text-white">아카이브</h3>
             <button className="hidden items-center gap-2 text-sm text-neutral-300 transition-colors hover-brand-primary md:inline-flex">
               더 보기
               <ArrowRight className="h-4 w-4" />

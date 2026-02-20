@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { AnimatePresence, motion, useInView } from "framer-motion"
+import { motion, useAnimation, useInView } from "framer-motion"
 import {
   ArrowRight,
   ChevronLeft,
@@ -142,9 +142,73 @@ const consultingHistory = [
 
 export function CaseStudies() {
   const [testimonialIdx, setTestimonialIdx] = useState(0)
-  const t = testimonials[testimonialIdx]
-  const nextT = () => setTestimonialIdx((p) => (p + 1) % testimonials.length)
-  const prevT = () => setTestimonialIdx((p) => (p - 1 + testimonials.length) % testimonials.length)
+  const totalTestimonials = testimonials.length
+  const carouselViewportRef = useRef<HTMLDivElement>(null)
+  const carouselControls = useAnimation()
+  const [isDesktopCarousel, setIsDesktopCarousel] = useState(false)
+  const [carouselViewportWidth, setCarouselViewportWidth] = useState(0)
+  const [isCarouselAnimating, setIsCarouselAnimating] = useState(false)
+
+  const wrapIndex = (index: number) => (index + totalTestimonials) % totalTestimonials
+  const gapPx = isDesktopCarousel ? 20 : 0
+  const cardWidth = isDesktopCarousel
+    ? Math.max((carouselViewportWidth - gapPx * 2) / 3, 0)
+    : carouselViewportWidth
+  const stepPx = cardWidth + gapPx
+  const baseOffset = isDesktopCarousel ? -stepPx : -stepPx * 2
+  const displayedTestimonials = [-2, -1, 0, 1, 2].map((offset) =>
+    testimonials[wrapIndex(testimonialIdx + offset)],
+  )
+
+  useEffect(() => {
+    const updateCarouselMetrics = () => {
+      if (!carouselViewportRef.current) return
+      setCarouselViewportWidth(carouselViewportRef.current.clientWidth)
+      setIsDesktopCarousel(window.matchMedia("(min-width: 768px)").matches)
+    }
+
+    updateCarouselMetrics()
+    const resizeObserver = new ResizeObserver(updateCarouselMetrics)
+    if (carouselViewportRef.current) resizeObserver.observe(carouselViewportRef.current)
+    window.addEventListener("resize", updateCarouselMetrics)
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener("resize", updateCarouselMetrics)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (stepPx <= 0 || isCarouselAnimating) return
+    carouselControls.set({ x: baseOffset })
+  }, [baseOffset, carouselControls, isCarouselAnimating, stepPx, testimonialIdx])
+
+  const slideBy = async (direction: 1 | -1) => {
+    if (isCarouselAnimating || stepPx <= 0) return
+
+    setIsCarouselAnimating(true)
+    await carouselControls.start({
+      x: baseOffset - direction * stepPx,
+      transition: { duration: 0.42, ease: [0.42, 0, 0.58, 1] },
+    })
+    setTestimonialIdx((prev) => wrapIndex(prev + direction))
+    setIsCarouselAnimating(false)
+  }
+
+  const nextT = () => {
+    void slideBy(1)
+  }
+
+  const prevT = () => {
+    void slideBy(-1)
+  }
+
+  const goToTestimonial = (idx: number) => {
+    if (idx === testimonialIdx || isCarouselAnimating) return
+    const forward = (idx - testimonialIdx + totalTestimonials) % totalTestimonials
+    const backward = (testimonialIdx - idx + totalTestimonials) % totalTestimonials
+    void slideBy(forward <= backward ? 1 : -1)
+  }
 
   return (
     <>
@@ -232,70 +296,47 @@ export function CaseStudies() {
       {/* Testimonials */}
       <section className="bg-neutral-950 py-16 lg:py-20">
         <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
-          <h3 className="text-center text-xl font-bold text-white md:text-2xl">전문가들의 평가</h3>
-          <p className="mt-2 text-center text-sm text-neutral-400">
+          <h3 className="text-center break-keep text-balance text-3xl font-extrabold leading-tight text-white md:text-4xl">전문가들의 평가</h3>
+          <p className="title-group__subtitle text-center text-sm text-neutral-400">
             전문성과 열정에 대한 고객 후기
           </p>
 
           {/* Carousel with blurred side cards */}
-          <div className="relative mt-10 overflow-hidden">
-            <AnimatePresence mode="popLayout" initial={false}>
-              <div className="flex items-stretch justify-center gap-5">
-                {/* Previous (left blurred card) */}
-                <motion.div
-                  key={`prev-${testimonialIdx}`}
-                  className="hidden w-full max-w-sm shrink-0 select-none md:block"
-                  initial={{ opacity: 0, x: -60 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -60 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  <div
-                    className="h-full rounded-xl border border-white/[0.06] bg-neutral-900/60 p-7"
-                    style={{ filter: "blur(2.5px)" }}
-                    aria-hidden="true"
-                  >
-                    <TestimonialCardContent
-                      testimonial={testimonials[(testimonialIdx - 1 + testimonials.length) % testimonials.length]}
-                    />
-                  </div>
-                </motion.div>
+          <div ref={carouselViewportRef} className="relative mt-10 overflow-hidden">
+            <motion.div
+              className="flex items-stretch gap-0 md:gap-5"
+              initial={false}
+              animate={carouselControls}
+            >
+              {displayedTestimonials.map((testimonial, slotIdx) => {
+                const slotDistance = Math.abs(slotIdx - 2)
+                const isActiveCard = slotDistance === 0
+                const sideCardClass =
+                  slotDistance === 1
+                    ? "md:opacity-65"
+                    : "md:opacity-35"
 
-                {/* Center (active card) */}
-                <motion.div
-                  key={`active-${testimonialIdx}`}
-                  className="w-full max-w-sm shrink-0 md:max-w-lg"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  <div className="h-full rounded-xl border border-white/10 bg-neutral-900 p-7 shadow-lg shadow-black/20">
-                    <TestimonialCardContent testimonial={t} />
-                  </div>
-                </motion.div>
-
-                {/* Next (right blurred card) */}
-                <motion.div
-                  key={`next-${testimonialIdx}`}
-                  className="hidden w-full max-w-sm shrink-0 select-none md:block"
-                  initial={{ opacity: 0, x: 60 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 60 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
+                return (
                   <div
-                    className="h-full rounded-xl border border-white/[0.06] bg-neutral-900/60 p-7"
-                    style={{ filter: "blur(2.5px)" }}
-                    aria-hidden="true"
+                    key={`${testimonial.author}-${slotIdx}`}
+                    className="w-full shrink-0"
+                    style={cardWidth > 0 ? { width: `${cardWidth}px` } : undefined}
                   >
-                    <TestimonialCardContent
-                      testimonial={testimonials[(testimonialIdx + 1) % testimonials.length]}
-                    />
+                    <div
+                      className={`h-full min-h-[300px] rounded-xl p-7 transition-all duration-300 md:min-h-[330px] ${
+                        isActiveCard
+                          ? "border border-white/10 bg-neutral-900 shadow-lg shadow-black/20 opacity-100"
+                          : `border border-white/[0.06] bg-neutral-900/60 pointer-events-none opacity-0 ${sideCardClass}`
+                      }`}
+                      style={!isActiveCard && isDesktopCarousel ? { filter: "blur(2.5px)" } : undefined}
+                      aria-hidden={!isActiveCard}
+                    >
+                      <TestimonialCardContent testimonial={testimonial} />
+                    </div>
                   </div>
-                </motion.div>
-              </div>
-            </AnimatePresence>
+                )
+              })}
+            </motion.div>
 
             {/* Left/right fade masks */}
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-16 bg-gradient-to-r from-neutral-950 to-transparent md:block" />
@@ -304,20 +345,21 @@ export function CaseStudies() {
 
           {/* Navigation */}
           <div className="mt-8 flex items-center justify-center gap-3">
-            <button onClick={prevT} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors hover:border-white/40" aria-label="이전 후기">
+            <button onClick={prevT} disabled={isCarouselAnimating} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors hover:border-white/40 disabled:opacity-50" aria-label="이전 후기">
               <ChevronLeft className="h-4 w-4 text-neutral-200" />
             </button>
             <div className="flex gap-1.5">
               {testimonials.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => setTestimonialIdx(i)}
+                  onClick={() => goToTestimonial(i)}
+                  disabled={isCarouselAnimating}
                   className={`h-2 w-2 rounded-full transition-colors ${i === testimonialIdx ? "bg-brand-primary" : "bg-neutral-700 hover:bg-neutral-500"}`}
                   aria-label={`후기 ${i + 1}번`}
                 />
               ))}
             </div>
-            <button onClick={nextT} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors hover:border-white/40" aria-label="다음 후기">
+            <button onClick={nextT} disabled={isCarouselAnimating} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors hover:border-white/40 disabled:opacity-50" aria-label="다음 후기">
               <ChevronRight className="h-4 w-4 text-neutral-200" />
             </button>
           </div>
@@ -330,8 +372,8 @@ export function CaseStudies() {
       {/* CTA */}
       <section className="bg-neutral-950 py-16">
         <div className="mx-auto max-w-3xl px-6 text-center lg:px-10 xl:px-[120px]">
-          <h2 className="text-xl font-bold text-white md:text-2xl">우리 기업도 프로젝트 사례의 주인공이 될 수 있습니다</h2>
-          <p className="mt-4 text-neutral-300">무료 진단을 통해 어세스타 솔루션의 기대 효과를 확인하세요.</p>
+          <h2 className="break-keep text-balance text-3xl font-extrabold leading-tight text-white md:text-4xl">우리 기업도 프로젝트 사례의 주인공이 될 수 있습니다</h2>
+          <p className="title-group__subtitle text-neutral-300">무료 진단을 통해 어세스타 솔루션의 기대 효과를 확인하세요.</p>
           <Link
             href="/inquiry"
             className="btn-brand group mt-8 inline-flex items-center gap-2 rounded-lg px-8 py-3.5 text-sm font-semibold transition-all"
@@ -438,10 +480,10 @@ function ConsultingTimeline() {
           <p className="text-brand-primary text-xs font-semibold tracking-[0.22em] uppercase">
             Since 2005
           </p>
-          <h3 className="mt-3 text-xl font-bold text-white md:text-2xl">
+          <h3 className="title-group__heading break-keep text-balance text-3xl font-extrabold leading-tight text-white md:text-4xl">
             20년간의 컨설팅 연혁
           </h3>
-          <p className="mt-3 max-w-xl text-sm leading-relaxed text-neutral-400">
+          <p className="title-group__subtitle max-w-xl text-sm leading-relaxed text-neutral-400">
             어세스타는 2005년부터 국내외 주요 기업 및 기관과 함께
             역량 기반 HR 혁신을 이끌어왔습니다.
           </p>

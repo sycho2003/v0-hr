@@ -11,6 +11,16 @@
   }
 }
 
+@layer components {
+  .title-group__heading {
+    margin-top: 1rem;
+  }
+
+  .title-group__subtitle {
+    margin-top: 1rem;
+  }
+}
+
 @keyframes nebula-drift-a {
   0% { transform: translate3d(-8%, -6%, 0) scale(1); }
   50% { transform: translate3d(6%, 5%, 0) scale(1.12); }

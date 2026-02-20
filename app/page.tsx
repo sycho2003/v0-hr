@@ -442,7 +442,7 @@ function SpotlightRevealSection() {
           transition={{ duration: 0.55, ease: 'easeOut' }}
           className="mb-4"
         >
-          <span className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
+          <span className="text-brand-primary text-xs font-semibold uppercase tracking-[0.26em]">
             ASTRA SOLUTION
           </span>
         </motion.div>
@@ -584,7 +584,7 @@ function FlowStep({
         <Icon className="h-5 w-5 text-[#3B82F6]" />
       </div>
       <div className="w-full rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-md">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Step 0{index + 1}</p>
+        <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.2em]">Step 0{index + 1}</p>
         <h3 className="mt-2 text-xl font-bold text-white">{title}</h3>
         <p className="mt-3 text-sm leading-relaxed text-slate-300">{desc}</p>
       </div>
@@ -664,10 +664,10 @@ function FeatureFlow() {
         transition={{ duration: 0.7 }}
         className="mb-7 text-center"
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">
+        <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.26em]">
           Real-time Competency Modeling
         </p>
-        <h2 className="mt-3 text-3xl font-bold text-white md:text-4xl">
+        <h2 className="title-group__heading text-3xl font-bold text-white md:text-4xl">
           멈춰있는 역량 모델, 이제 실시간으로 진화합니다.
         </h2>
         <p className="mx-auto mt-4 max-w-3xl text-slate-300">
@@ -775,7 +775,7 @@ function ROICalculator() {
         <div className="grid gap-12 md:grid-cols-[1fr_1.12fr] md:gap-14">
           <div>
             <div className="mb-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">ROI Calculator</p>
+              <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.26em]">ROI Calculator</p>
               <h2 className="mt-3 text-3xl font-bold text-white">예상 연간 이익 시뮬레이션</h2>
             </div>
 
@@ -816,6 +816,9 @@ function ROICalculator() {
               예상 연간 이익은 오차가 있을 수 있습니다.
               <br />
               자세한 내용은 상담 문의 주시면 도와드리겠습니다.
+              <span className="mt-1 block text-[11px] opacity-60">
+                출처를 기입해주세요.
+              </span>
             </p>
           </div>
 
@@ -1222,7 +1225,7 @@ export default function Page() {
           transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
           className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex flex-col items-center text-center text-neutral-300 md:bottom-8"
         >
-          <p className="text-xs tracking-[0.18em] uppercase">Scroll Down</p>
+          <p className="text-brand-primary text-xs tracking-[0.18em] uppercase">Scroll Down</p>
           <ChevronDown className="mx-auto mt-1 h-4 w-4 text-cyan-300" />
         </motion.div>
       </section>

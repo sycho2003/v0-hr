@@ -91,7 +91,7 @@ export default function FeaturedResearchDetailPage() {
         <article>
           <header className="w-full">
             <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.24em]">VALIDITY STUDY</p>
-            <h1 className="mt-5 break-keep text-4xl font-extrabold leading-tight md:text-5xl">
+            <h1 className="title-group__heading break-keep text-4xl font-extrabold leading-tight md:text-5xl">
               다차원 AI 역량 모델링의 예측 타당도 검증: Schmidt & Hunter 이론의 현대적 재해석
             </h1>
             <p className="mt-5 text-sm text-neutral-400">By ASTRA Research Team • 2026. 02. 14 • 15 min read</p>

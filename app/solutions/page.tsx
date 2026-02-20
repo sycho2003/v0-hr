@@ -43,7 +43,7 @@ export default function SolutionsPage() {
       <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
         <section>
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Astra Product</p>
-          <h1 className="mt-3 max-w-4xl break-keep text-3xl font-extrabold leading-[1.6] md:text-4xl">
+          <h1 className="title-group__heading max-w-4xl break-keep text-3xl font-extrabold leading-[1.6] md:text-4xl">
             채용의 불확실성을 0으로 만드는 데이터 솔루션, ASTRA.
           </h1>
 
@@ -52,7 +52,6 @@ export default function SolutionsPage() {
             className="mt-10 origin-center"
           >
             <div className="rounded-2xl border border-white/10 bg-neutral-900 p-4">
-              <p className="text-sm text-neutral-300">Competency Prediction Demo Reel</p>
               <InteractiveDemoReel />
             </div>
           </motion.div>
@@ -60,7 +59,7 @@ export default function SolutionsPage() {
 
         <section className="mt-20">
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Psychology Data + AI Automation + Expert Verification</p>
-          <h2 className="mt-3 text-xl font-bold md:text-2xl">3-Step Process</h2>
+          <h2 className="title-group__heading text-2xl font-bold md:text-3xl">아스트라만의 3단계 솔루션</h2>
 
           <div className="mt-8 space-y-4">
             {processCards.map((card) => {

@@ -152,7 +152,7 @@ export function InteractiveDemoReel() {
   const isClicked = useCallback((id: string) => clickedElements.has(id), [clickedElements])
 
   return (
-    <div className="relative mt-4 h-[22rem] overflow-hidden rounded-xl border border-white/10 bg-[#050914] md:h-[26rem] lg:h-[32rem]">
+    <div className="relative h-[22rem] overflow-hidden rounded-xl border border-white/10 bg-[#050914] md:h-[26rem] lg:h-[32rem]">
       {/* MacOS chrome */}
       <div className="absolute inset-x-0 top-0 z-20 flex h-8 items-center justify-between border-b border-white/10 bg-black/60 px-3 backdrop-blur-md">
         <div className="flex items-center gap-2">

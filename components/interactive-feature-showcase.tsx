@@ -275,7 +275,7 @@ export function InteractiveFeatureShowcase() {
     <section className="mt-20 lg:mt-28">
         {/* Section header */}
         <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Interactive Showcase</p>
-        <h2 className="mt-3 text-2xl font-bold text-white md:text-3xl">
+        <h2 className="title-group__heading text-2xl font-bold text-white md:text-3xl">
           ASTRA 플랫폼을 직접 체험해보세요
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-400">

@@ -15,7 +15,7 @@ export default function CasesPage() {
         </div>
         <div className="relative mx-auto w-full px-6 md:px-20 xl:px-[120px]">
           <p className="text-brand-primary text-xs font-semibold tracking-[0.22em] uppercase">Project Stories</p>
-          <h1 className="mt-3 text-balance text-3xl font-extrabold tracking-tight text-white md:text-4xl">
+          <h1 className="title-group__heading text-balance text-3xl font-extrabold tracking-tight text-white md:text-4xl">
             프로젝트 사례
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-neutral-300 md:text-lg">

@@ -141,7 +141,7 @@ export default function HRConsultingPage() {
           className="mb-16"
         >
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.18em]">Customized Consulting</p>
-          <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white md:text-4xl">HR 컨설팅 서비스</h2>
+          <h2 className="title-group__heading text-3xl font-extrabold leading-tight text-white md:text-4xl">HR 컨설팅 서비스</h2>
           <p className="mt-5 max-w-4xl text-base leading-relaxed text-neutral-300 md:text-lg">
             조직의 특성에 맞춘 맞춤형 HR 시스템 구축. 25년간의 전문 노하우와 AI 기술을 결합한 데이터 기반 컨설팅입니다.
           </p>
