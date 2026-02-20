@@ -338,7 +338,7 @@ export function CaseStudies() {
 
       {/* CTA */}
       <section className="bg-neutral-950 pt-16 pb-28 md:pb-36">
-        <div className="mx-auto max-w-3xl px-6 text-center lg:px-10 xl:px-[120px]">
+        <div id="cases-cta-anchor" className="mx-auto max-w-3xl px-6 text-center lg:px-10 xl:px-[120px]">
           <h2 className="break-keep text-balance text-3xl font-extrabold leading-tight text-white md:text-4xl">우리 기업도 프로젝트 사례의 주인공이 될 수 있습니다</h2>
           <p className="title-group__subtitle text-neutral-300">무료 진단을 통해 어세스타 솔루션의 기대 효과를 확인하세요.</p>
           <Link
@@ -390,10 +390,141 @@ function TestimonialCardContent({
 /* ------------------------------------------------------------------ */
 
 function ConsultingTimeline() {
-  const [activeYear, setActiveYear] = useState(consultingTimeline[0]?.year ?? "2025")
+  const [activeYear, setActiveYear] = useState<string>(consultingTimeline[0].year)
+  const [edgePad, setEdgePad] = useState(0)
+  const [lineRange, setLineRange] = useState({ start: 84, end: 84 })
+  const railRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef<Array<HTMLLIElement | null>>([])
+  const anchorViewportXRef = useRef<number | null>(null)
+  const scrollRafRef = useRef<number | null>(null)
   const activeIndex = consultingTimeline.findIndex((entry) => entry.year === activeYear)
-  const safeActiveIndex = activeIndex >= 0 ? activeIndex : 0
-  const hintIndex = safeActiveIndex < consultingTimeline.length - 1 ? safeActiveIndex + 1 : -1
+  const hintIndex = activeIndex >= 0 && activeIndex < consultingTimeline.length - 1 ? activeIndex + 1 : -1
+  const landingCenterIndex = consultingTimeline.findIndex((entry) => entry.year === "2024년")
+  const autoAlignStartIndex = consultingTimeline.findIndex((entry) => entry.year === "2023년")
+  const resolveFocusIndex = (selectedIndex: number) => {
+    if (selectedIndex < 0) return landingCenterIndex >= 0 ? landingCenterIndex : 0
+    if (autoAlignStartIndex >= 0 && selectedIndex >= autoAlignStartIndex) return selectedIndex
+    return landingCenterIndex >= 0 ? landingCenterIndex : selectedIndex
+  }
+  const alignBySelection = (selectedIndex: number, behavior: ScrollBehavior) => {
+    anchorViewportXRef.current = resolveAnchorViewportX()
+    alignTimelineItemToAnchor(resolveFocusIndex(selectedIndex), behavior)
+    updateLineRange()
+  }
+  const resolveAnchorViewportX = () => {
+    const rail = railRef.current
+    if (!rail) return 0
+
+    const ctaAnchor = document.getElementById("cases-cta-anchor")
+    if (ctaAnchor) {
+      const railRect = rail.getBoundingClientRect()
+      const ctaRect = ctaAnchor.getBoundingClientRect()
+      const anchorFromCtaCenter = ctaRect.left + ctaRect.width / 2 - railRect.left
+      return Math.min(Math.max(0, anchorFromCtaCenter), rail.clientWidth)
+    }
+
+    const firstItem = itemRefs.current[0]
+    if (firstItem) {
+      return firstItem.offsetLeft - rail.scrollLeft + firstItem.clientWidth / 2
+    }
+
+    return rail.clientWidth / 2
+  }
+
+  const stopScrollAnimation = () => {
+    if (scrollRafRef.current !== null) {
+      cancelAnimationFrame(scrollRafRef.current)
+      scrollRafRef.current = null
+    }
+  }
+
+  const animateRailScroll = (rail: HTMLDivElement, targetLeft: number, duration = 420) => {
+    stopScrollAnimation()
+    const startLeft = rail.scrollLeft
+    const delta = targetLeft - startLeft
+    if (Math.abs(delta) < 1) {
+      rail.scrollLeft = targetLeft
+      return
+    }
+
+    const startTime = performance.now()
+    const step = (now: number) => {
+      const progress = Math.min(1, (now - startTime) / duration)
+      const eased =
+        progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2
+      rail.scrollLeft = startLeft + delta * eased
+
+      if (progress < 1) {
+        scrollRafRef.current = requestAnimationFrame(step)
+      } else {
+        scrollRafRef.current = null
+      }
+    }
+
+    scrollRafRef.current = requestAnimationFrame(step)
+  }
+
+  const alignTimelineItemToAnchor = (index: number, behavior: ScrollBehavior = "smooth") => {
+    const rail = railRef.current
+    const item = itemRefs.current[index]
+    if (!rail || !item) return
+    const fallbackAnchor = rail.clientWidth / 2
+    const anchorViewportX = anchorViewportXRef.current ?? fallbackAnchor
+    const target = item.offsetLeft + item.clientWidth / 2 - anchorViewportX
+    const max = rail.scrollWidth - rail.clientWidth
+    const clampedTarget = Math.min(Math.max(0, target), Math.max(0, max))
+
+    if (behavior === "smooth") {
+      animateRailScroll(rail, clampedTarget)
+      return
+    }
+
+    stopScrollAnimation()
+    rail.scrollTo({
+      left: clampedTarget,
+      behavior,
+    })
+  }
+
+  const updateLineRange = () => {
+    const startItem = itemRefs.current[0]
+    const lastItem = itemRefs.current[consultingTimeline.length - 1]
+    if (!startItem || !lastItem) return
+
+    const start = startItem.offsetLeft + startItem.clientWidth / 2
+    const end = lastItem.offsetLeft + lastItem.clientWidth / 2
+    setLineRange({ start, end })
+  }
+
+  useEffect(() => {
+    const updateEdgePadding = () => {
+      const rail = railRef.current
+      const firstItem = itemRefs.current[0]
+      if (!rail || !firstItem) return
+      const computed = Math.max(0, rail.clientWidth / 2 - firstItem.clientWidth / 2)
+      setEdgePad(computed)
+      requestAnimationFrame(updateLineRange)
+    }
+
+    updateEdgePadding()
+    window.addEventListener("resize", updateEdgePadding)
+    return () => window.removeEventListener("resize", updateEdgePadding)
+  }, [])
+
+  useEffect(() => {
+    if (edgePad <= 0) return
+    requestAnimationFrame(() => {
+      alignBySelection(activeIndex, "auto")
+    })
+  }, [edgePad])
+
+  useEffect(() => {
+    return () => {
+      stopScrollAnimation()
+    }
+  }, [])
 
   return (
     <section className="bg-neutral-950 py-16 lg:py-24">
@@ -415,92 +546,107 @@ function ConsultingTimeline() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full pb-44 md:pb-52 md:pl-24 lg:pl-28"
+          className="w-full pb-16 md:pb-20 md:pl-[72px] lg:pl-[86px]"
         >
-          <ul className="relative space-y-3 md:space-y-4">
-            {consultingTimeline.map((entry, index) => {
-              const isActive = activeYear === entry.year
-              const isHint = index === hintIndex
+          <div className="relative">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-3 bg-gradient-to-r from-neutral-950 to-transparent md:w-6" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-6 bg-gradient-to-l from-neutral-950 to-transparent md:w-10" />
 
-              return (
-                <li
-                  key={entry.year}
-                  className="timeline-item relative h-14 before:absolute before:bottom-[-18px] before:left-[119px] before:top-[28px] before:w-[2px] before:bg-gradient-to-b before:from-[#5f7394] before:via-[#4a5b76] before:to-[#36445d] last:before:hidden md:before:left-[192px]"
-                >
-                  <button
-                    type="button"
-                    onClick={() => setActiveYear(entry.year)}
-                    className="group grid h-14 w-full grid-cols-[104px_24px] items-start gap-x-3 text-left md:grid-cols-[160px_24px] md:gap-x-5"
-                    aria-pressed={isActive}
-                  >
-                    <span
-                      className={`pt-0.5 text-xl font-semibold leading-none tracking-tight transition-colors duration-200 md:text-2xl ${
-                        isActive ? "text-white" : "text-[#4a5870] group-hover:text-[#7c8aa2]"
-                      }`}
+            <div ref={railRef} className="overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <ul
+                style={{ paddingLeft: edgePad, paddingRight: edgePad }}
+                className="relative grid min-w-max grid-flow-col auto-cols-[168px] gap-2 md:auto-cols-[176px] lg:auto-cols-[184px] lg:gap-3"
+              >
+                <span
+                  className="pointer-events-none absolute top-[74px] z-0 h-[2px] bg-gradient-to-r from-[#5f7394] via-[#4a5b76] to-[#36445d]"
+                  style={{
+                    left: lineRange.start,
+                    width: Math.max(0, lineRange.end - lineRange.start),
+                  }}
+                />
+                {consultingTimeline.map((entry, index) => {
+                  const isActive = activeYear === entry.year
+                  const isHint = index === hintIndex
+
+                  return (
+                    <li
+                      key={entry.year}
+                      ref={(node) => {
+                        itemRefs.current[index] = node
+                      }}
+                      className="relative z-10 flex flex-col items-center text-center"
                     >
-                      {entry.year}
-                    </span>
+                      <div className="group flex w-full flex-col items-center text-center">
+                        <span
+                          className={`text-xl font-semibold leading-none tracking-tight transition-colors duration-200 md:text-2xl ${
+                            isActive ? "text-white" : "text-[#4a5870] group-hover:text-[#7c8aa2]"
+                          }`}
+                        >
+                          {entry.year}
+                        </span>
 
-                    <span
-                      className={`relative mt-[2px] h-6 w-6 rounded-full transition-all duration-200 ${
-                        isActive
-                          ? "border-[4px] border-white bg-[#0d1320]"
-                          : "border border-[#5b6d89] bg-[#0d1320]"
-                      }`}
-                    >
-                      {isActive && (
-                        <motion.span
-                          key={`ring-${activeYear}`}
-                          initial={{ scale: 0.35, opacity: 0.95 }}
-                          animate={{ scale: 2.25, opacity: 0 }}
-                          transition={{ duration: 0.55, ease: "easeOut" }}
-                          className="pointer-events-none absolute inset-0 rounded-full border-[4px] border-white"
-                        />
-                      )}
-                      {isActive ? (
-                        <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0d1320]" />
-                      ) : (
-                        <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#617595]" />
-                      )}
-                      {!isActive && isHint && (
-                        <motion.span
-                          key={`hint-${entry.year}`}
-                          initial={{ scale: 0.55, opacity: 0.75 }}
-                          animate={{ scale: [0.55, 1.85, 1.85], opacity: [0.75, 0, 0] }}
-                          transition={{ duration: 1.25, ease: "easeOut", repeat: Infinity, repeatDelay: 0.3 }}
-                          className="pointer-events-none absolute inset-0 rounded-full border-[3px] border-white"
-                        />
-                      )}
-                    </span>
-                  </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setActiveYear(entry.year)
+                            alignBySelection(index, "smooth")
+                          }}
+                          aria-pressed={isActive}
+                          className={`relative mt-8 h-6 w-6 rounded-full transition-all duration-200 ${
+                            isActive ? "border-[4px] border-white bg-[#0d1320]" : "border border-[#5b6d89] bg-[#0d1320]"
+                          }`}
+                        >
+                          {isActive && (
+                            <motion.span
+                              key={`ring-${activeYear}`}
+                              initial={{ scale: 0.35, opacity: 0.95 }}
+                              animate={{ scale: 2.25, opacity: 0 }}
+                              transition={{ duration: 0.55, ease: "easeOut" }}
+                              className="pointer-events-none absolute inset-0 rounded-full border-[4px] border-white"
+                            />
+                          )}
+                          {isActive ? (
+                            <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0d1320]" />
+                          ) : (
+                            <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#617595]" />
+                          )}
+                          {!isActive && isHint && (
+                            <motion.span
+                              key={`hint-${entry.year}`}
+                              initial={{ scale: 0.55, opacity: 0.75 }}
+                              animate={{ scale: [0.55, 1.85, 1.85], opacity: [0.75, 0, 0] }}
+                              transition={{ duration: 1.25, ease: "easeOut", repeat: Infinity, repeatDelay: 0.3 }}
+                              className="pointer-events-none absolute inset-0 rounded-full border-[3px] border-white"
+                            />
+                          )}
+                        </button>
 
-                  <AnimatePresence initial={false} mode="wait">
-                    {isActive && (
-                      <motion.ul
-                        key={`details-${entry.year}`}
-                        initial={{ opacity: 0, y: 18 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.34, ease: "easeOut" }}
-                        className="absolute left-[140px] top-[2px] z-20 w-[min(760px,calc(100%-148px))] space-y-3 md:left-[220px] md:w-[min(900px,calc(100%-228px))]"
-                      >
-                        {entry.history.map((item, idx) => (
-                          <motion.li
-                            key={`${entry.year}-${idx}`}
-                            initial={{ opacity: 0, y: 12 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.24, delay: idx * 0.06, ease: "easeOut" }}
-                          >
-                            <p className="text-base font-medium leading-snug text-white md:text-lg">{item}</p>
-                          </motion.li>
-                        ))}
-                      </motion.ul>
-                    )}
-                  </AnimatePresence>
-                </li>
-              )
-            })}
-          </ul>
+                        <AnimatePresence initial={false}>
+                          {isActive && (
+                            <motion.ul
+                              key={`details-${entry.year}`}
+                              initial={{ opacity: 0, y: 14 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -8 }}
+                              transition={{ duration: 0.28, ease: "easeOut" }}
+                              className="mt-5 min-w-max space-y-2 text-center"
+                            >
+                              {entry.history.map((item, idx) => (
+                                <li key={`${entry.year}-${idx}`} className="flex items-start gap-2">
+                                  <span className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-white/85" />
+                                  <p className="text-base leading-relaxed text-white">{item}</p>
+                                </li>
+                              ))}
+                            </motion.ul>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </li>
+                  )
+                })}
+              </ul>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>
