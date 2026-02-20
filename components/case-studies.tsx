@@ -399,12 +399,9 @@ function ConsultingTimeline() {
   const scrollRafRef = useRef<number | null>(null)
   const activeIndex = consultingTimeline.findIndex((entry) => entry.year === activeYear)
   const hintIndex = activeIndex >= 0 && activeIndex < consultingTimeline.length - 1 ? activeIndex + 1 : -1
-  const landingCenterIndex = consultingTimeline.findIndex((entry) => entry.year === "2024년")
-  const autoAlignStartIndex = consultingTimeline.findIndex((entry) => entry.year === "2023년")
   const resolveFocusIndex = (selectedIndex: number) => {
-    if (selectedIndex < 0) return landingCenterIndex >= 0 ? landingCenterIndex : 0
-    if (autoAlignStartIndex >= 0 && selectedIndex >= autoAlignStartIndex) return selectedIndex
-    return landingCenterIndex >= 0 ? landingCenterIndex : selectedIndex
+    if (selectedIndex < 0) return 0
+    return selectedIndex
   }
   const alignBySelection = (selectedIndex: number, behavior: ScrollBehavior) => {
     anchorViewportXRef.current = resolveAnchorViewportX()
