@@ -605,7 +605,7 @@ function FeatureFlow() {
       desc: (
         <>
           비싼 컨설팅 없이, 고성과자 데이터와 어세스타의 검증된 DB를 결합하여{' '}
-          <span className="font-semibold text-blue-200">단 3일 만에</span> 최적화된 역량 모델을
+          <span className="font-semibold text-blue-200">��� 3일 만에</span> 최적화된 역량 모델을
           구축합니다.
         </>
       ),
@@ -733,7 +733,7 @@ function ROICalculator() {
   const validityBaseline = 0.3
   const validityAstra = 0.65
   const sdYRatio = 0.4
-  const selectedZScore = 0.5
+  const selectedZScore = 0.8
   const failureShare = 0.25
   const performanceStdDev = useMemo(() => salary * sdYRatio, [salary, sdYRatio])
 
@@ -872,9 +872,7 @@ function ROICalculator() {
             </div>
 
             <p className="mt-6 text-xs leading-relaxed text-[color:var(--astra-text-muted)]">
-              기준값: r_base = 0.30, r_astra = 0.65, SD_y = 연봉의 40%, Z_x = 0.5
-              <br />
-              ΔU = N × T × (r_astra - r_base) × SD_y × Z_x - (N × C)
+              본 ROI 분석 결과는 인사 심리학의 세계적 권위자인 Schmidt &amp; Oh(2016) 및 Sackett et al.(2022)의 메타 분석 연구 데이터를 기반으로 산출되었으며, 기업의 실질적인 채용 실패 비용 절감 및 성과 향상 가치를 정량화한 수치입니다.
             </p>
           </div>
 
