@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { AnimatePresence, motion, useAnimation } from "framer-motion"
 import {
@@ -145,7 +145,7 @@ export function CaseStudies() {
     }
   }, [])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (stepPx <= 0 || isCarouselAnimating) return
     carouselControls.set({ x: baseOffset })
   }, [baseOffset, carouselControls, isCarouselAnimating, stepPx, testimonialIdx])
@@ -272,6 +272,7 @@ export function CaseStudies() {
           <div ref={carouselViewportRef} className="relative mt-10 overflow-hidden">
             <motion.div
               className="flex items-stretch gap-0 md:gap-5"
+              style={{ x: baseOffset }}
               initial={false}
               animate={carouselControls}
             >
