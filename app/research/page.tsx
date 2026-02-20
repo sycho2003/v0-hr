@@ -103,7 +103,7 @@ export default function ResearchPage() {
   }, [activeTab])
 
   return (
-    <div className="min-h-screen bg-neutral-950 pb-24 pt-32 text-white">
+    <div className="min-h-screen bg-neutral-950 pb-24 pt-32 lg:pt-40 text-white">
       <div className="px-6 md:px-20 xl:px-[120px]">
         <header className="mb-6">
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Research Library</p>

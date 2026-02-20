@@ -39,7 +39,7 @@ export default function SolutionsPage() {
   const translateY = useTransform(scrollYProgress, [0, 0.35], [30, 0])
 
   return (
-    <div className="min-h-screen bg-neutral-950 pb-24 pt-32 text-white">
+    <div className="min-h-screen bg-neutral-950 pb-24 pt-32 lg:pt-40 text-white">
       <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
         <section>
           <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Astra Product</p>
