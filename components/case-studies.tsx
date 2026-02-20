@@ -339,8 +339,8 @@ export function CaseStudies() {
       {/* CTA */}
       <section className="bg-neutral-950 pt-16 pb-28 md:pb-36">
         <div id="cases-cta-anchor" className="mx-auto max-w-3xl px-6 text-center lg:px-10 xl:px-[120px]">
-          <h2 className="break-keep text-balance text-3xl font-extrabold leading-tight text-white md:text-4xl">우리 기업도 프로젝트 사례의 주인공이 될 수 있습니다</h2>
-          <p className="title-group__subtitle text-neutral-300">무료 진단을 통해 어세스타 솔루션의 기대 효과를 확인하세요.</p>
+          <h2 className="text-xl font-bold text-white md:text-2xl">우리 기업도 프로젝트 사례의 주인공이 될 수 있습니다</h2>
+          <p className="mt-4 text-neutral-300">무료 진단을 통해 어세스타 솔루션의 기대 효과를 확인하세요.</p>
           <Link
             href="/inquiry"
             className="btn-brand group mt-8 inline-flex items-center gap-2 rounded-lg px-8 py-3.5 text-sm font-semibold transition-all"
