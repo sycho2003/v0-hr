@@ -4,13 +4,6 @@ import { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
@@ -54,8 +47,8 @@ const isItemActiveForAudience = (item: ConsultingItem, audience: AudienceChipTyp
 const consultingCatalog: { hrm: ConsultingItem[]; hrd: ConsultingItem[] } = {
   hrm: [
     { id: 'hrm-1', title: '채용', description: '구조화 면접과 심리측정 기반으로 최적의 인재를 과학적으로 선발합니다.', audiences: ['government', 'public', 'enterprise', 'stateOwned'] },
-    { id: 'hrm-2', title: '역량평가(AC)', description: '평가센터(Assessment Center) 기법으로 직무 역량을 다면적으로 측정합니다.', audiences: ['government', 'public', 'enterprise', 'stateOwned'] },
-    { id: 'hrm-3', title: '성과평가', description: '성과지표와 연동된 공정한 평가 체계를 설계하고 운영합니다.', audiences: ['government', 'public', 'enterprise', 'stateOwned'] },
+    { id: 'hrm-2', title: '역량평가(AC)', description: '평가센터(Assessment Center) 기반으로 직무 역량을 다면적으로 측정합니다.', audiences: ['government', 'public', 'enterprise', 'stateOwned'] },
+    { id: 'hrm-3', title: '성과평가', description: '성과지표와 연동된 공정한 평가 체계를 설계하고 운영합니다.', audiences: ['government', 'public', 'stateOwned'] },
     { id: 'hrm-4', title: '보상', description: '성과와 역량에 기반한 공정하고 동기부여적인 보상 체계를 구축합니다.', audiences: ['public', 'enterprise', 'stateOwned'] },
     { id: 'hrm-5', title: '직무 분석 및 설계', description: '직무 구조를 체계적으로 분석하고 역할과 책임을 최적화합니다.', audiences: ['government', 'public', 'enterprise', 'stateOwned'] },
   ],
@@ -64,17 +57,15 @@ const consultingCatalog: { hrm: ConsultingItem[]; hrd: ConsultingItem[] } = {
     { id: 'hrd-2', title: '리더십개발', description: '계층별 리더십 역량을 진단하고 맞춤형 리더십 프로그램을 운영합니다.', audiences: ['government', 'public', 'enterprise', 'stateOwned'] },
     { id: 'hrd-3', title: '커뮤니케이션', description: '조직 내 소통 역량을 강화하여 협업 효율성과 팀 성과를 높입니다.', audiences: ['government', 'public', 'enterprise', 'stateOwned'] },
     { id: 'hrd-4', title: '팀빌딩/팀워크', description: '팀 응집력과 시너지를 높이는 체험형 프로그램을 설계하고 운영합니다.', audiences: ['public', 'enterprise', 'stateOwned'] },
-    { id: 'hrd-5', title: '감정관리', description: '감정 인식과 조절 역량을 개발하여 직무 스트레스 관리와 조직 적응력을 향상시킵니다.', audiences: ['government', 'public', 'enterprise', 'stateOwned'] },
+    { id: 'hrd-5', title: '감정관리', description: '감정 인식과 조절 역량을 개발하여 직무 스트레스 관리와 조직 적응력을 향상시킵니다.', audiences: ['government', 'public', 'stateOwned'] },
   ],
 }
 
 export default function HRConsultingPage() {
-  const [activeAudience, setActiveAudience] = useState<AudienceChipType | null>(null)
-  const [mobileDetail, setMobileDetail] = useState<ConsultingItem | null>(null)
+  const [activeAudience, setActiveAudience] = useState<AudienceChipType>('government')
 
   const hrmCards = useMemo<ConsultingItem[]>(() => consultingCatalog.hrm, [])
   const hrdCards = useMemo<ConsultingItem[]>(() => consultingCatalog.hrd, [])
-
   const hrmActiveCount = useMemo(
     () => activeAudience ? hrmCards.filter((item) => isItemActiveForAudience(item, activeAudience)).length : hrmCards.length,
     [activeAudience, hrmCards]
@@ -103,7 +94,7 @@ export default function HRConsultingPage() {
             오프라인 컨설팅이 필요하신가요?
           </h1>
           <p className="mx-auto mt-3 max-w-3xl text-base leading-relaxed text-neutral-300 md:text-lg">
-            어세스타가 기존에 진행해온 컨설팅 서비스를 만나보세요.
+            어세스타의 전문성이 담긴 컨설팅 서비스를 만나보세요.
           </p>
         </motion.section>
 
@@ -115,10 +106,12 @@ export default function HRConsultingPage() {
           transition={{ duration: 0.55 }}
           className="mb-8"
         >
-          <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.18em]">Customized Consulting</p>
-          <h2 className="title-group__heading mt-2 text-3xl font-extrabold leading-tight text-white md:text-4xl">HR 컨설팅 서비스</h2>
-          <p className="title-group__subtitle mt-5 max-w-4xl text-base leading-relaxed text-neutral-300 md:text-lg">
-            조직의 특성에 맞춘 맞춤형 HR 시스템 구축. 25년간의 전문 노하우와 AI 기술을 결합한 데이터 기반 컨설팅입니다.
+          <p className="text-brand-primary text-xs font-semibold uppercase tracking-[0.22em]">Customized Consulting</p>
+          <h2 className="mt-3 text-balance text-3xl font-extrabold tracking-tight text-white md:text-4xl">HR 컨설팅 서비스</h2>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-neutral-300 md:text-lg">
+            조직의 특성에 맞춘 맞춤형 HR 시스템을 구축해왔습니다.
+            <br />
+            20년간의 전문 노하우와 AI 기술을 결합한 데이터 기반 컨설팅입니다.
           </p>
         </motion.section>
 
@@ -164,15 +157,15 @@ export default function HRConsultingPage() {
                 </div>
                 <div className="grid min-w-0 grid-cols-2 gap-3">
                   {hrmCards.map((item) => {
-                    const isActive = activeAudience === null || isItemActiveForAudience(item, activeAudience)
+                    const isActive = isItemActiveForAudience(item, activeAudience)
                     return (
                       <Tooltip key={`${item.id}-${activeAudience}`}>
                         <TooltipTrigger asChild>
                           <article
-                            className={`relative flex min-h-[173px] min-w-0 flex-col rounded-lg border px-4 pt-4 pb-2 transition-colors duration-200 ${
+                            className={`relative flex min-h-[152px] min-w-0 flex-col rounded-lg border px-4 pt-4 pb-0 transition-colors duration-200 ${
                               isActive
                                 ? 'border-brand-primary/70 bg-brand-primary/12 hr-card-glow-sync'
-                                : 'border-white/10 bg-white/[0.01] opacity-45'
+                                : 'border-white/15 bg-white/[0.02]'
                             }`}
                           >
                             {isActive && (
@@ -186,16 +179,6 @@ export default function HRConsultingPage() {
                             <p className={`mt-2 text-sm leading-snug ${isActive ? 'text-neutral-300' : 'text-neutral-500'}`}>
                               {item.description}
                             </p>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                setMobileDetail(item)
-                              }}
-                              className="mt-auto pt-3 text-left text-xs font-medium text-brand-primary underline-offset-2 hover:underline md:hidden"
-                            >
-                              자세히 보기
-                            </button>
                           </article>
                         </TooltipTrigger>
                         <TooltipContent className="hidden max-w-[280px] border-white/20 bg-neutral-900 text-neutral-100 md:block">
@@ -206,7 +189,6 @@ export default function HRConsultingPage() {
                     )
                   })}
                 </div>
-
               </div>
 
               <div className="min-w-0">
@@ -218,15 +200,15 @@ export default function HRConsultingPage() {
                 </div>
                 <div className="grid min-w-0 grid-cols-2 gap-3">
                   {hrdCards.map((item) => {
-                    const isActive = activeAudience === null || isItemActiveForAudience(item, activeAudience)
+                    const isActive = isItemActiveForAudience(item, activeAudience)
                     return (
                       <Tooltip key={`${item.id}-${activeAudience}`}>
                         <TooltipTrigger asChild>
                           <article
-                            className={`relative flex min-h-[173px] min-w-0 flex-col rounded-lg border px-4 pt-4 pb-2 transition-colors duration-200 ${
+                            className={`relative flex min-h-[152px] min-w-0 flex-col rounded-lg border px-4 pt-4 pb-0 transition-colors duration-200 ${
                               isActive
                                 ? 'border-brand-primary/70 bg-brand-primary/12 hr-card-glow-sync'
-                                : 'border-white/10 bg-white/[0.01] opacity-45'
+                                : 'border-white/15 bg-white/[0.02]'
                             }`}
                           >
                             {isActive && (
@@ -240,16 +222,6 @@ export default function HRConsultingPage() {
                             <p className={`mt-2 text-sm leading-snug ${isActive ? 'text-neutral-300' : 'text-neutral-500'}`}>
                               {item.description}
                             </p>
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                setMobileDetail(item)
-                              }}
-                              className="mt-auto pt-3 text-left text-xs font-medium text-brand-primary underline-offset-2 hover:underline md:hidden"
-                            >
-                              자세히 보기
-                            </button>
                           </article>
                         </TooltipTrigger>
                         <TooltipContent className="hidden max-w-[280px] border-white/20 bg-neutral-900 text-neutral-100 md:block">
@@ -260,21 +232,12 @@ export default function HRConsultingPage() {
                     )
                   })}
                 </div>
-
               </div>
             </div>
           </TooltipProvider>
-
-          <Dialog open={!!mobileDetail} onOpenChange={(open) => !open && setMobileDetail(null)}>
-            <DialogContent className="max-w-[92vw] border-white/15 bg-neutral-900 text-white">
-              <DialogHeader>
-                <DialogTitle className="text-lg font-bold">{mobileDetail?.title}</DialogTitle>
-                <DialogDescription className="pt-2 text-sm leading-relaxed text-neutral-200">
-                  {mobileDetail?.description}
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
-          </Dialog>
+          <p className="mt-5 text-sm leading-relaxed text-neutral-500">
+            일반적인 패키지의 구성입니다. 자세한 컨설팅 상담은 아래 &apos;무료 상담 신청&apos; 버튼을 클릭해주세요.
+          </p>
         </motion.section>
 
         {/* ── CTA ── */}

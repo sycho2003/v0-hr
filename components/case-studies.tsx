@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { AnimatePresence, motion, useAnimation } from "framer-motion"
+import { AnimatePresence, motion, useAnimationControls } from "framer-motion"
 import {
   ArrowRight,
   ChevronLeft,
@@ -108,73 +108,146 @@ const consultingTimeline = [
 ]
 
 export function CaseStudies() {
-  const [testimonialIdx, setTestimonialIdx] = useState(0)
+  const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0)
+  const [isTestimonialAnimating, setIsTestimonialAnimating] = useState(false)
   const totalTestimonials = testimonials.length
-  const carouselViewportRef = useRef<HTMLDivElement>(null)
-  const carouselControls = useAnimation()
-  const [isDesktopCarousel, setIsDesktopCarousel] = useState(false)
-  const [carouselViewportWidth, setCarouselViewportWidth] = useState(0)
-  const [isCarouselAnimating, setIsCarouselAnimating] = useState(false)
+  const testimonialCardSize = 336
+  const testimonialCardGap = 24
+  const testimonialStep = testimonialCardSize + testimonialCardGap
+  const testimonialCenterX = 0
+  const testimonialTrackControls = useAnimationControls()
+  const activeTestimonialIndexRef = useRef(0)
+  const targetTestimonialIndexRef = useRef<number | null>(null)
+  const testimonialFlushRef = useRef(false)
 
-  const wrapIndex = (index: number) => (index + totalTestimonials) % totalTestimonials
-  const gapPx = isDesktopCarousel ? 20 : 0
-  const cardWidth = isDesktopCarousel
-    ? Math.max((carouselViewportWidth - gapPx * 2) / 3, 0)
-    : carouselViewportWidth
-  const stepPx = cardWidth + gapPx
-  const baseOffset = isDesktopCarousel ? -stepPx : -stepPx * 2
-  const displayedTestimonials = [-2, -1, 0, 1, 2].map((offset) =>
-    testimonials[wrapIndex(testimonialIdx + offset)],
-  )
+  const wrapIndex = (index: number) =>
+    (index + totalTestimonials) % totalTestimonials
+
+  const resolveDirectionToTarget = (from: number, to: number): 1 | -1 | 0 => {
+    if (from === to) return 0
+    const forwardSteps = (to - from + totalTestimonials) % totalTestimonials
+    const backwardSteps = (from - to + totalTestimonials) % totalTestimonials
+    return forwardSteps <= backwardSteps ? 1 : -1
+  }
+
+  const animateTestimonialStep = async (direction: 1 | -1) => {
+    setIsTestimonialAnimating(true)
+    await testimonialTrackControls.start({
+      x: direction > 0 ? -testimonialStep : testimonialStep,
+      transition: { duration: 0.62, ease: [0.22, 0.61, 0.36, 1] },
+    })
+    const next = wrapIndex(activeTestimonialIndexRef.current + direction)
+    activeTestimonialIndexRef.current = next
+    setActiveTestimonialIndex(next)
+    testimonialTrackControls.set({ x: testimonialCenterX })
+  }
+
+  const flushTestimonialQueue = async () => {
+    if (testimonialFlushRef.current) return
+    testimonialFlushRef.current = true
+    try {
+      while (targetTestimonialIndexRef.current !== null) {
+        const target = targetTestimonialIndexRef.current
+        if (target === activeTestimonialIndexRef.current) {
+          targetTestimonialIndexRef.current = null
+          break
+        }
+        const direction = resolveDirectionToTarget(activeTestimonialIndexRef.current, target)
+        if (direction === 0) {
+          targetTestimonialIndexRef.current = null
+          break
+        }
+        await animateTestimonialStep(direction)
+      }
+    } finally {
+      testimonialFlushRef.current = false
+      setIsTestimonialAnimating(false)
+    }
+  }
+
+  const requestTestimonialMove = (targetIndex: number) => {
+    const wrappedTarget = wrapIndex(targetIndex)
+    if (wrappedTarget === activeTestimonialIndexRef.current) return
+    targetTestimonialIndexRef.current = wrappedTarget
+    void flushTestimonialQueue()
+  }
+
+  const nextT = () => requestTestimonialMove(activeTestimonialIndexRef.current + 1)
+
+  const prevT = () => requestTestimonialMove(activeTestimonialIndexRef.current - 1)
+
+  const jumpToTestimonial = (index: number) => {
+    if (index === activeTestimonialIndexRef.current) return
+    requestTestimonialMove(index)
+  }
 
   useEffect(() => {
-    const updateCarouselMetrics = () => {
-      if (!carouselViewportRef.current) return
-      setCarouselViewportWidth(carouselViewportRef.current.clientWidth)
-      setIsDesktopCarousel(window.matchMedia("(min-width: 768px)").matches)
-    }
+    activeTestimonialIndexRef.current = activeTestimonialIndex
+  }, [activeTestimonialIndex])
 
-    updateCarouselMetrics()
-    const resizeObserver = new ResizeObserver(updateCarouselMetrics)
-    if (carouselViewportRef.current) resizeObserver.observe(carouselViewportRef.current)
-    window.addEventListener("resize", updateCarouselMetrics)
+  useEffect(() => {
+    testimonialTrackControls.set({ x: testimonialCenterX })
+  }, [testimonialCenterX, testimonialTrackControls])
 
-    return () => {
-      resizeObserver.disconnect()
-      window.removeEventListener("resize", updateCarouselMetrics)
-    }
-  }, [])
+  const renderTestimonialTrack = (centerIndex: number) => {
+    const prev2Index = wrapIndex(centerIndex - 2)
+    const prevIndex = wrapIndex(centerIndex - 1)
+    const nextIndex = wrapIndex(centerIndex + 1)
+    const next2Index = wrapIndex(centerIndex + 2)
+    return (
+      <>
+        {/* Previous-2 (left outer blurred buffer card) */}
+        <div className="hidden w-[336px] shrink-0 select-none md:block">
+          <div
+            className="h-full min-h-[336px] w-[336px] rounded-2xl border border-white/10 bg-neutral-900 p-8"
+            style={{ filter: "blur(2.2px)", opacity: 0.72 }}
+            aria-hidden="true"
+          >
+            <TestimonialCardContent testimonial={testimonials[prev2Index]} />
+          </div>
+        </div>
 
-  useLayoutEffect(() => {
-    if (stepPx <= 0 || isCarouselAnimating) return
-    carouselControls.set({ x: baseOffset })
-  }, [baseOffset, carouselControls, isCarouselAnimating, stepPx, testimonialIdx])
+        {/* Previous (left blurred card) */}
+        <div className="hidden w-[336px] shrink-0 select-none md:block">
+          <div
+            className="h-full min-h-[336px] w-[336px] rounded-2xl border border-white/10 bg-neutral-900 p-8"
+            style={{ filter: "blur(1.45px)", opacity: 0.84 }}
+            aria-hidden="true"
+          >
+            <TestimonialCardContent testimonial={testimonials[prevIndex]} />
+          </div>
+        </div>
 
-  const slideBy = async (direction: 1 | -1) => {
-    if (isCarouselAnimating || stepPx <= 0) return
+        {/* Center (active card) */}
+        <div className="w-[min(336px,88vw)] shrink-0 md:w-[336px]">
+          <div className="h-full min-h-[336px] w-full rounded-2xl border border-white/10 bg-neutral-900 p-8">
+            <TestimonialCardContent testimonial={testimonials[centerIndex]} />
+          </div>
+        </div>
 
-    setIsCarouselAnimating(true)
-    await carouselControls.start({
-      x: baseOffset - direction * stepPx,
-      transition: { duration: 0.42, ease: [0.42, 0, 0.58, 1] },
-    })
-    setTestimonialIdx((prev) => wrapIndex(prev + direction))
-    setIsCarouselAnimating(false)
-  }
+        {/* Next (right blurred card) */}
+        <div className="hidden w-[336px] shrink-0 select-none md:block">
+          <div
+            className="h-full min-h-[336px] w-[336px] rounded-2xl border border-white/10 bg-neutral-900 p-8"
+            style={{ filter: "blur(1.45px)", opacity: 0.84 }}
+            aria-hidden="true"
+          >
+            <TestimonialCardContent testimonial={testimonials[nextIndex]} />
+          </div>
+        </div>
 
-  const nextT = () => {
-    void slideBy(1)
-  }
-
-  const prevT = () => {
-    void slideBy(-1)
-  }
-
-  const goToTestimonial = (idx: number) => {
-    if (idx === testimonialIdx || isCarouselAnimating) return
-    const forward = (idx - testimonialIdx + totalTestimonials) % totalTestimonials
-    const backward = (testimonialIdx - idx + totalTestimonials) % totalTestimonials
-    void slideBy(forward <= backward ? 1 : -1)
+        {/* Next-2 (right outer blurred buffer card) */}
+        <div className="hidden w-[336px] shrink-0 select-none md:block">
+          <div
+            className="h-full min-h-[336px] w-[336px] rounded-2xl border border-white/10 bg-neutral-900 p-8"
+            style={{ filter: "blur(2.2px)", opacity: 0.72 }}
+            aria-hidden="true"
+          >
+            <TestimonialCardContent testimonial={testimonials[next2Index]} />
+          </div>
+        </div>
+      </>
+    )
   }
 
   return (
@@ -263,71 +336,43 @@ export function CaseStudies() {
       {/* Testimonials */}
       <section className="bg-neutral-950 py-16 lg:py-20">
         <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
-          <h3 className="text-center break-keep text-balance text-3xl font-extrabold leading-tight text-white md:text-4xl">전문가들의 평가</h3>
-          <p className="title-group__subtitle text-center text-sm text-neutral-400">
+          <h3 className="text-center text-3xl font-extrabold tracking-tight text-white md:text-4xl">전문가들의 평가</h3>
+          <p className="mt-3 text-center text-xs text-neutral-400 md:text-sm">
             전문성과 열정에 대한 고객 후기
           </p>
 
           {/* Carousel with blurred side cards */}
-          <div ref={carouselViewportRef} className="relative mt-10 overflow-hidden">
-            <motion.div
-              className="flex items-stretch gap-0 md:gap-5"
-              style={{ x: baseOffset }}
-              initial={false}
-              animate={carouselControls}
-            >
-              {displayedTestimonials.map((testimonial, slotIdx) => {
-                const slotDistance = Math.abs(slotIdx - 2)
-                const isActiveCard = slotDistance === 0
-                const sideCardClass =
-                  slotDistance === 1
-                    ? "md:opacity-65"
-                    : "md:opacity-35"
-
-                return (
-                  <div
-                    key={`${testimonial.author}-${slotIdx}`}
-                    className="w-full shrink-0"
-                    style={cardWidth > 0 ? { width: `${cardWidth}px` } : undefined}
-                  >
-                    <div
-                      className={`h-full min-h-[300px] rounded-xl p-7 transition-all duration-300 md:min-h-[330px] ${
-                        isActiveCard
-                          ? "border border-white/10 bg-neutral-900 shadow-lg shadow-black/20 opacity-100"
-                          : `border border-white/[0.06] bg-neutral-900/60 pointer-events-none opacity-0 ${sideCardClass}`
-                      }`}
-                      style={!isActiveCard && isDesktopCarousel ? { filter: "blur(2.5px)" } : undefined}
-                      aria-hidden={!isActiveCard}
-                    >
-                      <TestimonialCardContent testimonial={testimonial} />
-                    </div>
-                  </div>
-                )
-              })}
-            </motion.div>
+          <div className="relative mt-12 overflow-hidden">
+            <div className="relative h-[336px]">
+              <motion.div
+                animate={testimonialTrackControls}
+                className="absolute inset-0 will-change-transform flex items-stretch justify-center gap-6"
+              >
+                {renderTestimonialTrack(activeTestimonialIndex)}
+              </motion.div>
+            </div>
 
             {/* Left/right fade masks */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-16 bg-gradient-to-r from-neutral-950 to-transparent md:block" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-16 bg-gradient-to-l from-neutral-950 to-transparent md:block" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-20 bg-gradient-to-r from-neutral-950 to-transparent md:block" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-20 bg-gradient-to-l from-neutral-950 to-transparent md:block" />
           </div>
 
           {/* Navigation */}
-          <div className="mt-8 flex items-center justify-center gap-3">
-            <button onClick={prevT} disabled={isCarouselAnimating} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors hover:border-white/40 disabled:opacity-50" aria-label="이전 후기">
+          <div className="mt-10 flex items-center justify-center gap-3">
+            <button onClick={prevT} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-all duration-300 hover:border-white/40 hover:bg-neutral-800" aria-label="이전 후기">
               <ChevronLeft className="h-4 w-4 text-neutral-200" />
             </button>
             <div className="flex gap-1.5">
               {testimonials.map((_, i) => (
                 <button
                   key={i}
-                  onClick={() => goToTestimonial(i)}
-                  disabled={isCarouselAnimating}
-                  className={`h-2 w-2 rounded-full transition-colors ${i === testimonialIdx ? "bg-brand-primary" : "bg-neutral-700 hover:bg-neutral-500"}`}
+                  onClick={() => jumpToTestimonial(i)}
+                  className={`h-2 w-2 rounded-full transition-colors ${i === activeTestimonialIndex ? "bg-brand-primary" : "bg-neutral-700 hover:bg-neutral-500"}`}
                   aria-label={`후기 ${i + 1}번`}
                 />
               ))}
             </div>
-            <button onClick={nextT} disabled={isCarouselAnimating} className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-colors hover:border-white/40 disabled:opacity-50" aria-label="다음 후기">
+            <button onClick={nextT} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-neutral-900 transition-all duration-300 hover:border-white/40 hover:bg-neutral-800" aria-label="다음 후기">
               <ChevronRight className="h-4 w-4 text-neutral-200" />
             </button>
           </div>
@@ -394,21 +439,20 @@ function ConsultingTimeline() {
   const [activeYear, setActiveYear] = useState<string>(consultingTimeline[0].year)
   const [edgePad, setEdgePad] = useState(0)
   const [lineRange, setLineRange] = useState({ start: 84, end: 84 })
+  const [snappedIndex, setSnappedIndex] = useState(-1)
   const railRef = useRef<HTMLDivElement>(null)
+  const railListRef = useRef<HTMLUListElement>(null)
   const itemRefs = useRef<Array<HTMLLIElement | null>>([])
+  const stampRefs = useRef<Array<HTMLButtonElement | null>>([])
   const anchorViewportXRef = useRef<number | null>(null)
-  const scrollRafRef = useRef<number | null>(null)
+  const wheelStepConsumedRef = useRef(false)
+  const wheelGestureResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hasInitializedRef = useRef(false)
   const activeIndex = consultingTimeline.findIndex((entry) => entry.year === activeYear)
-  const hintIndex = activeIndex >= 0 && activeIndex < consultingTimeline.length - 1 ? activeIndex + 1 : -1
-  const resolveFocusIndex = (selectedIndex: number) => {
-    if (selectedIndex < 0) return 0
-    return selectedIndex
-  }
-  const alignBySelection = (selectedIndex: number, behavior: ScrollBehavior) => {
-    anchorViewportXRef.current = resolveAnchorViewportX()
-    alignTimelineItemToAnchor(resolveFocusIndex(selectedIndex), behavior)
-    updateLineRange()
-  }
+  const activeIndexRef = useRef(activeIndex)
+  const snappedIndexRef = useRef(-1)
+  const landingCenterIndex = consultingTimeline.findIndex((entry) => entry.year === "2024년")
+  const resolveLandingIndex = () => (landingCenterIndex >= 0 ? landingCenterIndex : 0)
   const resolveAnchorViewportX = () => {
     const rail = railRef.current
     if (!rail) return 0
@@ -429,41 +473,6 @@ function ConsultingTimeline() {
     return rail.clientWidth / 2
   }
 
-  const stopScrollAnimation = () => {
-    if (scrollRafRef.current !== null) {
-      cancelAnimationFrame(scrollRafRef.current)
-      scrollRafRef.current = null
-    }
-  }
-
-  const animateRailScroll = (rail: HTMLDivElement, targetLeft: number, duration = 420) => {
-    stopScrollAnimation()
-    const startLeft = rail.scrollLeft
-    const delta = targetLeft - startLeft
-    if (Math.abs(delta) < 1) {
-      rail.scrollLeft = targetLeft
-      return
-    }
-
-    const startTime = performance.now()
-    const step = (now: number) => {
-      const progress = Math.min(1, (now - startTime) / duration)
-      const eased =
-        progress < 0.5
-          ? 4 * progress * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2
-      rail.scrollLeft = startLeft + delta * eased
-
-      if (progress < 1) {
-        scrollRafRef.current = requestAnimationFrame(step)
-      } else {
-        scrollRafRef.current = null
-      }
-    }
-
-    scrollRafRef.current = requestAnimationFrame(step)
-  }
-
   const alignTimelineItemToAnchor = (index: number, behavior: ScrollBehavior = "smooth") => {
     const rail = railRef.current
     const item = itemRefs.current[index]
@@ -474,25 +483,60 @@ function ConsultingTimeline() {
     const max = rail.scrollWidth - rail.clientWidth
     const clampedTarget = Math.min(Math.max(0, target), Math.max(0, max))
 
-    if (behavior === "smooth") {
-      animateRailScroll(rail, clampedTarget)
-      return
-    }
-
-    stopScrollAnimation()
     rail.scrollTo({
       left: clampedTarget,
       behavior,
     })
   }
 
-  const updateLineRange = () => {
-    const startItem = itemRefs.current[0]
-    const lastItem = itemRefs.current[consultingTimeline.length - 1]
-    if (!startItem || !lastItem) return
+  const alignByIndex = (index: number, behavior: ScrollBehavior) => {
+    if (index < 0) return
+    anchorViewportXRef.current = resolveAnchorViewportX()
+    snappedIndexRef.current = index
+    setSnappedIndex(index)
+    alignTimelineItemToAnchor(index, behavior)
+  }
 
-    const start = startItem.offsetLeft + startItem.clientWidth / 2
-    const end = lastItem.offsetLeft + lastItem.clientWidth / 2
+  const resolveCurrentIndex = () => {
+    if (activeIndexRef.current >= 0) return activeIndexRef.current
+    if (snappedIndexRef.current >= 0) return snappedIndexRef.current
+    return resolveLandingIndex()
+  }
+
+  const alignToIndexRespectLanding = (index: number, behavior: ScrollBehavior = "smooth") => {
+    if (index < 0 || index >= consultingTimeline.length) return
+    const landingIndex = resolveLandingIndex()
+    // Allow selecting "현재/2025년", while keeping landing rail position.
+    setActiveYear(consultingTimeline[index].year)
+    if (index < landingIndex) {
+      alignByIndex(landingIndex, behavior)
+      return
+    }
+    alignByIndex(index, behavior)
+  }
+
+  const alignByStep = (direction: -1 | 1, behavior: ScrollBehavior = "smooth") => {
+    const baseIndex = resolveCurrentIndex()
+    const nextIndex = Math.min(
+      consultingTimeline.length - 1,
+      Math.max(0, baseIndex + direction),
+    )
+    if (nextIndex === baseIndex) return
+    alignToIndexRespectLanding(nextIndex, behavior)
+  }
+
+  const updateLineRange = () => {
+    const railList = railListRef.current
+    const startStamp = stampRefs.current[0]
+    const endStamp = stampRefs.current[consultingTimeline.length - 1]
+    if (!railList || !startStamp || !endStamp) return
+
+    // Align the rail line strictly to the center point of the first and last stamps.
+    const railListRect = railList.getBoundingClientRect()
+    const startRect = startStamp.getBoundingClientRect()
+    const endRect = endStamp.getBoundingClientRect()
+    const start = startRect.left - railListRect.left + startRect.width / 2
+    const end = endRect.left - railListRect.left + endRect.width / 2
     setLineRange({ start, end })
   }
 
@@ -512,17 +556,70 @@ function ConsultingTimeline() {
   }, [])
 
   useEffect(() => {
+    activeIndexRef.current = activeIndex
+  }, [activeIndex])
+
+  useEffect(() => {
+    snappedIndexRef.current = snappedIndex
+  }, [snappedIndex])
+
+  useEffect(() => {
     if (edgePad <= 0) return
     requestAnimationFrame(() => {
-      alignBySelection(activeIndex, "auto")
+      if (!hasInitializedRef.current) {
+        hasInitializedRef.current = true
+        alignByIndex(resolveLandingIndex(), "auto")
+        return
+      }
+      alignByIndex(resolveCurrentIndex(), "auto")
     })
   }, [edgePad])
 
   useEffect(() => {
-    return () => {
-      stopScrollAnimation()
+    const rail = railRef.current
+    if (!rail || edgePad <= 0) return
+
+    const resetWheelGesture = () => {
+      wheelStepConsumedRef.current = false
+      if (wheelGestureResetTimerRef.current) {
+        clearTimeout(wheelGestureResetTimerRef.current)
+        wheelGestureResetTimerRef.current = null
+      }
     }
-  }, [])
+
+    const armWheelGestureReset = () => {
+      if (wheelGestureResetTimerRef.current) {
+        clearTimeout(wheelGestureResetTimerRef.current)
+      }
+      wheelGestureResetTimerRef.current = setTimeout(() => {
+        wheelStepConsumedRef.current = false
+        wheelGestureResetTimerRef.current = null
+      }, 140)
+    }
+
+    const handleWheel = (event: WheelEvent) => {
+      event.preventDefault()
+      const unit =
+        event.deltaMode === WheelEvent.DOM_DELTA_LINE
+          ? 16
+          : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+            ? rail.clientHeight
+            : 1
+      // Use vertical wheel intent only; trackpad horizontal jitter can flip direction.
+      const dominantDelta = event.deltaY * unit
+      if (Math.abs(dominantDelta) < 5) return
+      armWheelGestureReset()
+      if (wheelStepConsumedRef.current) return
+      wheelStepConsumedRef.current = true
+      alignByStep(dominantDelta > 0 ? 1 : -1, "auto")
+    }
+
+    rail.addEventListener("wheel", handleWheel, { passive: false })
+    return () => {
+      rail.removeEventListener("wheel", handleWheel)
+      resetWheelGesture()
+    }
+  }, [edgePad])
 
   return (
     <section className="bg-neutral-950 py-16 lg:py-24">
@@ -544,14 +641,15 @@ function ConsultingTimeline() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="w-full pb-16 md:pb-20 md:pl-[72px] lg:pl-[86px]"
+          className="w-full pb-16 md:pb-20"
         >
           <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-3 bg-gradient-to-r from-neutral-950 to-transparent md:w-6" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-6 bg-gradient-to-l from-neutral-950 to-transparent md:w-10" />
+            <div className="pointer-events-none absolute left-0 top-0 z-20 h-[128px] w-[60px] bg-gradient-to-r from-neutral-950 to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 z-20 h-[128px] w-[60px] bg-gradient-to-l from-neutral-950 to-transparent" />
 
-            <div ref={railRef} className="overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div ref={railRef} className="touch-pan-y overflow-x-hidden pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <ul
+                ref={railListRef}
                 style={{ paddingLeft: edgePad, paddingRight: edgePad }}
                 className="relative grid min-w-max grid-flow-col auto-cols-[168px] gap-2 md:auto-cols-[176px] lg:auto-cols-[184px] lg:gap-3"
               >
@@ -564,7 +662,7 @@ function ConsultingTimeline() {
                 />
                 {consultingTimeline.map((entry, index) => {
                   const isActive = activeYear === entry.year
-                  const isHint = index === hintIndex
+                  const isSnapped = index === snappedIndex
 
                   return (
                     <li
@@ -577,7 +675,11 @@ function ConsultingTimeline() {
                       <div className="group flex w-full flex-col items-center text-center">
                         <span
                           className={`text-xl font-semibold leading-none tracking-tight transition-colors duration-200 md:text-2xl ${
-                            isActive ? "text-white" : "text-[#4a5870] group-hover:text-[#7c8aa2]"
+                            isActive
+                              ? "text-white"
+                              : isSnapped
+                                ? "text-[#7c8aa2]"
+                                : "text-[#4a5870] group-hover:text-[#7c8aa2]"
                           }`}
                         >
                           {entry.year}
@@ -585,37 +687,25 @@ function ConsultingTimeline() {
 
                         <button
                           type="button"
+                          ref={(node) => {
+                            stampRefs.current[index] = node
+                          }}
                           onClick={() => {
-                            setActiveYear(entry.year)
-                            alignBySelection(index, "smooth")
+                            alignToIndexRespectLanding(index, "smooth")
                           }}
                           aria-pressed={isActive}
                           className={`relative mt-8 h-6 w-6 rounded-full transition-all duration-200 ${
-                            isActive ? "border-[4px] border-white bg-[#0d1320]" : "border border-[#5b6d89] bg-[#0d1320]"
+                            isActive
+                              ? "border-[4px] border-white bg-[#0d1320]"
+                              : isSnapped
+                                ? "border border-[#8aa0c4] bg-[#13203a]"
+                                : "border border-[#5b6d89] bg-[#0d1320]"
                           }`}
                         >
-                          {isActive && (
-                            <motion.span
-                              key={`ring-${activeYear}`}
-                              initial={{ scale: 0.35, opacity: 0.95 }}
-                              animate={{ scale: 2.25, opacity: 0 }}
-                              transition={{ duration: 0.55, ease: "easeOut" }}
-                              className="pointer-events-none absolute inset-0 rounded-full border-[4px] border-white"
-                            />
-                          )}
                           {isActive ? (
                             <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0d1320]" />
                           ) : (
                             <span className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#617595]" />
-                          )}
-                          {!isActive && isHint && (
-                            <motion.span
-                              key={`hint-${entry.year}`}
-                              initial={{ scale: 0.55, opacity: 0.75 }}
-                              animate={{ scale: [0.55, 1.85, 1.85], opacity: [0.75, 0, 0] }}
-                              transition={{ duration: 1.25, ease: "easeOut", repeat: Infinity, repeatDelay: 0.3 }}
-                              className="pointer-events-none absolute inset-0 rounded-full border-[3px] border-white"
-                            />
                           )}
                         </button>
 

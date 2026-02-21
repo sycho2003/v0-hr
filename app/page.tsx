@@ -15,9 +15,7 @@ import {
   Workflow,
   Target,
 } from 'lucide-react'
-import { motion, useInView, useScroll } from 'framer-motion'
-
-const ELECTRIC_BLUE = '#3B82F6'
+import { motion, useInView, useScroll, type Variants } from 'framer-motion'
 
 function QuantumParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -38,8 +36,10 @@ function QuantumParticleCanvas() {
     let blueSprite: HTMLCanvasElement | null = null
     let mintSprite: HTMLCanvasElement | null = null
     let starSprite: HTMLCanvasElement | null = null
+    const impactCooldown = new WeakMap<HTMLElement, number>()
+    const impactTimers = new WeakMap<HTMLElement, number>()
 
-    const particleCount = () => (window.innerWidth < 768 ? 110 : 220)
+    const particleCount = () => (window.innerWidth < 768 ? 120 : 250)
     const particles: Array<{
       orbit: number
       angle: number
@@ -52,6 +52,10 @@ function QuantumParticleCanvas() {
       wobbleSpeed: number
       wobblePhase: number
       eccentricity: number
+      ambient: boolean
+      twinkleSpeed: number
+      twinklePhase: number
+      flashStrength: number
     }> = []
     const meteors: Array<{
       x: number
@@ -68,29 +72,44 @@ function QuantumParticleCanvas() {
       const count = particleCount()
       const maxOrbit = Math.max(180, Math.min(width, height) * 0.42)
       const minOrbit = Math.max(34, Math.min(width, height) * 0.08)
+      const outerMinOrbit = maxOrbit * 1.04
+      const outerMaxOrbit = Math.max(outerMinOrbit + 60, Math.min(width, height) * 0.68)
       const bands = 6
       const bandStep = (maxOrbit - minOrbit) / Math.max(1, bands - 1)
+      const ambientStart = Math.floor(count * 0.72)
 
       for (let i = 0; i < count; i += 1) {
+        const ambient = i >= ambientStart
         const colorSeed = Math.random()
         const color =
           colorSeed > 0.88 ? '186,230,255' : colorSeed > 0.24 ? '59,130,246' : '94,234,212'
-        const band = Math.floor(Math.random() * bands)
-        const bandBase = minOrbit + bandStep * band
-        const ringBias = Math.pow(Math.random(), 0.67)
-        const orbit = bandBase + (ringBias - 0.5) * bandStep * 0.88
+        const flashStrength = !ambient && Math.random() < 0.18 ? Math.random() * 0.55 + 0.3 : 0
+        let orbit = 0
+        if (ambient) {
+          const ambientT = Math.pow(Math.random(), 0.82)
+          orbit = outerMinOrbit + ambientT * (outerMaxOrbit - outerMinOrbit)
+        } else {
+          const band = Math.floor(Math.random() * bands)
+          const bandBase = minOrbit + bandStep * band
+          const ringBias = Math.pow(Math.random(), 0.67)
+          orbit = bandBase + (ringBias - 0.5) * bandStep * 0.88
+        }
         particles.push({
           orbit,
           angle: Math.random() * Math.PI * 2,
-          speed: Math.random() * 0.001 + 0.00024,
-          radius: Math.random() * 0.82 + 0.58,
-          alpha: Math.random() * 0.34 + 0.43,
+          speed: ambient ? Math.random() * 0.0005 + 0.00014 : Math.random() * 0.001 + 0.00024,
+          radius: ambient ? Math.random() * 0.44 + 0.34 : Math.random() * 0.82 + 0.58,
+          alpha: ambient ? Math.random() * 0.28 + 0.3 : Math.random() * 0.34 + 0.43,
           color,
-          jitter: (Math.random() - 0.5) * 12,
-          wobbleAmp: Math.random() * 5.4 + 1.2,
-          wobbleSpeed: Math.random() * 0.009 + 0.002,
+          jitter: (Math.random() - 0.5) * (ambient ? 7 : 12),
+          wobbleAmp: ambient ? Math.random() * 3 + 0.8 : Math.random() * 5.4 + 1.2,
+          wobbleSpeed: ambient ? Math.random() * 0.005 + 0.0014 : Math.random() * 0.009 + 0.002,
           wobblePhase: Math.random() * Math.PI * 2,
-          eccentricity: Math.random() * 0.24 - 0.06,
+          eccentricity: ambient ? Math.random() * 0.2 - 0.05 : Math.random() * 0.24 - 0.06,
+          ambient,
+          twinkleSpeed: Math.random() * 2.2 + 1.6,
+          twinklePhase: Math.random() * Math.PI * 2,
+          flashStrength,
         })
       }
     }
@@ -136,11 +155,26 @@ function QuantumParticleCanvas() {
     }
 
     const draw = () => {
+      const nowMs = performance.now()
       ctx.clearRect(0, 0, width, height)
-      const now = performance.now() * 0.001
-      const cx = width * 0.5 + (pointer.active ? (pointer.x - width * 0.5) * 0.04 : 0)
-      const cy = height * 0.45 + (pointer.active ? (pointer.y - height * 0.45) * 0.04 : 0)
+      const now = nowMs * 0.001
+      // Keep the star field anchored; pointer should not drag the whole cluster.
+      const cx = width * 0.5
+      const cy = height * 0.45
       const positions: Array<{ x: number; y: number; alpha: number; color: string }> = []
+      const hostRect = host.getBoundingClientRect()
+      const tokenRects = Array.from(host.querySelectorAll<HTMLElement>('.hero-reflect-token')).map((node) => {
+        const r = node.getBoundingClientRect()
+        return {
+          node,
+          left: r.left - hostRect.left,
+          top: r.top - hostRect.top,
+          right: r.right - hostRect.left,
+          bottom: r.bottom - hostRect.top,
+          width: r.width,
+          height: r.height,
+        }
+      })
 
       const base = ctx.createLinearGradient(0, 0, 0, height)
       base.addColorStop(0, '#030712')
@@ -204,7 +238,14 @@ function QuantumParticleCanvas() {
         const titleNorm = Math.sqrt(((x - tx) / trX) ** 2 + ((y - ty) / trY) ** 2)
         const titleWeight = titleNorm < 1 ? 0.28 + titleNorm * 0.72 : 1
         const pulse = 0.78 + Math.sin(now * 1.7 + p.wobblePhase * 2.3) * 0.22
-        const particleAlpha = Math.min(1, p.alpha * centerWeight * titleWeight * 1.18 * pulse)
+        const twinkleBase = 0.9 + Math.sin(now * p.twinkleSpeed + p.twinklePhase) * 0.1
+        const flashWave = Math.max(0, Math.sin(now * (p.twinkleSpeed * 1.8) + p.twinklePhase * 1.4))
+        const flashBoost = p.flashStrength * Math.pow(flashWave, 16)
+        const twinkle = twinkleBase + flashBoost
+        const weightedAlpha = p.ambient
+          ? p.alpha * Math.max(0.66, centerWeight * 0.98) * Math.max(0.88, titleWeight) * 1.15 * pulse * twinkle
+          : p.alpha * centerWeight * titleWeight * 1.18 * pulse * twinkle
+        const particleAlpha = Math.min(1, weightedAlpha)
 
         const sprite =
           p.color === '59,130,246' ? blueSprite : p.color === '94,234,212' ? mintSprite : starSprite
@@ -265,6 +306,41 @@ function QuantumParticleCanvas() {
         ctx.moveTo(m.x, m.y)
         ctx.lineTo(tailX, tailY)
         ctx.stroke()
+
+        // Trigger text impact highlight only when meteor head intersects a token area.
+        for (let t = 0; t < tokenRects.length; t += 1) {
+          const token = tokenRects[t]
+          const pad = 10
+          if (
+            m.x < token.left - pad ||
+            m.x > token.right + pad ||
+            m.y < token.top - pad ||
+            m.y > token.bottom + pad
+          ) {
+            continue
+          }
+
+          const last = impactCooldown.get(token.node) ?? 0
+          if (nowMs - last < 220) continue
+          impactCooldown.set(token.node, nowMs)
+
+          const impactPct = Math.max(0, Math.min(100, ((m.x - token.left) / Math.max(1, token.width)) * 100))
+          const impactYPct = Math.max(0, Math.min(100, ((m.y - token.top) / Math.max(1, token.height)) * 100))
+          token.node.style.setProperty('--impact-x', `${impactPct}%`)
+          token.node.style.setProperty('--impact-y', `${impactYPct}%`)
+          token.node.classList.remove('is-impact')
+          void token.node.offsetWidth
+          token.node.classList.add('is-impact')
+
+          const prevTimer = impactTimers.get(token.node)
+          if (prevTimer) {
+            window.clearTimeout(prevTimer)
+          }
+          const timer = window.setTimeout(() => {
+            token.node.classList.remove('is-impact')
+          }, 260)
+          impactTimers.set(token.node, timer)
+        }
       }
 
       // Smooth pointer interpolation to avoid jitter from raw pointer events.
@@ -387,6 +463,13 @@ function QuantumParticleCanvas() {
       window.removeEventListener('resize', resize)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerleave', onLeave)
+      const tokenNodes = Array.from(host.querySelectorAll<HTMLElement>('.hero-reflect-token'))
+      for (let i = 0; i < tokenNodes.length; i += 1) {
+        const node = tokenNodes[i]
+        const timer = impactTimers.get(node)
+        if (timer) window.clearTimeout(timer)
+        node.classList.remove('is-impact')
+      }
     }
   }, [])
 
@@ -737,26 +820,18 @@ function ROICalculator() {
   const failureShare = 0.25
   const performanceStdDev = useMemo(() => salary * sdYRatio, [salary, sdYRatio])
 
-  const baselineUtility = useMemo(() => {
-    return hires * tenureYears * validityBaseline * performanceStdDev * selectedZScore
-  }, [hires, tenureYears, validityBaseline, performanceStdDev, selectedZScore])
-
-  const astraUtility = useMemo(() => {
-    return hires * tenureYears * validityAstra * performanceStdDev * selectedZScore
-  }, [hires, tenureYears, validityAstra, performanceStdDev, selectedZScore])
-
-  const grossUtility = useMemo(() => {
-    return astraUtility - baselineUtility
-  }, [astraUtility, baselineUtility])
+  const incrementalUtility = useMemo(() => {
+    return hires * tenureYears * (validityAstra - validityBaseline) * performanceStdDev * selectedZScore
+  }, [hires, tenureYears, validityAstra, validityBaseline, performanceStdDev, selectedZScore])
 
   // Decompose incremental utility for readability.
-  const failureReduction = useMemo(() => grossUtility * failureShare, [grossUtility, failureShare])
-  const productivityGain = useMemo(() => grossUtility * (1 - failureShare), [grossUtility, failureShare])
+  const failureReduction = useMemo(() => incrementalUtility * failureShare, [incrementalUtility, failureShare])
+  const productivityGain = useMemo(() => incrementalUtility * (1 - failureShare), [incrementalUtility, failureShare])
   const totalCost = useMemo(() => hires * costPerHire, [hires, costPerHire])
 
   const estimatedBenefit = useMemo(() => {
-    return grossUtility - totalCost
-  }, [grossUtility, totalCost])
+    return incrementalUtility
+  }, [incrementalUtility])
 
   const formatManwonToKrw = (value: number) => {
     const rounded = Math.round(value)
@@ -872,17 +947,16 @@ function ROICalculator() {
             </div>
 
             <p className="mt-6 text-xs leading-relaxed text-[color:var(--astra-text-muted)]">
-              본 ROI 분석 결과는 인사 심리학의 세계적 권위자인 Schmidt &amp; Oh(2016) 및 Sackett et al.(2022)의 메타 분석 연구 데이터를 기반으로 산출되었으며, 기업의 실질적인 채용 실패 비용 절감 및 성과 향상 가치를 정량화한 수치입니다.
+              산정 근거: Schmidt, F. L., & Hunter, J. E. (1998) 및 Utility Analysis(BCG) 프레임을 단순화 적용
               <br />
-              자세한 내용은 상담 문의 주시면 도와드리겠습니다.
-              <span className="mt-1 block text-[11px] opacity-60">
-                출처를 기입해주세요.
-              </span>
+              본 시뮬레이션 결과는 총편익(증분 효용) 기준이며 비용 차감 전 추정치입니다.
+              <br />
+              자세한 추정액은 상담에서 도와드리겠습니다.
             </p>
           </div>
 
           <div className="rounded-2xl border border-white/10 bg-[#0b1428]/50 p-8 md:p-12">
-            <p className="text-sm text-slate-300">예상 연간 이익</p>
+            <p className="text-sm text-slate-300">총편익 (증분 효용, ΔU)</p>
             <p className="mt-4 break-keep text-[clamp(1.95rem,9.2vw,3.75rem)] font-extrabold leading-[1.05] tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400 [font-variant-numeric:tabular-nums]">
               {formatManwonToKrw(displayValue)}
             </p>
@@ -895,7 +969,7 @@ function ROICalculator() {
                 📈 생산성 증대: <span className="font-semibold">{formatManwonToKrw(productivityGain).replace(' 원', '')}</span>
               </p>
               <p className="text-sm text-rose-300">
-                💸 비용 차감: <span className="font-semibold">{formatManwonToKrw(totalCost).replace(' 원', '')}</span>
+                💸 예상 비용(참고): <span className="font-semibold">{formatManwonToKrw(totalCost).replace(' 원', '')}</span>
               </p>
             </div>
           </div>
@@ -1209,12 +1283,13 @@ function SocialProof() {
 }
 
 export default function Page() {
-  const heroVariants = {
+  const heroEase = [0.22, 1, 0.36, 1] as const
+  const heroVariants: Variants = {
     hidden: { opacity: 0, y: 28 },
     visible: (delay: number) => ({
       opacity: 1,
       y: 0,
-      transition: { duration: 0.65, ease: 'easeOut', delay },
+      transition: { duration: 0.65, ease: heroEase, delay },
     }),
   }
 
@@ -1242,18 +1317,19 @@ export default function Page() {
               variants={heroVariants}
               initial="hidden"
               animate="visible"
-              className="text-balance text-3xl font-extrabold leading-[1.08] tracking-[-0.02em] sm:text-4xl md:text-5xl lg:text-6xl"
+              className="text-balance text-3xl font-extrabold leading-[1.14] tracking-[-0.02em] sm:text-4xl md:text-5xl lg:text-6xl"
             >
               <span className="block">
                 <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">고성과자의 </span>
-                <span style={{ color: ELECTRIC_BLUE }}>DNA</span>,
+                <span className="hero-reflect-token hero-reflect-token--a" data-text="DNA">DNA</span>,
               </span>
-              <span aria-hidden className="block h-2" />
+              <span aria-hidden className="block h-3" />
               <span className="block">
-                <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">AI가 </span>
-                <span style={{ color: ELECTRIC_BLUE }}>3초</span>
+                <span className="hero-reflect-token hero-reflect-token--b" data-text="AI">AI</span>
+                <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">가 </span>
+                <span className="hero-reflect-token hero-reflect-token--c" data-text="3초">3초</span>
                 <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent"> 만에 </span>
-                <span style={{ color: ELECTRIC_BLUE }}>시각화</span>
+                <span className="hero-reflect-token" data-text="시각화">시각화</span>
                 <span className="bg-gradient-to-b from-white to-gray-200 bg-clip-text text-transparent">합니다.</span>
               </span>
             </motion.h1>
@@ -1297,6 +1373,163 @@ export default function Page() {
       <ROICalculator />
       <LiveAIDashboardSection />
       <SocialProof />
+      <style jsx global>{`
+        .hero-reflect-token {
+          position: relative;
+          display: inline-block;
+          color: transparent;
+          background-image:
+            linear-gradient(
+              94deg,
+              rgba(64, 145, 250, 0.9) 0%,
+              rgba(88, 165, 255, 0.95) 48%,
+              rgba(60, 141, 248, 0.9) 100%
+            ),
+            linear-gradient(
+              132deg,
+              rgba(255, 255, 255, 0.2) 8%,
+              rgba(255, 255, 255, 0.03) 34%,
+              rgba(214, 236, 255, 0.2) 52%,
+              rgba(255, 255, 255, 0.02) 78%,
+              rgba(196, 226, 255, 0.16) 100%
+            );
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-stroke: 0.26px rgba(222, 240, 255, 0.4);
+          filter: brightness(1.08) contrast(1.04) saturate(1.05);
+          text-shadow: 0 1px 0 rgba(9, 20, 38, 0.14);
+          --impact-x: 50%;
+          --impact-y: 50%;
+          animation: hero-token-base 6.6s ease-in-out infinite;
+        }
+
+        .hero-reflect-token::after {
+          content: attr(data-text);
+          position: absolute;
+          inset: 0;
+          color: transparent;
+          background-image:
+            radial-gradient(
+              ellipse at var(--impact-x) var(--impact-y),
+              rgba(255, 255, 255, 0.98) 0 8%,
+              rgba(233, 247, 255, 0.78) 13%,
+              rgba(233, 247, 255, 0.22) 22%,
+              rgba(255, 255, 255, 0) 34%
+            ),
+            linear-gradient(
+              126deg,
+              rgba(255, 255, 255, 0) 44%,
+              rgba(255, 255, 255, 0.82) 50%,
+              rgba(255, 255, 255, 0) 56%
+            );
+          background-size: 100% 100%, 38% 38%;
+          background-position: center, var(--impact-x) var(--impact-y);
+          background-repeat: no-repeat, no-repeat;
+          -webkit-background-clip: text;
+          background-clip: text;
+          mix-blend-mode: screen;
+          filter: blur(0.08px);
+          pointer-events: none;
+          opacity: 0;
+          transform: scale(0.94);
+        }
+
+        .hero-reflect-token::before {
+          content: attr(data-text);
+          position: absolute;
+          inset: 0;
+          color: transparent;
+          background-image: radial-gradient(
+            circle at var(--impact-x) var(--impact-y),
+            rgba(255, 255, 255, 0.86) 0 3.5%,
+            rgba(226, 243, 255, 0.58) 9%,
+            rgba(212, 236, 255, 0.18) 16%,
+            rgba(212, 236, 255, 0) 30%
+          );
+          background-size: 100% 100%;
+          background-position: center;
+          background-repeat: no-repeat;
+          -webkit-background-clip: text;
+          background-clip: text;
+          mix-blend-mode: screen;
+          filter: blur(0.6px);
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .hero-reflect-token.is-impact::after {
+          animation: hero-token-impact-beam 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .hero-reflect-token.is-impact::before {
+          animation: hero-token-impact-fracture 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        .hero-reflect-token.is-impact {
+          animation: hero-token-base 6.6s ease-in-out infinite, hero-token-impact-core 260ms ease-out;
+        }
+
+        @keyframes hero-token-impact-beam {
+          0% {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          34% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(1.04);
+          }
+        }
+
+        @keyframes hero-token-impact-fracture {
+          0% {
+            opacity: 0;
+            transform: scale(0.98);
+          }
+          42% {
+            opacity: 0.72;
+            transform: scale(1);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(1.01);
+          }
+        }
+
+        @keyframes hero-token-impact-core {
+          0% {
+            filter: brightness(1.08) contrast(1.04) saturate(1.05);
+          }
+          40% {
+            filter: brightness(1.28) contrast(1.13) saturate(1.15);
+          }
+          100% {
+            filter: brightness(1.08) contrast(1.04) saturate(1.05);
+          }
+        }
+
+        @keyframes hero-token-base {
+          0%,
+          100% {
+            filter: brightness(1.07) saturate(1.04) contrast(1.04);
+          }
+          82% {
+            filter: brightness(1.14) saturate(1.08) contrast(1.08);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .hero-reflect-token {
+            -webkit-text-stroke: 0.22px rgba(235, 246, 255, 0.36);
+          }
+          .hero-reflect-token::before {
+            filter: blur(0.58px);
+          }
+        }
+      `}</style>
     </div>
   )
 }
