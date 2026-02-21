@@ -688,7 +688,7 @@ function FeatureFlow() {
       desc: (
         <>
           비싼 컨설팅 없이, 고성과자 데이터와 어세스타의 검증된 DB를 결합하여{' '}
-          <span className="font-semibold text-blue-200">��� 3일 만에</span> 최적화된 역량 모델을
+          <span className="font-semibold text-blue-200">단 3일 만에</span> 최적화된 역량 모델을
           구축합니다.
         </>
       ),
