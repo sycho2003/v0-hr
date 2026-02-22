@@ -1,5 +1,5 @@
 @import url('https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css');
-@import './styles/tokens.css';
+@import '../styles/tokens.css';
 
 @tailwind base;
 @tailwind components;
@@ -13,11 +13,14 @@
 
 @layer components {
   .title-group__heading {
-    margin-top: 1rem;
+    margin-top: var(--ds-space-4);
+    color: var(--ds-text-primary);
+    letter-spacing: -0.02em;
   }
 
   .title-group__subtitle {
-    margin-top: 1rem;
+    margin-top: var(--ds-space-4);
+    color: var(--ds-text-secondary);
   }
 }
 
@@ -57,7 +60,7 @@
 }
 
 .hr-card-glow-sync {
-  animation: hr-card-glow-sync 1.3s ease-in-out infinite;
+  animation: hr-card-glow-sync 1.3s var(--ds-ease-standard) infinite;
 }
 
 .animate-chip-marquee {

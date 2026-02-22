@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { AnimatePresence, motion, useAnimationControls } from "framer-motion"
 import {
@@ -107,14 +107,24 @@ const consultingTimeline = [
   }),
 ]
 
+const readCssVarNumber = (name: string, fallback: number) => {
+  if (typeof window === "undefined") return fallback
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+  if (!raw) return fallback
+  const parsed = Number.parseFloat(raw.replace("px", ""))
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
 export function CaseStudies() {
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0)
   const [isTestimonialAnimating, setIsTestimonialAnimating] = useState(false)
   const totalTestimonials = testimonials.length
-  const testimonialCardSize = 336
-  const testimonialCardGap = 24
+  const testimonialCardSize = readCssVarNumber("--ds-cases-card-size", 336)
+  const testimonialCardGap = readCssVarNumber("--ds-cases-card-gap", 24)
   const testimonialStep = testimonialCardSize + testimonialCardGap
   const testimonialCenterX = 0
+  const testimonialMotionDuration =
+    readCssVarNumber("--ds-motion-carousel-step-ms", 620) / 1000
   const testimonialTrackControls = useAnimationControls()
   const activeTestimonialIndexRef = useRef(0)
   const targetTestimonialIndexRef = useRef<number | null>(null)
@@ -134,7 +144,7 @@ export function CaseStudies() {
     setIsTestimonialAnimating(true)
     await testimonialTrackControls.start({
       x: direction > 0 ? -testimonialStep : testimonialStep,
-      transition: { duration: 0.62, ease: [0.22, 0.61, 0.36, 1] },
+      transition: { duration: testimonialMotionDuration, ease: [0.22, 0.61, 0.36, 1] },
     })
     const next = wrapIndex(activeTestimonialIndexRef.current + direction)
     activeTestimonialIndexRef.current = next
@@ -197,10 +207,10 @@ export function CaseStudies() {
     return (
       <>
         {/* Previous-2 (left outer blurred buffer card) */}
-        <div className="hidden w-[336px] shrink-0 select-none md:block">
+        <div className="hidden shrink-0 select-none md:block" style={{ width: testimonialCardSize }}>
           <div
-            className="h-full min-h-[336px] w-[336px] rounded-2xl border border-white/10 bg-neutral-900 p-8"
-            style={{ filter: "blur(2.2px)", opacity: 0.72 }}
+            className="h-full rounded-2xl border border-white/10 bg-neutral-900 p-8"
+            style={{ minHeight: testimonialCardSize, width: testimonialCardSize, filter: "blur(2.2px)", opacity: 0.72 }}
             aria-hidden="true"
           >
             <TestimonialCardContent testimonial={testimonials[prev2Index]} />
@@ -208,10 +218,10 @@ export function CaseStudies() {
         </div>
 
         {/* Previous (left blurred card) */}
-        <div className="hidden w-[336px] shrink-0 select-none md:block">
+        <div className="hidden shrink-0 select-none md:block" style={{ width: testimonialCardSize }}>
           <div
-            className="h-full min-h-[336px] w-[336px] rounded-2xl border border-white/10 bg-neutral-900 p-8"
-            style={{ filter: "blur(1.45px)", opacity: 0.84 }}
+            className="h-full rounded-2xl border border-white/10 bg-neutral-900 p-8"
+            style={{ minHeight: testimonialCardSize, width: testimonialCardSize, filter: "blur(1.45px)", opacity: 0.84 }}
             aria-hidden="true"
           >
             <TestimonialCardContent testimonial={testimonials[prevIndex]} />
@@ -219,17 +229,17 @@ export function CaseStudies() {
         </div>
 
         {/* Center (active card) */}
-        <div className="w-[min(336px,88vw)] shrink-0 md:w-[336px]">
-          <div className="h-full min-h-[336px] w-full rounded-2xl border border-white/10 bg-neutral-900 p-8">
+        <div className="w-[min(336px,88vw)] shrink-0 md:w-[336px]" style={{ width: `min(${testimonialCardSize}px, 88vw)` }}>
+          <div className="h-full w-full rounded-2xl border border-white/10 bg-neutral-900 p-8" style={{ minHeight: testimonialCardSize }}>
             <TestimonialCardContent testimonial={testimonials[centerIndex]} />
           </div>
         </div>
 
         {/* Next (right blurred card) */}
-        <div className="hidden w-[336px] shrink-0 select-none md:block">
+        <div className="hidden shrink-0 select-none md:block" style={{ width: testimonialCardSize }}>
           <div
-            className="h-full min-h-[336px] w-[336px] rounded-2xl border border-white/10 bg-neutral-900 p-8"
-            style={{ filter: "blur(1.45px)", opacity: 0.84 }}
+            className="h-full rounded-2xl border border-white/10 bg-neutral-900 p-8"
+            style={{ minHeight: testimonialCardSize, width: testimonialCardSize, filter: "blur(1.45px)", opacity: 0.84 }}
             aria-hidden="true"
           >
             <TestimonialCardContent testimonial={testimonials[nextIndex]} />
@@ -237,10 +247,10 @@ export function CaseStudies() {
         </div>
 
         {/* Next-2 (right outer blurred buffer card) */}
-        <div className="hidden w-[336px] shrink-0 select-none md:block">
+        <div className="hidden shrink-0 select-none md:block" style={{ width: testimonialCardSize }}>
           <div
-            className="h-full min-h-[336px] w-[336px] rounded-2xl border border-white/10 bg-neutral-900 p-8"
-            style={{ filter: "blur(2.2px)", opacity: 0.72 }}
+            className="h-full rounded-2xl border border-white/10 bg-neutral-900 p-8"
+            style={{ minHeight: testimonialCardSize, width: testimonialCardSize, filter: "blur(2.2px)", opacity: 0.72 }}
             aria-hidden="true"
           >
             <TestimonialCardContent testimonial={testimonials[next2Index]} />
@@ -343,7 +353,7 @@ export function CaseStudies() {
 
           {/* Carousel with blurred side cards */}
           <div className="relative mt-12 overflow-hidden">
-            <div className="relative h-[336px]">
+            <div className="relative" style={{ height: testimonialCardSize }}>
               <motion.div
                 animate={testimonialTrackControls}
                 className="absolute inset-0 will-change-transform flex items-stretch justify-center gap-6"
@@ -353,8 +363,8 @@ export function CaseStudies() {
             </div>
 
             {/* Left/right fade masks */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-20 bg-gradient-to-r from-neutral-950 to-transparent md:block" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-20 bg-gradient-to-l from-neutral-950 to-transparent md:block" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-[var(--ds-cases-side-fade-width)] bg-gradient-to-r from-neutral-950 to-transparent md:block" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-[var(--ds-cases-side-fade-width)] bg-gradient-to-l from-neutral-950 to-transparent md:block" />
           </div>
 
           {/* Navigation */}
@@ -436,6 +446,10 @@ function TestimonialCardContent({
 /* ------------------------------------------------------------------ */
 
 function ConsultingTimeline() {
+  const timelineDetailMotionDuration =
+    readCssVarNumber("--ds-motion-timeline-detail-ms", 280) / 1000
+  const wheelThreshold = readCssVarNumber("--ds-cases-wheel-threshold", 5)
+  const wheelGestureResetMs = readCssVarNumber("--ds-cases-wheel-gesture-reset-ms", 140)
   const [activeYear, setActiveYear] = useState<string>(consultingTimeline[0].year)
   const [edgePad, setEdgePad] = useState(0)
   const [lineRange, setLineRange] = useState({ start: 84, end: 84 })
@@ -594,7 +608,7 @@ function ConsultingTimeline() {
       wheelGestureResetTimerRef.current = setTimeout(() => {
         wheelStepConsumedRef.current = false
         wheelGestureResetTimerRef.current = null
-      }, 140)
+      }, wheelGestureResetMs)
     }
 
     const handleWheel = (event: WheelEvent) => {
@@ -607,7 +621,7 @@ function ConsultingTimeline() {
             : 1
       // Use vertical wheel intent only; trackpad horizontal jitter can flip direction.
       const dominantDelta = event.deltaY * unit
-      if (Math.abs(dominantDelta) < 5) return
+      if (Math.abs(dominantDelta) < wheelThreshold) return
       armWheelGestureReset()
       if (wheelStepConsumedRef.current) return
       wheelStepConsumedRef.current = true
@@ -625,7 +639,7 @@ function ConsultingTimeline() {
     <section className="bg-neutral-950 py-16 lg:py-24">
       <div className="mx-auto w-full px-6 md:px-20 xl:px-[120px]">
         <div className="mb-14 md:mb-16">
-          <p className="text-brand-primary text-xs font-semibold tracking-[0.22em] uppercase">
+          <p className="ds-eyebrow text-brand-primary text-xs font-semibold tracking-[0.22em] uppercase">
             Since 2005
           </p>
           <h3 className="title-group__heading mt-3 text-balance text-3xl font-extrabold tracking-tight text-white md:text-4xl">
@@ -644,17 +658,17 @@ function ConsultingTimeline() {
           className="w-full pb-16 md:pb-20"
         >
           <div className="relative">
-            <div className="pointer-events-none absolute left-0 top-0 z-20 h-[128px] w-[60px] bg-gradient-to-r from-neutral-950 to-transparent" />
-            <div className="pointer-events-none absolute right-0 top-0 z-20 h-[128px] w-[60px] bg-gradient-to-l from-neutral-950 to-transparent" />
+            <div className="pointer-events-none absolute left-0 top-0 z-20 h-[var(--ds-cases-timeline-mask-height)] w-[var(--ds-cases-timeline-mask-width)] bg-gradient-to-r from-neutral-950 to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 z-20 h-[var(--ds-cases-timeline-mask-height)] w-[var(--ds-cases-timeline-mask-width)] bg-gradient-to-l from-neutral-950 to-transparent" />
 
             <div ref={railRef} className="touch-pan-y overflow-x-hidden pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <ul
                 ref={railListRef}
                 style={{ paddingLeft: edgePad, paddingRight: edgePad }}
-                className="relative grid min-w-max grid-flow-col auto-cols-[168px] gap-2 md:auto-cols-[176px] lg:auto-cols-[184px] lg:gap-3"
+                className="relative grid min-w-max grid-flow-col auto-cols-[var(--ds-cases-timeline-col-sm)] gap-2 md:auto-cols-[var(--ds-cases-timeline-col-md)] lg:auto-cols-[var(--ds-cases-timeline-col-lg)] lg:gap-3"
               >
                 <span
-                  className="pointer-events-none absolute top-[74px] z-0 h-[2px] bg-gradient-to-r from-[#5f7394] via-[#4a5b76] to-[#36445d]"
+                  className="pointer-events-none absolute top-[var(--ds-cases-timeline-line-top)] z-0 h-[2px] bg-gradient-to-r from-[#5f7394] via-[#4a5b76] to-[#36445d]"
                   style={{
                     left: lineRange.start,
                     width: Math.max(0, lineRange.end - lineRange.start),
@@ -716,7 +730,7 @@ function ConsultingTimeline() {
                               initial={{ opacity: 0, y: 14 }}
                               animate={{ opacity: 1, y: 0 }}
                               exit={{ opacity: 0, y: -8 }}
-                              transition={{ duration: 0.28, ease: "easeOut" }}
+                              transition={{ duration: timelineDetailMotionDuration, ease: "easeOut" }}
                               className="mt-5 min-w-max space-y-2 text-center"
                             >
                               {entry.history.map((item, idx) => (
