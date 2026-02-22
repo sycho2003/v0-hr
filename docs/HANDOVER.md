@@ -244,8 +244,13 @@
 - `next.config.mjs`에서 `typescript.ignoreBuildErrors: true`
   - 빌드 시 타입 오류 통과 가능
 - `components/case-studies.tsx` 단일 파일 책임 과다
-- `components/inquiry-form.tsx` 미사용 상태(중복 관리 위험)
-- 하드코딩 콘텐츠 다수
+- `components/inquiry-form.tsx`
+  - 현재 `/inquiry`에서 import 사용 중
+  - 향후 서버 연동 시 폼 제출 로직(저장/API 에러 처리) 추가 필요
+- 9-4. 하드코딩 콘텐츠 다수 (상태 업데이트)
+  - 1차 조치 완료: 콘텐츠를 `content/` 폴더로 분리해 import하는 구조로 전환
+  - 적용 파일: `content/cases.ts`, `content/research.ts`, `content/research-featured.ts`, `content/education.ts`, `content/solutions.ts`, `content/inquiry.ts`
+  - 잔여 과제: 랜딩(`app/HomePageView.tsx`)의 일부 카피/섹션 데이터는 여전히 컴포넌트 내부에 있어 2차 분리 필요
 
 ---
 
